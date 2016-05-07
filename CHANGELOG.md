@@ -1,6 +1,91 @@
 Changelog
 =========
 
+3.0.0-alpha.0
+-------------
+
+### Improvements
+* Migrated to Fractal Project Structure, huge thanks to [justingreenberg](https://github.com/justingreenberg). See https://github.com/davezuko/react-redux-starter-kit/pull/684 for details and discussion.
+
+2.0.0
+-----
+
+### Features
+* Upgraded `eslint-plugin-react` to `^5.0.0`
+* Upgraded `fs-extra` to `^0.28.0`
+
+### Improvements
+* Updated syntax used for `createStore` to match `redux@^3.1.0`
+* Cleaned up `connect` decorator in `HomeView`
+* Cleaned up flow types in `HomeView`
+
+2.0.0-alpha.5
+-------------
+
+### Features
+* Upgraded `flow-bin` to `0.23.0`
+* Upgraded `fs-extra` to `^0.27.0`
+
+### Improvements
+* Minor cleanup in Karma configuration
+* Added missing node-style index files in blueprints
+
+### Fixes
+* Modified webpack manifest initialization to prevent syntax errors in some environments (https://github.com/davezuko/react-redux-starter-kit/issues/572)
+
+2.0.0-alpha.4
+-------------
+
+### Features
+* Upgraded `react` to `^15.0.0`
+* Upgraded `react-dom` to `^15.0.0`
+* Upgraded `react-addons-test-utils` to `^15.0.0`
+* Upgraded `eslint-plugin-flow-vars` to `^0.3.0`
+
+### Improvements
+* Updated `npm run deploy` to be environment agnostic (no longer forces `production`)
+* Added `npm run deploy:prod` (forces `production`, acts as old `npm run deploy`)
+* Added `npm run deploy:dev` (forces `development`)
+
+### Fixes
+* Removed `strip_root` option in Flow to support Nuclide
+* Updated webpack development configuration to use correct `public_path`
+
+
+2.0.0-alpha.3
+-------------
+
+### Features
+* Upgraded `flow-interfaces` to `^0.6.0`
+
+### Improvements
+* Moved dependencies needed for production builds from devDependencies to regular dependencies
+
+### Fixes
+* Production configuration now generates assets with absolute rather than relative paths
+
+### Deprecations
+* Removed `eslint-loader` for performance reasons
+
+2.0.0-alpha.2
+-------------
+
+### Features
+* Upgraded `eslint` to `^2.4.0`
+* Upgraded `babel-eslint` to `^6.0.0-beta.6`
+* Upgraded `better-npm-run` to `0.0.8`
+* Upgraded `phantomjs-polyfill` to `0.0.2`
+* Upgraded `karma-mocha-reporter` to `^2.0.0`
+* Upgraded `webpack` to `^1.12.14`
+* Upgraded `redux-thunk` to `^2.0.0`
+
+### Improvements
+* Added `index.js` files for blueprints for convenient imports
+
+### Fixes
+* Removed some `cssnano` options that caused potential conflicts with css modules
+* Updated flow to understand global webpack definitions
+
 2.0.0-alpha.1
 -------------
 
