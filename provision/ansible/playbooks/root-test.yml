@@ -1,0 +1,18 @@
+---
+- hosts: react-dev
+  sudo: true
+
+  vars_files:
+    - vars/main.yml
+    - [ "vars/{{ ansible_virtualization_type }}-passwords.yml", "vars/vaulted-passwords.yml" ]
+
+  pre_tasks:
+  - name: VM type?
+    debug: msg="VM type vars = vars/{{ ansible_virtualization_type }}-passwords.yml"
+
+  - debug: msg="zoneeditPassword = {{ vaulted_zoneedit_password }}"
+
+  roles:
+    - { role: system, subDomain: react, zoneeditPassword: "{{ vaulted_zoneedit_password }}" }
+
+  post_tasks:

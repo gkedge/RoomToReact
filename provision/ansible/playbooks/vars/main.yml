@@ -1,0 +1,64 @@
+---
+
+zoneeditPassword: "{{ vaulted_zoneedit_password }}"
+timezone: America/New_York
+subDomain: react
+
+download_dir: /tmp
+firewall_allowed_tcp_ports:
+  - "22"
+  - "80"
+  - "8080"
+  - "9990"
+
+firewall_forwarded_tcp_ports:
+  - { src: "80", dest: "8080" }
+
+#vhost_root: http://react-rest.dev:8080
+vhost_root: http://react.emeraldpoolsolutions.com:8080
+
+nginx_remove_default_vhost: true
+
+nginx_vhosts:
+  - listen: "80 default_server" # default: "80 default_server"
+    server_name: "{{subDomain}}.{{domain}}.com" # default: N/A
+    root: "/var/www/{{subDomain}}.{{domain}}.com" # default: N/A
+    index: "index.html index.htm" # default: "index.html index.htm"
+    extra_parameters: |
+      location ~* \.(?:manifest|appcache|html?|xml|json)$ {
+          expires -1;
+          # access_log logs/static.log; # I don't usually include a static log
+      }
+  
+      location ~* \.(?:css|js)$ {
+          expires 1y;
+          access_log off;
+          add_header Cache-Control "public";
+      }
+  
+      location / {
+          try_files $uri $uri/ =404;
+      }
+
+      location /tiffscaledpng {
+        proxy_pass "{{vhost_root}}/tiff-to-scaled-png-app/tiffscaledpng";
+      }
+
+nodejs_version: "5.x"
+
+node_modules:
+#  - gulp
+#  - bower
+#  - babel-core
+#  - babel
+#  - gulp
+#  - gulp-util
+#  - gulp-jslint
+#  - lint
+#  - gulp-jshint
+#  - gulp-load-plugins
+#  - gulp-uglify
+#  - wiredep
+#  - del
+#  - require
+  - yo

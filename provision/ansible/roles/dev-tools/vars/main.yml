@@ -1,0 +1,10 @@
+---
+dev_tools:
+  - npm
+  - mlocate
+  - yum-utils
+  - bzip2
+  - bzip2-devel
+  - wget
+  - curl
+  - tar

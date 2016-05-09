@@ -141,6 +141,7 @@
     "karma-mocha": "^1.0.1",
     "karma-mocha-reporter": "^2.0.0",
     "karma-phantomjs-launcher": "^1.0.0",
+    "karma-slimerjs-launcher": "^1.0.0",
     "karma-webpack-with-fast-source-maps": "^1.9.2",
     "mocha": "^2.2.5",
     "nodemon": "^1.8.1",
@@ -150,6 +151,7 @@
     "redbox-react": "^1.2.2",
     "sinon": "^1.17.3",
     "sinon-chai": "^2.8.0",
+    "slimerjs": "^0.906.1",
     "webpack-dev-middleware": "^1.6.1",
     "webpack-hot-middleware": "^2.6.0"
   }

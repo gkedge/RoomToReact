@@ -1,0 +1,58 @@
+---
+- hosts: all
+  remote_user: deployer
+  become: yes
+
+  vars_files:
+    - vars/main.yml
+#    - vars/vaulted-passwords.yml
+    - [ "vars/{{ ansible_virtualization_type }}-passwords.yml", "vars/vaulted-passwords.yml" ]
+
+  pre_tasks:
+    - debug: msg="VM type = '{{ ansible_virtualization_type }}'"
+
+    - name: ensure github.com is a known host
+      lineinfile:
+        dest: "/home/{{ansible_ssh_user}}/.ssh/known_hosts"
+        create: yes
+        state: present
+        line: "{{ lookup('pipe', 'ssh-keyscan -t rsa github.com') }}"
+        regexp: "^github\\.com"
+
+  roles:
+    - { role: swap }
+    - { role: system, zoneeditPassword: "{{vaulted_zoneedit_password}}" }
+    - { role: geerlingguy.nodejs }
+    - { role: dependent-libs }
+    - { role: dev-tools }
+    - { role: geerlingguy.nginx }
+
+# Todo
+#    - { role: geerlingguy.dotfiles }
+#    - { role: geerlingguy.firewall }
+
+  tasks:
+    - debug: msg="Server = '{{subDomain}}.{{domain}}.com'"
+
+    - name: add deployer to nginx group
+      user: name=deployer groups=nginx append=yes
+
+    - name: Create virtual host root
+      file: path="/var/www/{{subDomain}}.{{domain}}.com" owner=nginx group=nginx state=directory mode="u=wrx,g=wrx,o=wrx"
+
+    - name: Restart nginx.
+      service: name=nginx state=restarted enabled=yes
+
+#    - name: Remove npm packages.
+#      npm: name={{ item }} state=absent global=yes
+#      with_items:
+#        - lint
+#        - gulp-jslint
+
+# Much faster to bring in build-related, gulp 'required' npm packages from the build directory
+# on the guest using an ansible 'command' that references the package.json. See react play...
+# Researve npm globals package installation for package intended to be run on CLI.
+
+    - name: Install npm packages.
+      npm: name='{{ item }}' global=yes state=present
+      with_items: '{{node_modules}}'

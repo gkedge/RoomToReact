@@ -1,0 +1,165 @@
+    # -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+dev_memory = "1024" # MB
+
+$addAuthKey = <<SCRIPT
+cat ~vagrant/.ssh/crisp_vagrant_rsa.pub >> ~vagrant/.ssh/authorized_keys
+SCRIPT
+
+$fixCento6EPEL = <<SCRIPT
+sed -i "s/mirrorlist=https/mirrorlist=http/" /etc/yum.repos.d/epel.repo
+SCRIPT
+
+# Ensure that VMWare Tools recompiles kernel modules
+# when we update the linux images
+$fix_vmware_tools_script = <<SCRIPT
+sed -i.bak 's/answer AUTO_KMODS_ENABLED_ANSWER no/answer AUTO_KMODS_ENABLED_ANSWER yes/g' /etc/vmware-tools/locations
+sed -i 's/answer AUTO_KMODS_ENABLED no/answer AUTO_KMODS_ENABLED yes/g' /etc/vmware-tools/locations
+SCRIPT
+
+# All Vagrant configuration is done below. The "2" in Vagrant.configure
+# configures the configuration version (we support older styles for
+# backwards compatibility). Please don't change it unless you know what
+# you're doing.
+Vagrant.configure(2) do |config|
+
+  # Look to vmware .vmx file for this VM to discover possible values.
+  config.vm.provider :vmware_fusion do |vb|
+    vb.vmx["memsize"] = dev_memory
+    vb.vmx["displayname"] = "react-dev-1"
+  end
+
+  # Dev 0 server.
+  config.vm.define "react-dev" do |reactdev|
+    reactdev.vm.hostname = "react-dev"
+    reactdev.vm.box = "geerlingguy/centos7"
+    reactdev.vm.network :private_network, ip: "192.168.239.144"
+    
+    reactdev.vm.provision 'shell', inline: $fix_vmware_tools_script
+    
+    # Putting public key in authorized_keys has to happen ahead of Ansible provision.
+    reactdev.vm.provision 'file', source: '~/.ssh/tiff-to-scaled-png-vagrant_rsa.pub',
+                           destination: '~/.ssh/tiff-to-scaled-png-vagrant_rsa.pub'
+    
+    reactdev.vm.provision 'shell', inline: $addAuthKey
+    
+    # reactdev.vm.provision "shell", inline: $fixCento6EPEL
+    
+    # reactdev.vm.network "forwarded_port", guest: 8080, host: 8080 # HTTP
+    # reactdev.vm.network "forwarded_port", guest: 8440, host: 8440 # HTTPs
+    # reactdev.vm.network "forwarded_port", guest: 8780, host: 8780 # DEBUG
+
+    # reactdev.vm.synced_folder "./wildfly/wildfly-server-logs", "/opt/wildfly-9.0.1.Final/standalone/log",
+    #    owner: "wildfly", group: "wildfly", create: true
+
+    # reactdev.vm.synced_folder "./wildfly/wildfly-console-logs", "/var/log/wildfly",
+    #    owner: "wildfly", group: "wildfly" # , create: true
+
+    # reactdev.vm.synced_folder "/Users/greg.kedge/Projects/RoomToReact/dist", "/var/www/react.emeraldpoolsolutions.com",
+    #   owner: "nginx", group: "nginx", create: true
+  end
+
+  # Dev 1 server.
+  # config.vm.define "react-dev-1" do |reactdev|
+    # reactdev.vm.hostname = "react-dev-1"
+    # reactdev.vm.box = "geerlingguy/centos7"
+    # reactdev.vm.network :private_network, ip: "192.168.239.145"
+    # reactdev.vm.network "forwarded_port", guest: 8080, host: 8080 # HTTP
+    # reactdev.vm.network "forwarded_port", guest: 8440, host: 8440 # HTTPs
+    # reactdev.vm.network "forwarded_port", guest: 8780, host: 8780 # DEBUG
+
+    # reactdev.vm.synced_folder "./wildfly1/wildfly-server-logs", "/opt/wildfly-9.0.1.Final/standalone/log",
+    #   owner: "wildfly", group: "wildfly", create: true
+
+    # reactdev.vm.synced_folder "./wildfly1/wildfly-console-logs", "/var/log/wildfly",
+    #  owner: "wildfly", group: "wildfly", create: true
+
+    # reactdev.vm.synced_folder "/Users/greg.kedge/Projects/RoomToReact/dist", "/var/www/react.emeraldpoolsolutions.com",
+    #       owner: "nginx", group: "nginx", create: true
+  # end
+
+  config.vm.provision "shell", inline: $fix_vmware_tools_script
+
+  config.vm.provision "file", source: "~/.ssh/crisp_vagrant_rsa.pub",
+     destination: "~/.ssh/crisp_vagrant_rsa.pub"
+
+  config.vm.provision "shell", inline: $addAuthKey
+
+  # config.vm.provision "shell", inline: $fixCento6EPEL
+
+  # The most common configuration options are documented and commented below.
+  # For a complete reference, please see the online documentation at
+  # https://docs.vagrantup.com.
+
+  # Every Vagrant development environment requires a box. You can search for
+  # boxes at https://atlas.hashicorp.com/search.
+  # config.vm.box = "geerlingguy/centos7"
+
+  # Disable automatic box update checking. If you disable this, then
+  # boxes will only be checked for updates when the user runs
+  # `vagrant box outdated`. This is not recommended.
+  # config.vm.box_check_update = false
+
+  # Create a forwarded port mapping which allows access to a specific port
+  # within the machine from a port on the host machine. In the example below,
+  # accessing "localhost:8080" will access port 80 on the guest machine.
+  # config.vm.network "forwarded_port", guest: 80, host: 8080
+
+  # Create a private network, which allows host-only access to the machine
+  # using a specific IP.
+  # config.vm.network "private_network", ip: "192.168.239.154"
+
+  # Create a public network, which generally matched to bridged network.
+  # Bridged networks make the machine appear as another physical device on
+  # your network.
+  # config.vm.network "public_network"
+
+  # Share an additional folder to the guest VM. The first argument is
+  # the path on the host to the actual folder. The second argument is
+  # the path on the guest to mount the folder. And the optional third
+  # argument is a set of non-required options.
+  # config.vm.synced_folder "../data", "/vagrant_data"
+
+  # config.vm.synced_folder "./jboss/jboss-apps", "/usr/local/jboss-apps"
+  # config.vm.synced_folder "./jboss/jboss-logs", "/var/log/jboss"
+  # config.vm.synced_folder "./jboss/jboss-deploy", "/usr/local/jboss-deploy"
+
+  # Provider-specific configuration so you can fine-tune various
+  # backing providers for Vagrant. These expose provider-specific options.
+  # Example for VirtualBox:
+  #
+  # config.vm.provider "virtualbox" do |vb|
+  #   # Display the VirtualBox GUI when booting the machine
+  #   vb.gui = true
+  #
+  #   # Customize the amount of memory on the VM:
+  #   vb.memory = "1024"
+  # end
+  #
+  # View the documentation for the provider you are using for more
+  # information on available options.
+
+  # Define a Vagrant Push strategy for pushing to Atlas. Other push strategies
+  # such as FTP and Heroku are also available. See the documentation at
+  # https://docs.vagrantup.com/v2/push/atlas.html for more information.
+  # config.push.define "atlas" do |push|
+  #   push.app = "YOUR_ATLAS_USERNAME/YOUR_APPLICATION_NAME"
+  # end
+
+  # Enable provisioning with a shell script. Additional provisioners such as
+  # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
+  # documentation for more information about their specific syntax and use.
+  # config.vm.provision "shell", inline: <<-SHELL
+  #   sudo apt-get update
+  #   sudo apt-get install -y apache2
+  # SHELL
+
+  config.vm.provision 'ansible' do |ansible|
+    # ansible.limit = 'react.dev'
+    ansible.playbook = 'vagrant-deploy.yml'
+    ansible.verbose = 'vvvv'
+    ansible.extra_vars = { ansible_ssh_user: 'vagrant' }
+   end
+
+end
