@@ -2,9 +2,9 @@
 - name: install the 'Development tools' package group
   yum: name="@Development tools" state=present
 
-- name: Install yum packages
-  yum: name={{ item }} state=present
-  with_items: "{{dev_tools}}"
+#- name: Install yum packages
+#  yum: name={{ item }} state=present
+#  with_items: "{{dev_tools}}"
     
 - name: Update locate db (/var/lib/mlocate.db)
   command: /usr/bin/updatedb

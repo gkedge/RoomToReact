@@ -32,13 +32,13 @@
 #    - { role: geerlingguy.firewall }
 
   tasks:
-    - debug: msg="Server = '{{subDomain}}.{{domain}}.com'"
+    - debug: msg="Server = '{{subDomain}}.{{domain}}.{{domainExt}}'"
 
     - name: add deployer to nginx group
       user: name=deployer groups=nginx append=yes
 
     - name: Create virtual host root
-      file: path="/var/www/{{subDomain}}.{{domain}}.com" owner=nginx group=nginx state=directory mode="u=wrx,g=wrx,o=wrx"
+      file: path="/var/www/{{subDomain}}.{{domain}}.{{domainExt}}" owner=nginx group=nginx state=directory mode="u=wrx,g=wrx,o=wrx"
 
     - name: Restart nginx.
       service: name=nginx state=restarted enabled=yes
