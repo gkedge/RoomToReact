@@ -1,12 +1,13 @@
 ---
-- hosts: all
+- hosts: react-ui
   remote_user: deployer
   become: yes
 
   vars_files:
     - vars/main.yml
 #    - vars/vaulted-passwords.yml
-    - [ "vars/{{ ansible_virtualization_type }}-passwords.yml", "vars/vaulted-passwords.yml" ]
+    - vars/VMWare-passwords.yml
+#    - [ "vars/{{ ansible_virtualization_type }}-passwords.yml", "vars/vaulted-passwords.yml" ]
 
   pre_tasks:
     - debug: msg="VM type = '{{ ansible_virtualization_type }}'"
@@ -26,6 +27,7 @@
     - { role: dependent-libs }
     - { role: dev-tools }
     - { role: geerlingguy.nginx }
+    - { role: geerlingguy.apache }
 
 # Todo
 #    - { role: geerlingguy.dotfiles }

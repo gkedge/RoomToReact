@@ -18,6 +18,21 @@ firewall_forwarded_tcp_ports:
 
 vhost_root: "http://{{subDomain}}.{{domain}}.{{domainExt}}:80"
 
+apache_listen_port: 8080
+apache_remove_default_vhost: true
+apache_vhosts:
+  # Additional properties: 'serveradmin, serveralias, extra_parameters'.
+  - servername: "{{subDomain}}.{{domain}}.{{domainExt}}"
+    documentroot: "/var/www/{{subDomain}}.{{domain}}.{{domainExt}}"
+    directory_extra: |
+      RewriteEngine on
+      # Don't rewrite files or directories
+      RewriteCond %{REQUEST_FILENAME} -f [OR]
+      RewriteCond %{REQUEST_FILENAME} -d
+      RewriteRule ^ - [L]
+      # Rewrite everything else to index.html to allow html5 state links
+      RewriteRule ^ index.html [L]
+
 nginx_remove_default_vhost: true
 
 nginx_vhosts:
@@ -45,7 +60,7 @@ nginx_vhosts:
       
       # Any route that doesn't have a file extension (e.g. /devices)
       location / {
-          try_files $uri /index.html;
+          try_files $uri $uri/ /index.html;
       }
 
 nodejs_version: "5.x"
