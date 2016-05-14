@@ -11,14 +11,20 @@ firewall_allowed_tcp_ports:
   - "22"
   - "80"
   - "8080"
+  - "8888"
   - "9990"
 
 firewall_forwarded_tcp_ports:
   - { src: "80", dest: "8080" }
 
+wildfly_mgmt_bind_address: "{{ansible_ssh_host}}" 
+wildfly_public_bind_address: "{{ansible_ssh_host}}"
+
+wildfly_alt_dir: wildfly-alt
+
 vhost_root: "http://{{subDomain}}.{{domain}}.{{domainExt}}:80"
 
-apache_listen_port: 8080
+apache_listen_port: 8888
 apache_remove_default_vhost: true
 apache_vhosts:
   # Additional properties: 'serveradmin, serveralias, extra_parameters'.

@@ -21,13 +21,16 @@
         regexp: "^github\\.com"
 
   roles:
-    - { role: swap }
-    - { role: system, zoneeditPassword: "{{vaulted_zoneedit_password}}" }
-    - { role: geerlingguy.nodejs }
-    - { role: dependent-libs }
-    - { role: dev-tools }
-    - { role: geerlingguy.nginx }
-    - { role: geerlingguy.apache }
+#    - { role: swap }
+#    - { role: system, zoneeditPassword: "{{vaulted_zoneedit_password}}" }
+#    - { role: geerlingguy.nodejs }
+#    - { role: dependent-libs }
+#    - { role: dev-tools }
+#    - { role: geerlingguy.nginx }
+#    - { role: geerlingguy.apache }
+#    - { role: wildfly/install }
+    - { role: wildfly/uninstall }
+
 
 # Todo
 #    - { role: geerlingguy.dotfiles }
@@ -58,3 +61,20 @@
     - name: Install npm packages.
       npm: name='{{ item }}' global=yes state=present
       with_items: '{{node_modules}}'
+
+  post_tasks:
+    - debug: msg="wildfly_mgmt_bind_address = {{wildfly_mgmt_bind_address}}"
+  
+    - name: Add wildfly group to sudoers file and validate
+      lineinfile:
+        dest: /etc/sudoers
+        regexp: '^%wildfly'
+        line: '%wildfly ALL=(ALL) NOPASSWD: ALL'
+        state: present
+        validate: "visudo -cf %s"
+    
+    - name: add deployer to wildfly group
+      user: name=deployer groups=wildfly append=yes
+    
+    - name: "Set java environment variables in: /etc/profile.d/java.sh"
+      template: src=etc_profiled_java.sh.j2 dest=/etc/profile.d/java.sh owner=root group=root mode="u=wr,g=r,o=r"

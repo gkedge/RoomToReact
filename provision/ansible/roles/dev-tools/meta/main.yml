@@ -1,4 +1,4 @@
 ---
 dependencies: 
   - role: geerlingguy.repo-epel
-#  - role: geerlingguy.repo-remi
+  - role: geerlingguy.repo-remi
