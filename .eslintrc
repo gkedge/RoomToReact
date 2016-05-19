@@ -1,11 +1,23 @@
 {
   "parser"  : "babel-eslint",
   "extends" : [
+    "eslint:recommended",
     "standard",
     "standard-react"
   ],
   "env"     : {
-    "browser" : true
+    "browser" : true,
+    "node": true,
+    "mocha": true,
+    "phantomjs": true
+  },
+  "parserOptions": {
+    "ecmaVersion": 7,
+    "ecmaFeatures": {
+      "jsx": true,
+      "experimentalObjectRestSpread": true
+    },
+    "sourceType": "module"
   },
   "globals" : {
     "Action"       : false,
@@ -16,7 +28,26 @@
     "__BASENAME__" : false
   },
   "rules": {
-    "semi" : [2, "never"],
-    "max-len": [2, 120, 2]
+    "no-console": 0,
+    "semi": [2, "never"],
+    "new-cap": 0,
+    "strict": 0,
+    "no-underscore-dangle": 0,
+    "no-use-before-define": 0,
+    "no-unused-vars": ["error", { "varsIgnorePattern": "(_decc||_value)" }],
+    "eol-last": 0,
+    "quotes": [0, "single"],
+    "jsx-quotes": 1,
+    "max-len": [2, 120, 2],
+    "react/jsx-no-undef": 1,
+    "react/jsx-no-bind": [0],
+    "react/jsx-uses-react": 1,
+    "react/jsx-uses-vars": 1,
+    "react/no-did-mount-set-state": 1,
+    "react/no-did-update-set-state": 1,
+    "react/no-multi-comp": 1,
+    "react/no-unknown-property": 1,
+    "react/react-in-jsx-scope": 1,
+    "react/self-closing-comp": 1
   }
 }
