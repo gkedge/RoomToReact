@@ -13,12 +13,13 @@ The primary goal of this project is to remain as **unopinionated** as possible. 
 Finally, This project wouldn't be possible without the help of our many contributors, so [thank you](#thank-you) for all of your help.
 
 ## Table of Contents
-1. [Requirements](#requirements)
 1. [Features](#features)
+1. [Requirements](#requirements)
 1. [Getting Started](#getting-started)
 1. [Application Structure](#application-structure)
 1. [Development](#development)
   1. [Developer Tools](#developer-tools)
+  1. [Routing](#routing)
 1. [Testing](#testing)
 1. [Deployment](#deployment)
 1. [Build System](#build-system)
@@ -28,8 +29,8 @@ Finally, This project wouldn't be possible without the help of our many contribu
   1. [Styles](#styles)
   1. [Server](#server)
   1. [Production Optimization](#production-optimization)
-1. [FAQ](#troubleshooting)
 1. [Learning Resources](#learning-resources)
+1. [FAQ](#troubleshooting)
 1. [Thank You](#thank-you)
 
 ## Features
@@ -58,13 +59,17 @@ $ npm install                   # Install project dependencies
 $ npm start                     # Compile and launch
 ```
 
+If everything works, you should see the following:
+
+<img src="http://i.imgur.com/zR7VRG6.png?2" />
+
 While developing, you will probably rely mostly on `npm start`; however, there are additional scripts at your disposal:
 
 |`npm run <script>`|Description|
-|---|---|
-|`start`|Spins up Koa server to serve your app at `localhost:3000`. HMR will be enabled in development.|
+|------------------|-----------|
+|`start`|Serves your app at `localhost:3000`. HMR will be enabled in development.|
 |`compile`|Compiles the application to disk (`~/dist` by default).|
-|`dev`|Same as `npm start`, but enables nodemon to automatically restart the server when server-related code is changed.|
+|`dev`|Same as `npm start`, but enables nodemon for the server as well.|
 |`dev:no-debug`|Same as `npm run dev` but disables devtool instrumentation.|
 |`test`|Runs unit tests with Karma and generates a coverage report.|
 |`test:dev`|Runs Karma and watches for changes to re-run tests; does not generate coverage reports.|
@@ -147,10 +152,10 @@ Have more questions? Feel free to submit an issue or join the Gitter chat!
 
 Default project configuration can be found in `~/config/index.js`. Here you'll be able to redefine your `src` and `dist` directories, adjust compilation settings, tweak your vendor dependencies, and more. For the most part, you should be able to make changes in here **without ever having to touch the actual webpack build configuration**.
 
-If you need environment-specific overrides (useful for dynamically setting API endpoints, for example), you can edit `~/config/environemnts.js` and define overrides on a per-NODE_ENV basis. There are examples for both `development` and `production`, so use those as guidelines. Here are some common configuration options:
+If you need environment-specific overrides (useful for dynamically setting API endpoints, for example), you can edit `~/config/environments.js` and define overrides on a per-NODE_ENV basis. There are examples for both `development` and `production`, so use those as guidelines. Here are some common configuration options:
 
 |Key|Description|
-|---|---|
+|---|-----------|
 |`dir_src`|application source code base path|
 |`dir_dist`|path to build compiled application to|
 |`server_host`|hostname for the Koa server|
