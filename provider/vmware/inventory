@@ -1,5 +1,0 @@
-[react]
-react-ui
-
-react-ui ansible_ssh_host=192.168.239.144 ansible_ssh_private_key_file=/Users/greg.kedge/.ssh/id_rsa/crisp_vagrant_rsa
-

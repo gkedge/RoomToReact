@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux'
 import { routerReducer as router } from 'react-router-redux'
 
-export const makeRootReducer = (asyncReducers) => {
+export const reducers = (asyncReducers) => {
   return combineReducers({
     // Add sync reducers here
     router,
@@ -11,7 +11,7 @@ export const makeRootReducer = (asyncReducers) => {
 
 export const injectReducer = (store, { key, reducer }) => {
   store.asyncReducers[key] = reducer
-  store.replaceReducer(makeRootReducer(store.asyncReducers))
+  store.replaceReducer(reducers(store.asyncReducers))
 }
 
-export default makeRootReducer
+export default reducers

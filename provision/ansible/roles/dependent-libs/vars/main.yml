@@ -1,5 +1,0 @@
----
-dependent_libs:
- - pcre-devel
- - openssl-devel 
- - zlib-devel
