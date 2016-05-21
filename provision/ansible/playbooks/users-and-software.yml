@@ -21,15 +21,15 @@
         regexp: "^github\\.com"
 
   roles:
-#    - { role: swap }
-#    - { role: system, zoneeditPassword: "{{vaulted_zoneedit_password}}" }
-#    - { role: geerlingguy.nodejs }
-#    - { role: dependent-libs }
-#    - { role: dev-tools }
-#    - { role: geerlingguy.nginx }
-#    - { role: geerlingguy.apache }
+    - { role: swap }
+    - { role: system, zoneeditPassword: "{{vaulted_zoneedit_password}}" }
+    - { role: geerlingguy.nodejs }
+    - { role: dependent-libs }
+    - { role: dev-tools }
+    - { role: geerlingguy.nginx }
+    - { role: geerlingguy.apache }
 #    - { role: wildfly/install }
-    - { role: wildfly/uninstall }
+#    - { role: wildfly/uninstall }
 
 
 # Todo
