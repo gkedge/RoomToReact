@@ -6,4 +6,4 @@ describe('(Redux) <%= pascalEntityName %>', () => {
       expect(reducer(undefined, {})).to.eql(initialState)
     })
   })
-})
+});

@@ -5,7 +5,7 @@
 // export const actions = { }
 
 // Reducer
-export const initialState = {}
+export const initialState = {};
 export default function (state = initialState, action) {
   switch (action.type) {
     default:
