@@ -4,9 +4,9 @@ import { fetchZen, saveCurrentZen } from '../modules/zen'
 
 import Zen from '../components/Zen'
 
-import type { ZenObject } from '../interfaces/zen'
+// import type { ZenObject } from '../interfaces/zen'
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state) /*: { zen: ?ZenObject, saved: ?Array<ZenObject> } */ => ({
   zen: state.zen.zens.find(zen => zen.id === state.zen.current),
   saved: state.zen.zens.filter(zen => state.zen.saved.indexOf(zen.id) !== -1)
 })
