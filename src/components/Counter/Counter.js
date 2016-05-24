@@ -1,5 +1,13 @@
+/* @flow */
+
 import React from 'react'
 import classes from './Counter.scss'
+
+// type Props = {
+//   counter: number,
+//   doubleAsync: Function,
+//   increment: Function
+// }
 
 export const Counter = (props) => (
   <div>
