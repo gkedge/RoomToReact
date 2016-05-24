@@ -3,13 +3,13 @@
 import React from 'react'
 import classes from './Counter.scss'
 
-// type Props = {
-//   counter: number,
-//   doubleAsync: Function,
-//   increment: Function
-// }
+type Props = {
+  counter: number,
+  doubleAsync: Function,
+  increment: Function
+}
 
-export const Counter = (props) => (
+export const Counter = (props: Props) => (
   <div>
     <h2 className={classes.counterContainer}>
       Counter:

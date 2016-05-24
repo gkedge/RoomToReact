@@ -2,8 +2,6 @@
 
 import type { ZenObject, ZenStateObject } from '../interfaces/zen';
 
-// import type { Action } from '../../../../node_modules/flow-interfaces/interfaces/action.dispatch';
-
 // ------------------------------------
 // Constants
 // ------------------------------------
@@ -15,14 +13,14 @@ export const SAVE_CURRENT_ZEN = 'SAVE_CURRENT_ZEN'
 // Actions
 // ------------------------------------
 
-export function requestZen (): Action {
+export function requestZen (): any {
   return {
     type: REQUEST_ZEN
   }
 }
 
 let availableId = 0
-export function receiveZen (value: string): Action {
+export function receiveZen (value: string): any {
   return {
     type: RECEIVE_ZEN,
     payload: {
