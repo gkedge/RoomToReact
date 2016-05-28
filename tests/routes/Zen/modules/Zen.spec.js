@@ -1,31 +1,31 @@
-import counterReducer, {
-  COUNTER_INCREMENT,
-  increment,
-  doubleAsync,
-} from 'routes/Counter/modules/counter'
+import zenReducer, {
+    REQUEST_ZEN, RECEIVE_ZEN, SAVE_CURRENT_ZEN
+    fetchZen,
+    saveCurrentZen
+} from 'routes/Zen/modules/zen'
 
-describe('(Route Module) Counter', () => {
-  it('Should export a constant COUNTER_INCREMENT.', () => {
-    expect(COUNTER_INCREMENT).to.equal('COUNTER_INCREMENT')
+describe('(Route Module) Zen', () => {
+  it('Should export a constant REQUEST_ZEN.', () => {
+    expect(REQUEST_ZEN).to.equal('REQUEST_ZEN')
   })
 
   describe('(Reducer)', () => {
     it('Should be a function.', () => {
-      expect(counterReducer).to.be.a('function')
+      expect(zenReducer).to.be.a('function')
     })
 
     it('Should initialize with a state of 0 (Number).', () => {
-      expect(counterReducer(undefined, {})).to.equal(0)
+      expect(zenReducer(undefined, {})).to.equal(0)
     })
 
     it('Should return the previous state if an action was not matched.', () => {
-      let state = counterReducer(undefined, {})
+      let state = zenReducer(undefined, {})
       expect(state).to.equal(0)
-      state = counterReducer(state, {type: '@@@@@@@'})
+      state = zenReducer(state, {type: '@@@@@@@'})
       expect(state).to.equal(0)
-      state = counterReducer(state, increment(5))
+      state = zenReducer(state, increment(5))
       expect(state).to.equal(5)
-      state = counterReducer(state, {type: '@@@@@@@'})
+      state = zenReducer(state, {type: '@@@@@@@'})
       expect(state).to.equal(5)
     })
   })
@@ -35,8 +35,8 @@ describe('(Route Module) Counter', () => {
       expect(increment).to.be.a('function')
     })
 
-    it('Should return an action with type "COUNTER_INCREMENT".', () => {
-      expect(increment()).to.have.property('type', COUNTER_INCREMENT)
+    it('Should return an action with type "REQUEST_ZEN".', () => {
+      expect(increment()).to.have.property('type', REQUEST_ZEN)
     })
 
     it('Should assign the first argument to the "payload" property.', () => {
@@ -55,12 +55,12 @@ describe('(Route Module) Counter', () => {
 
     beforeEach(() => {
       _globalState = {
-        counter: counterReducer(undefined, {})
+        zen: zenReducer(undefined, {})
       }
       _dispatchSpy = sinon.spy((action) => {
         _globalState = {
           ..._globalState,
-          counter: counterReducer(_globalState.counter, action)
+          zen: zenReducer(_globalState.zen, action)
         }
       })
       _getStateSpy = sinon.spy(() => {
@@ -89,19 +89,19 @@ describe('(Route Module) Counter', () => {
     })
 
     it('Should produce a state that is double the previous state.', () => {
-      _globalState = { counter: 2 }
+      _globalState = { zen: 2 }
 
       return doubleAsync()(_dispatchSpy, _getStateSpy)
         .then(() => {
           _dispatchSpy.should.have.been.calledOnce
           _getStateSpy.should.have.been.calledOnce
-          expect(_globalState.counter).to.equal(4)
+          expect(_globalState.zen).to.equal(4)
           return doubleAsync()(_dispatchSpy, _getStateSpy)
         })
         .then(() => {
           _dispatchSpy.should.have.been.calledTwice
           _getStateSpy.should.have.been.calledTwice
-          expect(_globalState.counter).to.equal(8)
+          expect(_globalState.zen).to.equal(8)
         })
     })
   })
@@ -109,15 +109,15 @@ describe('(Route Module) Counter', () => {
   // NOTE: if you have a more complex state, you will probably want to verify
   // that you did not mutate the state. In this case our state is just a number
   // (which cannot be mutated).
-  describe('(Action Handler) COUNTER_INCREMENT', () => {
+  describe('(Action Handler) REQUEST_ZEN', () => {
     it('Should increment the state by the action payload\'s "value" property.', () => {
-      let state = counterReducer(undefined, {})
+      let state = zenReducer(undefined, {})
       expect(state).to.equal(0)
-      state = counterReducer(state, increment(1))
+      state = zenReducer(state, fetchZen(1))
       expect(state).to.equal(1)
-      state = counterReducer(state, increment(2))
+      state = zenReducer(state, increment(2))
       expect(state).to.equal(3)
-      state = counterReducer(state, increment(-3))
+      state = zenReducer(state, increment(-3))
       expect(state).to.equal(0)
     })
   })
