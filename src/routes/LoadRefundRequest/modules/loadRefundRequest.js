@@ -120,9 +120,10 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
 // Reducer
 // ------------------------------------
 
-const initialState:LoadRefundRequestStateObject = {
+export const initialState:LoadRefundRequestStateObject = {
   referenceNum: -1,
-  dateFrom: null, dateTo: null,
+  dateFrom: null, 
+  dateTo: null,
   isLoading: false, pdfContent: null,
   isSaving: false, isSaved: false
 }

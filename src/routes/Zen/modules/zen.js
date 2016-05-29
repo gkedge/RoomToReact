@@ -69,7 +69,7 @@ const ZEN_ACTION_HANDLERS = {
 // Reducer
 // ------------------------------------
 
-const initialState: ZenStateObject = { fetching: false, current: null, zens: [], saved: [] }
+export const initialState: ZenStateObject = { fetching: false, current: null, zens: [], saved: [] }
 export default function zenReducer (state: ZenStateObject = initialState, action: any): ZenStateObject {
   const handler = ZEN_ACTION_HANDLERS[action.type]
 
