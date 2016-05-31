@@ -3,12 +3,23 @@
   remote_user: deployer
   become: yes
 
+#  vars_prompt:
+#  - name: "rhn_username"
+#    prompt: "Enter Your Red Hat Customer Portal Username"
+#    private: no
+#
+#  - name: "rhn_password"
+#    prompt: "Enter Your Red Hat Customer Portal Password"
+#    private: yes
+
   vars_files:
     - vars/main.yml
 #    - vars/vaulted-passwords.yml
     - vars/VMWare-passwords.yml
 #    - [ "vars/{{ ansible_virtualization_type }}-passwords.yml", "vars/vaulted-passwords.yml" ]
-
+  vars:
+    transfer_method: copy-from-controller
+    
   pre_tasks:
     - debug: msg="VM type = '{{ ansible_virtualization_type }}'"
 
@@ -28,6 +39,8 @@
     - { role: dev-tools }
     - { role: geerlingguy.nginx }
     - { role: geerlingguy.apache }
+    - { role: rhtconsulting.jboss_common }
+    - { role: rhtconsulting.jboss_eap }
 #    - { role: wildfly/install }
 #    - { role: wildfly/uninstall }
 
@@ -42,8 +55,14 @@
     - name: add deployer to nginx group
       user: name=deployer groups=nginx append=yes
 
-    - name: Create virtual host root
-      file: path="/var/www/{{subDomain}}.{{domain}}.{{domainExt}}" owner=nginx group=nginx state=directory mode="u=wrx,g=wrx,o=wrx"
+    - name: add nginx to deployer group
+      user: name=nginx groups=deployer append=yes
+
+    - name: add apache to deployer group
+      user: name=apache groups=deployer append=yes
+
+    - name: Create virtual host root as deployer
+      file: path="/var/www/{{subDomain}}.{{domain}}.{{domainExt}}" owner=deployer group=deployer state=directory mode="u=wrx,g=wrx,o=wrx"
 
     - name: Restart nginx.
       service: name=nginx state=restarted enabled=yes
@@ -76,5 +95,5 @@
     - name: add deployer to wildfly group
       user: name=deployer groups=wildfly append=yes
     
-    - name: "Set java environment variables in: /etc/profile.d/java.sh"
-      template: src=etc_profiled_java.sh.j2 dest=/etc/profile.d/java.sh owner=root group=root mode="u=wr,g=r,o=r"
+#    - name: "Set java environment variables in: /etc/profile.d/java.sh"
+#      template: src=etc_profiled_java.sh.j2 dest=/etc/profile.d/java.sh owner=root group=root mode="u=wr,g=r,o=r"

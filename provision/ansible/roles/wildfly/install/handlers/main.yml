@@ -2,10 +2,10 @@
 # file: roles/wildfly/install/handlers/main.yml
 
 - name: start wildfly 
-  service: name=wildfly state=started
+  service: name=jboss state=started
 
 - name: stop wildfly 
-  service: name=wildfly state=stopped
+  service: name=jboss state=stopped
 
 - name: restart wildfly 
-  service: name=wildfly state=restarted
+  service: name=jboss state=restarted

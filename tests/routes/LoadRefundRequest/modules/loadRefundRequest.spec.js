@@ -5,7 +5,7 @@ import loadRefundRequestReducer, { initialState,
 
 // http://redux.js.org/docs/recipes/WritingTests.html
 
-describe('(Route Module) loadRefundRequest', () => {
+describe('(Route Module) requestLoadRefundRequest', () => {
   describe('Actions', () => {
     it('should create an action to load refund request', () => {
       const expectedAction = {
@@ -15,7 +15,7 @@ describe('(Route Module) loadRefundRequest', () => {
         }
       }
 
-      expect(actions.requestLoadRefundRequest()).toEqual(expectedAction)
+      expect(actions.requestLoadRefundRequest()).to.eql(expectedAction)
     })
   })
 

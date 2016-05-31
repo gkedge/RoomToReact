@@ -57,7 +57,7 @@ Vagrant.configure(2) do |config|
     #    owner: "wildfly", group: "wildfly" # , create: true
 
     reactdev.vm.synced_folder "/Users/greg.kedge/Projects/RoomToReact/dist", "/var/www/ui.react.dev",
-        owner: "nginx", group: "nginx", create: true
+        owner: "deployer", group: "deployer", create: true
   end
 
   # Dev 1 server.

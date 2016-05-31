@@ -1,0 +1,17 @@
+---
+galaxy_info:
+  author: Red Hat Consulting
+  description: Role for Red Hat JBoss Enterprise Application Platform (EAP)
+  company: Red Hat
+  license: license (Apache)
+  min_ansible_version: 1.8
+  platforms:
+   - name: EL
+     versions:
+     - 7
+  categories:
+   - java
+   - jboss
+   - eap
+dependencies: []
+

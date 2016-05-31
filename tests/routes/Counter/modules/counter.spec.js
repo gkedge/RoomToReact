@@ -4,6 +4,7 @@ import counterReducer, {
   doubleAsync,
 } from 'routes/Counter/modules/counter'
 
+
 describe('(Route Module) Counter', () => {
   it('Should export a constant COUNTER_INCREMENT.', () => {
     expect(COUNTER_INCREMENT).to.equal('COUNTER_INCREMENT')
@@ -49,9 +50,6 @@ describe('(Route Module) Counter', () => {
   })
 
   describe('(Action Creator) doubleAsync', () => {
-    let _globalState
-    let _dispatchSpy
-    let _getStateSpy
 
     beforeEach(() => {
       _globalState = {

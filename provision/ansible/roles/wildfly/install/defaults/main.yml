@@ -8,7 +8,9 @@
 # Installation variables
 ###
 # wildfly_version: 8.2.1.Final
-wildfly_version: 9.0.1.Final
+# wildfly_version: 9.0.1.Final
+wildfly_version: 6.4.0
+wildfly_expanded_dir: "jboss-eap-{{ wildfly_version }}"
 wildfly_install_dir: /opt
 wildfly_alt_module_path: "{{ wildfly_install_dir }}/wildfly-alt/modules"
 
@@ -84,5 +86,5 @@ wildfly_memory_max: "1532m"
 wildfly_java_opts:
   - user.timezone=EST
   - java.library.path=/usr/java/packages/lib/amd64:/usr/lib64:/lib64:/lib:/usr/lib:/usr/local/lib
-  - "{{domainExt}}.{{domain}}.{{subDomain}}.app.report.CpuPressureReport.CpuUtilReport"=true
+  - "{{domainExt}}.{{domain}}.{{subDomain}}.app.report.CpuPressureReport.CpuUtilReport=true"
   - visualvm.id=1443270428334275000
