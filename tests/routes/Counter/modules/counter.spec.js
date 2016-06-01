@@ -51,6 +51,8 @@ describe('(Route Module) Counter', () => {
 
   describe('(Action Creator) doubleAsync', () => {
 
+    let _globalState, _dispatchSpy, _getStateSpy;
+
     beforeEach(() => {
       _globalState = {
         counter: counterReducer(undefined, {})

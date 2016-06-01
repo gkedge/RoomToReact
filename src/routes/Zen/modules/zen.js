@@ -37,10 +37,11 @@ export function saveCurrentZen (): any {
 }
 
 export const fetchZen = (): Function => {
-  return (dispatch: Function): Promise => {
+  // return (dispatch: Function): Promise => {
+  return (dispatch: Function) => {
     dispatch(requestZen())
 
-    return fetch('https://api.github.com/zen')
+    return fetch('https://baconipsum.com/api/?type=meat-and-filler&paras=1&format=text')
       .then(data => data.text())
       .then(text => dispatch(receiveZen(text)))
   }
