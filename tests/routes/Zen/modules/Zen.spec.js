@@ -124,7 +124,7 @@ describe('(Route Module) Zen', () => {
       expect(zenReducer(undefined, {})).to.equal(initialState)
     })
 
-    it('Should increment the state by the action payload\'s `value` property.', () => {
+    it('Should add a Zen to the action payload\'s `value` property.', () => {
       let state = zenReducer(undefined, {})
       expect(state).to.equal(initialState)
       state = zenReducer(state, {type: '@@@@@@@'})
