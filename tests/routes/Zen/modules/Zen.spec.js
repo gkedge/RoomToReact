@@ -4,6 +4,10 @@ import zenReducer, {
   initialState
 } from 'routes/Zen/modules/zen'
 
+// http://redux.js.org/docs/recipes/WritingTests.html
+// Disregard any reference to nock as that is a server-side
+// only solution; using fetch-mock instead.
+
 import fetchMock from 'fetch-mock'
 // import configureMockStore from 'redux-mock-store'
 // import thunk from 'redux-thunk'

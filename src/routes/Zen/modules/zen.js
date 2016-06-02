@@ -1,6 +1,7 @@
 /* @flow */
 
 import type { ZenObject, ZenStateObject } from '../interfaces/zen';
+import 'whatwg-fetch'
 
 // ------------------------------------
 // Constants
