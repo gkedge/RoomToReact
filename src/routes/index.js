@@ -7,9 +7,9 @@ import Home from './Home'
  When creating a new async route, pass the instantiated store!   */
 
 export const createRoutes = (store) => {
-  const routes = {
-    path: '/',
-    component: CoreLayout,
+  return {
+    path      : '/',
+    component : CoreLayout,
     indexRoute: Home,
     getChildRoutes(location, next) {
       require.ensure([], (require) => {
@@ -22,7 +22,6 @@ export const createRoutes = (store) => {
       })
     }
   }
-  return routes
 }
 
 export default createRoutes

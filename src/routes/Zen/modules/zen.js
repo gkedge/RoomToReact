@@ -41,7 +41,7 @@ export const fetchZen = (): Function => {
   return (dispatch: Function) => {
     dispatch(requestZen())
 
-    return fetch('https://baconipsum.com/api/?type=meat-and-filler&paras=1&format=text')
+    return fetch('https://api.github.com/zen')
       .then(data => data.text())
       .then(text => dispatch(receiveZen(text)))
   }

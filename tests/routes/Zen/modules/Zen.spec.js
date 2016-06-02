@@ -45,11 +45,11 @@ describe('(Route Module) Zen', () => {
     })
 
     it('Should assign the first argument to the "payload.value" property.', () => {
-      expect(actions.receiveZen('Yow')).to.have.property('payload').and.eql({value: 'Yow', id: 1})
+      expect(actions.receiveZen('Yow')).to.have.property('payload').and.eql({ value: 'Yow', id: 1 })
     })
 
     it('Should default the "payload.value" property to empty string.', () => {
-      expect(actions.receiveZen('')).to.have.property('payload').and.eql({value: '', id: 2})
+      expect(actions.receiveZen('')).to.have.property('payload').and.eql({ value: '', id: 2 })
     })
   })
 
@@ -81,7 +81,7 @@ describe('(Route Module) Zen', () => {
         return _globalState
       })
 
-      fetchMock.mock('https://baconipsum.com/api/?type=meat-and-filler&paras=1&format=text', 'GET', 'I like turtles!')
+      fetchMock.mock('https://api.github.com/zen', 'GET', 'I like turtles!')
 
     })
 
@@ -106,16 +106,14 @@ describe('(Route Module) Zen', () => {
       return actions.fetchZen()(_dispatchSpy)
         .then(() => {
           expect(_dispatchSpy).to.have.been.calledTwice;
-          expect(fetchMock.called('https://baconipsum.com/api/?type=meat-and-filler&paras=1&format=text')).to.be.true
+          expect(fetchMock.called('https://api.github.com/zen')).to.be.true
           expect(_globalState.zen.zens[0].value).to.equal('I like turtles!')
         })
     })
   })
 
-  // NOTE: if you have a more complex state, you will probably want to verify
-  // that you did not mutate the state. In this case our state is just a number
-  // (which cannot be mutated).
-  describe('(Action Handler) REQUEST_ZEN', () => {
+  // NOTE: Probably want to verify that state hasn't been mutated).
+  describe('(Action Handler) basic reduce tests', () => {
     it('Should be a function.', () => {
       expect(zenReducer).to.be.a('function')
     })
@@ -124,15 +122,38 @@ describe('(Route Module) Zen', () => {
       expect(zenReducer(undefined, {})).to.equal(initialState)
     })
 
-    it('Should add a Zen to the action payload\'s `value` property.', () => {
+    it('Passing `undefined` to reducer should produce initialState', () => {
       let state = zenReducer(undefined, {})
-      expect(state).to.equal(initialState)
-      state = zenReducer(state, {type: '@@@@@@@'})
-      expect(state).to.equal(initialState)
-      // state = zenReducer(state, fetchZen())
-      // expect(state).to.equal(5)
-      // state = zenReducer(state, {type: '@@@@@@@'})
-      // expect(state).to.equal(5)
+      expect(state).to.eql(initialState)
+      state = zenReducer(state, { type: '@@@@@@@' })
+      expect(state).to.eql(initialState)
     })
   })
+  
+  describe('(Action Handler) REQUEST_ZEN', () => {
+    it('Passing `requestZen()` to reducer should produce fetching truth', () => {
+      const expected ={ fetching: true, current: null, zens: [], saved: [] }
+      let state = zenReducer(initialState, actions.requestZen())
+      expect(state).to.eql(expected)
+      state = zenReducer(state, {type: '@@@@@@@'})
+      expect(state).to.eql(expected)
+    })
+  })
+  
+  describe('(Action Handler) RECEIVE_ZEN', () => {
+    it('Passing `receiveZen()` to reducer should produce fetching falsity with `zen-like` wisdom', () => {
+      let state = zenReducer(initialState, actions.receiveZen('Yow'))
+      
+      expect(state).to.eql({ fetching: false, current: 5, zens: [{"value":"Yow","id":5}], saved: [] })
+    })
+  })
+  
+  describe('(Action Handler) SAVE_CURRENT_ZEN', () => {
+    it('Passing `receiveZen()` to reducer should produce fetching falsity with saved `zen-like` wisdom', () => {
+      let state = zenReducer(initialState, actions.receiveZen('Yow'))
+      state = zenReducer(state, actions.saveCurrentZen())
+      
+      expect(state).to.eql({ fetching: false, current: 6, zens: [{"value":"Yow","id":6}], saved: [6] })
+    })
+  })  
 })
