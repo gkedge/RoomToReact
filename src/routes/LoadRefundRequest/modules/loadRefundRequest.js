@@ -1,9 +1,13 @@
 /* @flow */
-// https://davidwalsh.name/fetch
 
-import fetch from 'isomorphic-fetch'
-import type {LoadRefundRequestObject, LoadRefundRequestStateObject} from '../interfaces/loadRefundRequest.js'
-import Url from 'url'
+import type {
+  LoadRefundRequestObject,
+  SaveRefundRequestObject,
+  LoadRefundRequestStateObject
+} from '../interfaces/loadRefundRequest.js'
+// https://davidwalsh.name/fetch
+import 'whatwg-fetch'  // isomorphic-fetch contains the browser-specific whatwg-fetch
+import {Url} from 'url'
 
 import {reducer as formReducer} from 'redux-form'
 
@@ -12,106 +16,115 @@ import {reducer as formReducer} from 'redux-form'
 // ------------------------------------
 export const RECEIVE_LOAD_REFUND_REQUEST = 'RECEIVE_LOAD_REFUND_REQUEST'
 export const REQUEST_LOAD_REFUND_REQUEST = 'REQUEST_LOAD_REFUND_REQUEST'
-export const POST_CURRENT_LOAD_REFUND_REQUEST = 'POST_CURRENT_LOAD_REFUND_REQUEST'
-export const SAVED_CURRENT_LOAD_REFUND_REQUEST = 'SAVED_CURRENT_LOAD_REFUND_REQUEST'
+export const POST_REFUND_REQUEST = 'POST_REFUND_REQUEST'
+export const SAVED_REFUND_REQUEST = 'SAVED_REFUND_REQUEST'
 
 // ------------------------------------
 // Actions
 // ------------------------------------
 export function requestLoadRefundRequest():any {
   return {
-    type: REQUEST_LOAD_REFUND_REQUEST,
+    type:    REQUEST_LOAD_REFUND_REQUEST,
     payload: {
-      isLoading: true
+      isLoading:  true,
+      pdfContent: null
     }
   }
 }
 
-export function receiveLoadRefundRequest(value:string):any {
+export function receiveLoadRefundRequest(asciiPDF:string):any {
   return {
-    type: RECEIVE_LOAD_REFUND_REQUEST,
+    type:    RECEIVE_LOAD_REFUND_REQUEST,
     payload: {
-      isLoading: false,
-      pdfContent: value
+      isLoading:  false,
+      pdfContent: asciiPDF
     }
   }
 }
 
-export function postCurrentLoadRefundRequest():any {
+export function postLoadRefundRequest():any {
   return {
-    type: POST_CURRENT_LOAD_REFUND_REQUEST,
+    type:    POST_REFUND_REQUEST,
     payload: {
-      isSaving: true
+      isSaving: true,
+      isSaved:  false
     }
   }
 }
 
-export function savedCurrentLoadRefundRequest():any {
+export function savedLoadRefundRequest():any {
   return {
-    type: SAVED_CURRENT_LOAD_REFUND_REQUEST,
+    type:    SAVED_REFUND_REQUEST,
     payload: {
       isSaving: false,
-      isSaved: true
+      isSaved:  true
     }
   }
 }
 
 export const fetchRefundRequestFile = (file:Url):Function => {
-  return (dispatch:Function):Promise => {
+  // return (dispatch:Function):Promise => {
+  return (dispatch:Function) => {
     dispatch(requestLoadRefundRequest())
 
     return fetch(file.format())
       .then(data => data.text())
-      .then(text => dispatch(receiveLoadRefundRequest(text)))
+      .then(text => dispatch(receiveLoadRefundRequest(text || '')))
   }
 }
 
-export const saveRefundRequestFile = ():Function => {
-  return (dispatch:Function):Promise => {
-    dispatch(requestLoadRefundRequest())
+export const saveRefundRequest = (asciiPDF:string):Function => {
+  // return (dispatch:Function):Promise => {
+  return (dispatch:Function) => {
+    dispatch(postLoadRefundRequest())
 
     return fetch('/refunds')
-      .then(data => data.text())
-      .then(text => dispatch(receiveLoadRefundRequest(text)))
+      .then(data => dispatch(savedLoadRefundRequest()))
   }
 }
 
 export const actions = {
   requestLoadRefundRequest,
   fetchRefundRequestFile,
-  postCurrentLoadRefundRequest,
-  savedCurrentLoadRefundRequest
+  receiveLoadRefundRequest,
+  postLoadRefundRequest,
+  saveRefundRequest,
+  savedLoadRefundRequest
 }
 
+/*eslint "key-spacing": 0*/
 const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
   [REQUEST_LOAD_REFUND_REQUEST]: (state:LoadRefundRequestStateObject,
                                   action:{payload: LoadRefundRequestObject}):LoadRefundRequestStateObject => {
     return ({
       ...state,
-      isLoading: action.payload.isLoading
+      isLoading:  action.payload.isLoading,
+      pdfContent: action.payload.pdfContent
     })
   },
   [RECEIVE_LOAD_REFUND_REQUEST]: (state:LoadRefundRequestStateObject,
                                   action:{payload: LoadRefundRequestObject}):LoadRefundRequestStateObject => {
     return ({
       ...state,
-      pdfContent: action.payload.pdfContent,
-      isLoading: action.payload.isLoading
+      isLoading:  action.payload.isLoading,
+      pdfContent: action.payload.pdfContent
     })
   },
-  [POST_CURRENT_LOAD_REFUND_REQUEST]: (state:LoadRefundRequestStateObject,
-                                       action:{payload: LoadRefundRequestObject}):LoadRefundRequestStateObject => {
-    return ({
-      ...state,
-      isSaving: action.payload.isSaving
-    })
-  },
-  [SAVED_CURRENT_LOAD_REFUND_REQUEST]: (state:LoadRefundRequestStateObject,
-                                        action:{payload: LoadRefundRequestObject}):LoadRefundRequestStateObject => {
+  [POST_REFUND_REQUEST]:         (state:LoadRefundRequestStateObject,
+                                  action:{payload: SaveRefundRequestObject}):LoadRefundRequestStateObject => {
     return ({
       ...state,
       isSaving: action.payload.isSaving,
-      isSaved: action.payload.isSaved
+      isSaved:  action.payload.isSaved
+    })
+  },
+  [SAVED_REFUND_REQUEST]:        (state:LoadRefundRequestStateObject,
+                                  action:{payload: SaveRefundRequestObject}):LoadRefundRequestStateObject => {
+    return ({
+      ...state,
+      isSaving:   action.payload.isSaving,
+      isSaved:    action.payload.isSaved,
+      pdfContent: null
     })
   }
 }
@@ -122,10 +135,12 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
 
 export const initialState:LoadRefundRequestStateObject = {
   referenceNum: -1,
-  dateFrom: null, 
-  dateTo: null,
-  isLoading: false, pdfContent: null,
-  isSaving: false, isSaved: false
+  dateFrom:     null,
+  dateTo:       null,
+  isLoading:    false,
+  pdfContent:   null,
+  isSaving:     false,
+  isSaved:      false
 }
 
 export default function loadRefundRequestReducer(state:LoadRefundRequestStateObject = initialState,

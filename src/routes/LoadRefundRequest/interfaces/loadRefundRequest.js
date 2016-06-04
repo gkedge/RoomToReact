@@ -1,11 +1,11 @@
 /* @flow */
 
 export type LoadRefundRequestObject = {
-  referenceNum: number,
-  dateFrom: Date,
-  dateTo: Date,
   isLoading: boolean,
-  pdfContent: string, // base64
+  pdfContent: ?string
+}
+
+export type SaveRefundRequestObject = {
   isSaving: boolean,
   isSaved: boolean
 }

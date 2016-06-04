@@ -18,7 +18,7 @@ describe('(View) Home', () => {
   it('Renders an awesome duck image', () => {
     const duck = _component.find('img')
     expect(duck).to.exist
-    expect(duck.attr('alt')).to.match(/This is a duck, because Redux!/)
+    expect(duck.attr('alt')).to.match(/United States Patent and Trademark Office Seal/)
   })
 
 })

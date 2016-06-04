@@ -1,4 +1,6 @@
 /* @flow */
+// https://davidwalsh.name/fetch
+import fetch from 'isomorphic-fetch'
 
 import type { <%= pascalEntityName %>Object, <%= pascalEntityName %>StateObject } from '../interfaces/<%= camelEntityName %>.js'
 
@@ -13,14 +15,14 @@ export const SAVE_CURRENT_<%= snakeEntityName %> = 'SAVE_CURRENT_<%= snakeEntity
 // Actions
 // ------------------------------------
 
-export function request<%= pascalEntityName %> (): Action {
+export function request<%= pascalEntityName %>(): Action {
   return {
     type: REQUEST_<%= snakeEntityName %>
   }
 }
 
 let availableId = 0
-export function receive<%= pascalEntityName %> (value: string): Action {
+export function receive<%= pascalEntityName %>(value: string): Action {
   return {
     type: RECIEVE_<%= snakeEntityName %>,
     payload: {
@@ -30,7 +32,7 @@ export function receive<%= pascalEntityName %> (value: string): Action {
   }
 }
 
-export function saveCurrent<%= pascalEntityName %> (): Action {
+export function saveCurrent<%= pascalEntityName %>(): Action {
   return {
     type: SAVE_CURRENT_<%= snakeEntityName %>
   }

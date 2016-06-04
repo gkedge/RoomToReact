@@ -2,7 +2,7 @@ import { injectReducer } from '../../store/reducers'
 
 export default (store) => ({
   path: '<%= camelEntityName %>',
-  getComponent (nextState, next) {
+  getComponent(nextState, next) {
     require.ensure([
       './containers/<%= pascalEntityName %>Container',
       './modules/<%= camelEntityName %>'

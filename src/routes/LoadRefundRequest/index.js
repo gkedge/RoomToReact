@@ -11,11 +11,11 @@ export default (store) => ({
       const loadRefundRequestReducer = require('./modules/loadRefundRequest').default
 
       injectReducer(store, {
-        key: 'loadRefundRequest',
+        key:     'loadRefundRequest',
         reducer: loadRefundRequestReducer
       })
 
       next(null, LoadRefundRequest)
-    })
+    }, 'loadRefundRequest' /* Webpack named bundle */)
   }
 })

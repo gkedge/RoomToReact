@@ -7,9 +7,9 @@ import Home from './Home'
  When creating a new async route, pass the instantiated store!   */
 
 export const createRoutes = (store) => {
-  return {
-    path      : '/',
-    component : CoreLayout,
+  const routes = {
+    path:       '/',
+    component:  CoreLayout,
     indexRoute: Home,
     getChildRoutes(location, next) {
       require.ensure([], (require) => {
@@ -17,11 +17,13 @@ export const createRoutes = (store) => {
           // Provide store for async reducers and middleware
           // WITHOUT imports!
           require('./Counter').default(store),
-          require('./Zen').default(store)
+          require('./Zen').default(store),
+          require('./LoadRefundRequest').default(store)
         ])
       })
     }
   }
+  return routes
 }
 
 export default createRoutes

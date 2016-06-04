@@ -29,9 +29,9 @@ export const Counter = (props: Props) => (
 )
 
 Counter.propTypes = {
-  counter: React.PropTypes.number.isRequired,
+  counter:     React.PropTypes.number.isRequired,
   doubleAsync: React.PropTypes.func.isRequired,
-  increment: React.PropTypes.func.isRequired
+  increment:   React.PropTypes.func.isRequired
 }
 
 export default Counter

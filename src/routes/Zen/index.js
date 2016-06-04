@@ -2,7 +2,7 @@ import { injectReducer } from '../../store/reducers'
 
 export default (store) => ({
   path: 'zen',
-  getComponent (nextState, cb) {
+  getComponent(nextState, cb) {
     require.ensure([
       './containers/ZenContainer',
       './modules/zen'
@@ -10,10 +10,9 @@ export default (store) => ({
       const Zen = require('./containers/ZenContainer').default
       const zenReducer = require('./modules/zen').default
 
-      injectReducer(store, {  key: 'zen', reducer: zenReducer })
+      injectReducer(store, { key: 'zen', reducer: zenReducer })
 
       cb(null, Zen)
-      /* Webpack named bundle   */
-    }, 'zen')
+    }, 'zen' /* Webpack named bundle */)
   }
 })
