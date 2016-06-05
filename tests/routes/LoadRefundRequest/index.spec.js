@@ -15,8 +15,8 @@ describe('(Route) LoadRefundRequest', () => {
     expect(typeof(_route)).to.equal('object')
   })
 
-  it('Configuration should contain path `loadRefundRequest`', () => {
-    expect(_route.path).to.equal('loadRefundRequest')
+  it('Configuration should contain path `load`', () => {
+    expect(_route.path).to.equal('load')
   })
 
 })

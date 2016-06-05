@@ -4,10 +4,10 @@ import type {
   LoadRefundRequestObject,
   SaveRefundRequestObject,
   LoadRefundRequestStateObject
-} from '../interfaces/loadRefundRequest.js'
+} from '../interfaces/LoadRefundRequestTypes.js'
 // https://davidwalsh.name/fetch
 import 'whatwg-fetch'  // isomorphic-fetch contains the browser-specific whatwg-fetch
-import {Url} from 'url'
+import { Url } from 'url'
 
 import {reducer as formReducer} from 'redux-form'
 
@@ -22,7 +22,7 @@ export const SAVED_REFUND_REQUEST = 'SAVED_REFUND_REQUEST'
 // ------------------------------------
 // Actions
 // ------------------------------------
-export function requestLoadRefundRequest():any {
+export function requestLoadRefundRequest(pdfFilePath:Url):any {
   return {
     type:    REQUEST_LOAD_REFUND_REQUEST,
     payload: {
@@ -62,14 +62,16 @@ export function savedLoadRefundRequest():any {
   }
 }
 
-export const fetchRefundRequestFile = (file:Url):Function => {
+export const fetchRefundRequestFile = (pdfFilePath:Url):Function => {
   // return (dispatch:Function):Promise => {
-  return (dispatch:Function) => {
-    dispatch(requestLoadRefundRequest())
-
-    return fetch(file.format())
+  return (dispatch:Function, getState) => {
+    // let state = getState();
+    // console.out('State: ' + JSON.stringify(state));
+    dispatch(requestLoadRefundRequest(pdfFilePath))
+    
+    return fetch(pdfFilePath.format())
       .then(data => data.text())
-      .then(text => dispatch(receiveLoadRefundRequest(text || '')))
+      .then(text =>  dispatch(receiveLoadRefundRequest(text || '')))
   }
 }
 
@@ -128,6 +130,7 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
     })
   }
 }
+
 
 // ------------------------------------
 // Reducer

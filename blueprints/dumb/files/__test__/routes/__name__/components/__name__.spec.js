@@ -1,5 +1,7 @@
 import React from 'react'
 import <%= pascalEntityName %> from 'routes/<%= pascalEntityName %>/components/<%= pascalEntityName %>'
+import sinon from 'sinon';
+import { mount, shallow } from 'enzyme';
 
 describe('(Component) <%= pascalEntityName %>', () => {
   it('should exist', () => {

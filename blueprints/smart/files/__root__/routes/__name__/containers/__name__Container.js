@@ -1,10 +1,9 @@
 /* @flow */
+import type { <%= pascalEntityName %>Object } from '../interfaces/<%= camelEntityName %>'
 import { connect } from 'react-redux'
-import { fetch<%= pascalEntityName %>, saveCurrent<%= pascalEntityName %> } from '../modules/<%= camelEntityName %>'
+import { fetch<%= pascalEntityName %>, save<%= pascalEntityName %> } from '../modules/<%= camelEntityName %>'
 
 import <%= pascalEntityName %> from '../components/<%= pascalEntityName %>'
-
-import type { <%= pascalEntityName %>Object } from '../interfaces/<%= camelEntityName %>'
 
 const mapStateToProps = (state): { <%= camelEntityName %>: ?<%= pascalEntityName %>Object, saved: Array<<%= pascalEntityName %>Object> } => ({
   <%= camelEntityName %>: state.<%= camelEntityName %>.<%= camelEntityName %>s.find(<%= camelEntityName %> => <%= camelEntityName %>.id === state.<%= camelEntityName %>.current),

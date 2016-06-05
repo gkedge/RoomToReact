@@ -9,6 +9,10 @@ export const Header = () => (
       Home
     </IndexLink>
     {' · '}
+    <Link to='/load' activeClassName={classes.activeRoute}>
+      Load Refund Request
+    </Link>
+    {' · '}
     <Link to='/counter' activeClassName={classes.activeRoute}>
       Counter
     </Link>

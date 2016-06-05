@@ -4,7 +4,7 @@ import loadRefundRequestReducer, {
   POST_REFUND_REQUEST, SAVED_REFUND_REQUEST,
   actions,
   initialState
-} from 'routes/LoadRefundRequest/modules/loadRefundRequest'
+} from 'routes/LoadRefundRequest/modules/LoadRefundRequestMod'
 
 // http://redux.js.org/docs/recipes/WritingTests.html
 // Disregard any reference to nock as that is a server-side
@@ -34,9 +34,10 @@ describe('(Route Module) LoadRefundRequest', () => {
       it('Should be exported as a function.', () => {
         expect(actions.requestLoadRefundRequest).to.be.a('function')
       })
-
+      
       it('Should return an action with type "REQUEST_LOAD_REFUND_REQUEST".', () => {
-        expect(actions.requestLoadRefundRequest())
+        const pdfFilePath = url.parse('http://localhost/foo.pdf');
+        expect(actions.requestLoadRefundRequest(pdfFilePath))
           .to.have.property('type', REQUEST_LOAD_REFUND_REQUEST)
       })
     })
@@ -204,9 +205,10 @@ describe('(Route Module) LoadRefundRequest', () => {
 
     describe('(Action Handler) LOAD_REFUND_REQUEST_ACTION_HANDLERS', () => {
       it('Passing `requestLoadRefundRequest()` to reducer should produce fetching truth', () => {
+        const pdfFilePath = url.parse('http://localhost/foo.pdf')
         const expected = Object.assign({}, initialState)
         expected.isLoading = true;
-        let state = loadRefundRequestReducer(initialState, actions.requestLoadRefundRequest())
+        let state = loadRefundRequestReducer(initialState, actions.requestLoadRefundRequest(pdfFilePath))
         expect(state).to.eql(expected)
         state = loadRefundRequestReducer(state, {type: '@@@@@@@'})
         expect(state).to.eql(expected)
@@ -214,10 +216,11 @@ describe('(Route Module) LoadRefundRequest', () => {
     })
 
     describe('(Action Handler) RECEIVE_LOAD_REFUND_REQUEST', () => {
-      it('Passing `receiveLoadRefundRequest()` to reducer should produce...', () => {
+      it('Passing `receiveLoadRefundRequest()` to reducer should produce PDF data', () => {
+        const pdfFilePath = url.parse('http://localhost/foo.pdf')
         const expected = Object.assign({}, initialState)
         expected.pdfContent = 'Yow';
-        let state = loadRefundRequestReducer(initialState, actions.requestLoadRefundRequest())
+        let state = loadRefundRequestReducer(initialState, actions.requestLoadRefundRequest(pdfFilePath))
         state = loadRefundRequestReducer(state, actions.receiveLoadRefundRequest('Yow'))
         expect(state).to.eql(expected)
       })
@@ -225,10 +228,11 @@ describe('(Route Module) LoadRefundRequest', () => {
 
     describe('(Action Handler) POST_REFUND_REQUEST', () => {
       it('Passing `postLoadRefundRequest()` to reducer should produce...', () => {
+        const pdfFilePath = url.parse('http://localhost/foo.pdf')
         const expected = Object.assign({}, initialState)
         expected.pdfContent = 'Yow';
         expected.isSaving = true;
-        let state = loadRefundRequestReducer(initialState, actions.requestLoadRefundRequest())
+        let state = loadRefundRequestReducer(initialState, actions.requestLoadRefundRequest(pdfFilePath))
         state = loadRefundRequestReducer(state, actions.receiveLoadRefundRequest('Yow'))
         state = loadRefundRequestReducer(state, actions.postLoadRefundRequest())
 
@@ -238,9 +242,10 @@ describe('(Route Module) LoadRefundRequest', () => {
 
     describe('(Action Handler) SAVED_REFUND_REQUEST', () => {
       it('Passing `savedLoadRefundRequest()` to reducer should produce...', () => {
+        const pdfFilePath = url.parse('http://localhost/foo.pdf')
         const expected = Object.assign({}, initialState)
         expected.isSaved = true;
-        let state = loadRefundRequestReducer(initialState, actions.requestLoadRefundRequest())
+        let state = loadRefundRequestReducer(initialState, actions.requestLoadRefundRequest(pdfFilePath))
         state = loadRefundRequestReducer(state, actions.receiveLoadRefundRequest('Yow'))
         state = loadRefundRequestReducer(state, actions.postLoadRefundRequest())
         state = loadRefundRequestReducer(state, actions.savedLoadRefundRequest())
