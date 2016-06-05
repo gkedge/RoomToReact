@@ -1,10 +1,10 @@
 /* @flow */
+// import type { ZenObject } from '../interfaces/zen'
+
 import { connect } from 'react-redux'
 import { fetchZen, saveCurrentZen } from '../modules/zen'
 
 import Zen from '../components/Zen'
-
-// import type { ZenObject } from '../interfaces/zen'
 
 const mapStateToProps = (state) /* : { zen: ?ZenObject, saved: ?Array<ZenObject> } */ => ({
   zen:   state.zen.zens.find(zen => zen.id === state.zen.current),

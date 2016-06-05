@@ -6,19 +6,18 @@
 // } from '../interfaces/loadRefundRequest'
 
 import { connect } from 'react-redux'
-
 import { fetchRefundRequestFile, saveRefundRequest } from '../modules/LoadRefundRequestMod'
 
 import LoadRefundRequest from '../components/LoadRefundRequest'
 
 const mapStateToProps = (state)  => ({
   loadRefundRequestData : {
-    isLoading: state.isLoading,
+    isLoading: Boolean(state.isLoading),
     pdfContent: state.pdfContent
   },
   savedRefundRequestData: {
-    isSaving: state.isSaving,
-    isSaved : state.isSaved
+    isSaving: Boolean(state.isSaving),
+    isSaved : Boolean(state.isSaved)
   }
 })
 

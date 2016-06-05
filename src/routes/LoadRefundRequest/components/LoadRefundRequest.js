@@ -1,4 +1,6 @@
 /* @flow */
+/*eslint no-useless-constructor: 0*/
+
 import React from 'react'
 import classes from './LoadRefundRequest.scss'
 
@@ -6,17 +8,20 @@ import type { LoadRefundRequestObject, SaveRefundRequestObject } from '../interf
 
 type Props = {
   loadRefundRequestData: ?LoadRefundRequestObject,
-  saveRefundRequestData: SaveRefundRequestObject,
+  saveRefundRequestData: ?SaveRefundRequestObject,
   fetchRefundRequestFile : Function,
   saveRefundRequest: Function
 }
 
 export class LoadRefundRequest extends React.Component {
+  
   constructor(props:Props) {
     super(props)
   }
-
+  
+  
   render () {
+    
     return (
       <div>
          I like Turtles!
@@ -28,7 +33,7 @@ export class LoadRefundRequest extends React.Component {
 
 LoadRefundRequest.propTypes = {
   loadRefundRequestData: React.PropTypes.object,
-  saveRefundRequestData: React.PropTypes.object.isRequired,
+  saveRefundRequestData: React.PropTypes.object,
   fetchRefundRequestFile: React.PropTypes.func.isRequired,
   saveRefundRequest: React.PropTypes.func.isRequired
 }
