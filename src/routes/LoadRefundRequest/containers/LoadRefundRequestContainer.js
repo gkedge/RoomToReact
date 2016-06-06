@@ -11,6 +11,9 @@ import { fetchRefundRequestFile, saveRefundRequest } from '../modules/LoadRefund
 import LoadRefundRequest from '../components/LoadRefundRequest'
 
 const mapStateToProps = (state)  => ({
+  // pdf: {
+  //  
+  // },
   loadRefundRequestData : {
     isLoading: Boolean(state.isLoading),
     pdfContent: state.pdfContent

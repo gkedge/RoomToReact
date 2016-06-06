@@ -12,7 +12,7 @@ export default (store) => ({
       './containers/LoadRefundRequestContainer',
       './modules/LoadRefundRequestMod'
     ], (require) => {
-      const LoadRefundRequest = require('./containers/LoadRefundRequestContainer').default
+      const LoadRefundRequestContainer = require('./containers/LoadRefundRequestContainer').default
       const loadRefundRequestReducer = require('./modules/LoadRefundRequestMod').default
 
       // The key is only significant in that it ensures uniqueness of
@@ -24,7 +24,7 @@ export default (store) => ({
         reducer: loadRefundRequestReducer
       })
  
-      next(null, LoadRefundRequest)
+      next(null, LoadRefundRequestContainer)
     }, 'loadRefundRequest' /* Webpack named bundle */)
   }
 })
