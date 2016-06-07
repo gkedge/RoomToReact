@@ -16,6 +16,7 @@ const props = {
   saveRefundRequest: sinon.spy()
 }
 
+
 describe('(Component) LoadRefundRequest', () => {
   it('should exist', () => {
     expect(LoadRefundRequest).to.not.be.null

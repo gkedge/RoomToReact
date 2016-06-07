@@ -1,6 +1,19 @@
 /* @flow */
 
+// import PdfObject from 'components/Pdf/interfaces/PdfTypes.js'
+
+export type PdfObject = {
+  isLoading: boolean,
+  file: ?string,
+  content: ?string,
+  page: ?number,
+  scale: ?number,
+  onDocumentComplete : Function,
+  onPageComplete: Function
+}
+
 export type LoadRefundRequestObject = {
+  pdf: ?PdfObject,
   isLoading: boolean,
   pdfContent: ?string
 }
