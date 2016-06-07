@@ -9,7 +9,7 @@ import type { LoadRefundRequestObject, SaveRefundRequestObject } from '../interf
 // import Pdf from '../../../components/Pdf/Pdf'
 
 type Props = {
-  // pdf: ?PdfObject,
+  pdf: ?PdfObject,
   loadRefundRequestData: ?LoadRefundRequestObject,
   saveRefundRequestData: ?SaveRefundRequestObject,
   fetchRefundRequestFile : Function,
@@ -35,7 +35,7 @@ export class LoadRefundRequest extends React.Component {
 
 
 LoadRefundRequest.propTypes = {
-  // pdf: React.PropTypes.object,
+  pdf: React.PropTypes.object,
   loadRefundRequestData: React.PropTypes.object,
   saveRefundRequestData: React.PropTypes.object,
   fetchRefundRequestFile: React.PropTypes.func.isRequired,

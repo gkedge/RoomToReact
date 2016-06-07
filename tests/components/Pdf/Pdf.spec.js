@@ -23,7 +23,7 @@ describe('(Component) Pdf', () => {
 
   it('allows us to set props', () => {
     //sinon.spy(Pdf.prototype, 'componentDidMount');
-    const wrapper = mount(<Pdf {...props} />)
+    const wrapper = mount(<Pdf {props.pdfData} />)
     //expect(Pdf.prototype.componentDidMount.calledOnce).to.be.true
     expect(wrapper.props().pdf.value).to.equal('Yow')
     // wrapper.setProps({ pdf: { pdf:  { id: 0, value: 'Yowsa' }  })

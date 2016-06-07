@@ -2,17 +2,9 @@
 import React from 'react'
 import classes from './Pdf.scss'
 
-// import type {PdfObject} from './interfaces/PdfTypes'
+import type {PdfObject} from './interfaces/PdfTypes'
 
-type Props = {
-  isLoading: boolean,
-  file: ?string,
-  content: ?string,
-  page: ?number,
-  scale: ?number,
-  onDocumentComplete : Function,
-  onPageComplete: Function
-}
+type Props = ?PdfObject
 
 export class Pdf extends React.Component {
 
@@ -29,15 +21,7 @@ export class Pdf extends React.Component {
   }
 }
 
-Pdf.propTypes = {
-  isLoading         : React.PropTypes.boolean,
-  file              : React.PropTypes.string,
-  content           : React.PropTypes.string,
-  page              : React.PropTypes.number,
-  scale             : React.PropTypes.number,
-  onDocumentComplete: React.PropTypes.func,
-  onPageComplete    : React.PropTypes.func
-}
+Pdf.propTypes = React.PropTypes.object
 
 export default Pdf
 
