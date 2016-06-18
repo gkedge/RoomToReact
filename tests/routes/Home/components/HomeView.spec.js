@@ -15,10 +15,10 @@ describe('(View) Home', () => {
     expect(welcome.text()).to.match(/Welcome!/)
   })
 
-  it('Renders an awesome duck image', () => {
-    const duck = _component.find('img')
-    expect(duck).to.exist
-    expect(duck.attr('alt')).to.match(/United States Patent and Trademark Office Seal/)
+  it('Renders an awesome USPTO seal', () => {
+    const usptoSeal = _component.find('img')
+    expect(usptoSeal).to.exist
+    expect(usptoSeal.attr('alt')).to.match(/United States Patent and Trademark Office Seal/)
   })
 
 })

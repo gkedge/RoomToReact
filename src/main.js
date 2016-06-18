@@ -41,13 +41,13 @@ if (__DEBUG__) {
 const MOUNT_NODE = document.getElementById('root')
 
 let render = (routerKey = null) => {
-  const routes = require('./routes/index').default(store)
+  const createRoutes = require('./routes/index').default(store)
 
   ReactDOM.render(
     <AppContainer
       store={store}
       history={history}
-      routes={routes}
+      routes={createRoutes}
       routerKey={routerKey}
     />,
     MOUNT_NODE

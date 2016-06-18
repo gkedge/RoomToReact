@@ -5,6 +5,9 @@
     "standard",
     "standard-react"
   ],
+  "plugins" : [
+    "babel", "flow-vars"
+  ],
   "env"     : {
     "browser" : true,
     "node": true,
@@ -19,6 +22,11 @@
     },
     "sourceType": "module"
   },
+  "settings": {
+    "flowtype": {
+      "onlyFilesWithFlowAnnotation": true
+    }
+  },
   "globals" : {
     "__DEV__"      : false,
     "__PROD__"     : false,
@@ -28,16 +36,42 @@
   },
   "rules": {
     "no-console": 0,
-    "semi": [2, "never"],
+    "semi": ["warn", "never"],
+    "space-infix-ops": 0,
     "new-cap": 0,
     "strict": 0,
     "no-underscore-dangle": 0,
     "no-use-before-define": 0,
-    "no-unused-vars": ["error", { "varsIgnorePattern": "(_decc||_value)" }],
+    "no-useless-escape": 1,
+    "no-useless-computed-key": 1,
+    "no-empty": 1,
+    "no-multi-spaces": ["error", { "exceptions": {
+      "Property": true,
+      "VariableDeclarator": true,
+      "ImportDeclaration": true
+    } }],
+    "no-unused-vars": ["warn", { "varsIgnorePattern": "(_decc||_value)" }],
     "eol-last": 0,
     "quotes": [0, "single"],
     "jsx-quotes": 1,
     "max-len": [2, 120, 2],
+    "generator-star-spacing": 0,
+    "babel/generator-star-spacing": 1,
+    "key-spacing": ["error", {
+        "singleLine": {
+          "beforeColon": false,
+          "afterColon": true
+        },
+        "multiLine": {
+          "beforeColon": false,
+          "afterColon": true,
+          "align": "value"
+        }
+      }
+    ],
+    "brace-style": ["error"],
+    "flow-vars/define-flow-type": 1,
+    "flow-vars/use-flow-type": 1,
     "react/jsx-no-undef": 1,
     "react/jsx-no-bind": [0],
     "react/jsx-uses-react": 1,
@@ -47,6 +81,7 @@
     "react/no-multi-comp": 1,
     "react/no-unknown-property": 1,
     "react/react-in-jsx-scope": 1,
-    "react/self-closing-comp": 1
+    "react/self-closing-comp": 1,
+    "space-before-function-paren": ["error", "never"]
   }
 }

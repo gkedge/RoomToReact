@@ -57,6 +57,7 @@ export class Zen extends React.Component {
   }
 }
 
+Zen.displayName = 'Zen'
 Zen.propTypes = {
   zen:            React.PropTypes.object,
   saved:          React.PropTypes.array.isRequired,

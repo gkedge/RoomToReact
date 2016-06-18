@@ -1,34 +1,82 @@
 import React from 'react'
 import LoadRefundRequest from 'routes/LoadRefundRequest/components/LoadRefundRequest'
 import sinon from 'sinon';
-import { mount, shallow } from 'enzyme';
+import {mount, shallow} from 'enzyme';
 
 const props = {
-  loadRefundRequestData: {
-    isLoading: false,
-    pdfContent: null
+  pdfData:                {
+    pdf: {
+      isLoading: false,
+      file:      null,
+      content:   null,
+      page:      0,
+      scale:     1.0
+    }
   },
-  saveRefundRequestData: {
+  lookupFormData:         {
+    referenceNum: 'Yow',
+    dateFrom:     null,
+    dateTo:       null,
+    email:        null
+  },
+  saveRefundRequestData:  {
     isSaving: false,
-    isSaved: false
+    isSaved:  false
   },
-  fetchRefundRequestFile : sinon.spy(),
-  saveRefundRequest: sinon.spy()
+  loadingPdf:             sinon.spy(),
+  pdfBinary:              sinon.spy(),
+  pdfLoaded:              sinon.spy(),
+  fetchRefundRequestFile: sinon.spy(),
+  saveRefundRequest:      sinon.spy(),
+  resetState:             sinon.spy()
 }
 
-
-describe('(Component) LoadRefundRequest', () => {
+describe('(Route/Component) LoadRefundRequest/LoadRefundRequest', () => {
   it('should exist', () => {
     expect(LoadRefundRequest).to.not.be.null
   })
 
   it('allows us to set props', () => {
     //sinon.spy(LoadRefundRequest.prototype, 'componentDidMount');
-    const wrapper = mount(<LoadRefundRequest {...props} />)
+    const wrapper = shallow(<LoadRefundRequest {...props} />)
     //expect(LoadRefundRequest.prototype.componentDidMount.calledOnce).to.be.true
-    expect(wrapper.props().loadRefundRequestData.isLoading).to.be.false
+
+    let pdfPanel = wrapper.props().children[0]
+    console.log("PdfPanel Props: " + JSON.stringify(pdfPanel.props))
+    let lookupPanel = wrapper.props().children[1]
+    console.log("LookupPanel Props: " + JSON.stringify(lookupPanel.props))
+
+    expect(pdfPanel.props.isLoading).to.be.false
     // wrapper.setProps({ loadRefundRequest: { loadRefundRequest:  { id: 0, value: 'Yowsa' }  });
-    expect(wrapper.props().loadRefundRequestData.pdfContent).to.be.null
+    expect(pdfPanel.props.file).to.be.null
+    expect(pdfPanel.props.content).to.be.null
+
+    expect(lookupPanel.props.referenceNum).to.equal('Yow')
+
+    const propsChange = {
+      "children": [
+        {
+          "props": {
+            "pdf": {
+              "file": 'Yumsa'
+            }
+          }
+        },
+        {
+          "props": {
+            "referenceNum": "Yowsa"
+          }
+        }
+      ]
+    }
+
+    wrapper.setProps(propsChange);
+    pdfPanel = wrapper.props().children[0]
+    //console.log("Pdf Props: " + JSON.stringify(pdfPanel.props))
+    //expect(pdfPanel.props.file).to.equal('Yumsa')
+    lookupPanel = wrapper.props().children[1];
+    //console.log("LookupPanel Props: " + JSON.stringify(lookupPanel.props))
+    //expect(lookupPanel.props.referenceNum).to.equal('Yowsa')
   })
 
   // it('Simulate wisdom', () => {

@@ -1,9 +1,5 @@
-/*
-Described by Dan Abramov here: http://stackoverflow.com/a/33044701
- */
-
-import { injectReducer } from '../../store/reducers'
-
+import {injectReducer} from '../../store/reducers'
+import {reducer as formReducer} from 'redux-form'
 
 export default (store) => ({
   path: 'load',
@@ -12,19 +8,20 @@ export default (store) => ({
       './containers/LoadRefundRequestContainer',
       './modules/LoadRefundRequestMod'
     ], (require) => {
-      const LoadRefundRequestContainer = require('./containers/LoadRefundRequestContainer').default
+      const LoadRefundRequest = require('./containers/LoadRefundRequestContainer').default
       const loadRefundRequestReducer = require('./modules/LoadRefundRequestMod').default
 
-      // The key is only significant in that it ensures uniqueness of
-      // reducers when dynamically combineReducers. It can be any unique value
-      // to your app; it doesn't have any significance to the name of the path
-      // or the webpack bundle name.
       injectReducer(store, {
         key:     'loadRefundRequest',
         reducer: loadRefundRequestReducer
       })
- 
-      next(null, LoadRefundRequestContainer)
+
+      injectReducer(store, {
+        key:     'form',
+        reducer: formReducer
+      })
+
+      next(null, LoadRefundRequest)
     }, 'loadRefundRequest' /* Webpack named bundle */)
   }
 })

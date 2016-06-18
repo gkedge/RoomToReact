@@ -1,48 +1,61 @@
 /* @flow */
 
 import type {
-  LoadRefundRequestObject,
-  SaveRefundRequestObject,
+  PdfLoadingPayload,
+  ActionPayload,
+  LookupFormData,
+  PdfReadPayload,
+  SaveRefundRequestPayload,
   LoadRefundRequestStateObject
-} from '../interfaces/LoadRefundRequestTypes.js'
+} from '../interfaces/LoadRefundRequestTypes'
 // https://davidwalsh.name/fetch
 import 'whatwg-fetch'  // isomorphic-fetch contains the browser-specific whatwg-fetch
-import { Url } from 'url'
+import {Url} from 'url'
 
 import {reducer as formReducer} from 'redux-form'
 
 // ------------------------------------
 // Constants
 // ------------------------------------
-export const RECEIVE_LOAD_REFUND_REQUEST = 'RECEIVE_LOAD_REFUND_REQUEST'
-export const REQUEST_LOAD_REFUND_REQUEST = 'REQUEST_LOAD_REFUND_REQUEST'
+export const LOADING_PDF = 'LOADING_PDF'
+export const PDF_BINARY = 'PDF_BINARY'
+export const PDF_LOADED = 'PDF_LOADED'
 export const POST_REFUND_REQUEST = 'POST_REFUND_REQUEST'
 export const SAVED_REFUND_REQUEST = 'SAVED_REFUND_REQUEST'
+export const RESET_STATE = 'RESET_STATE'
 
 // ------------------------------------
 // Actions
 // ------------------------------------
-export function requestLoadRefundRequest(pdfFilePath:Url):any {
+export function loadingPdf(pdfFile:Object):ActionPayload {
   return {
-    type:    REQUEST_LOAD_REFUND_REQUEST,
+    type:    LOADING_PDF,
     payload: {
-      isLoading:  true,
-      pdfContent: null
+      isLoading: true,
+      pdfFile:   pdfFile
     }
   }
 }
 
-export function receiveLoadRefundRequest(asciiPDF:string):any {
+export function pdfBinary(pdfRaw:Uint8Array):ActionPayload {
   return {
-    type:    RECEIVE_LOAD_REFUND_REQUEST,
+    type:    PDF_BINARY,
     payload: {
-      isLoading:  false,
-      pdfContent: asciiPDF
+      pdfRaw: pdfRaw
     }
   }
 }
 
-export function postLoadRefundRequest():any {
+export function pdfLoaded():ActionPayload {
+  return {
+    type:    PDF_LOADED,
+    payload: {
+      isLoading: false
+    }
+  }
+}
+
+export function postLoadRefundRequest():ActionPayload {
   return {
     type:    POST_REFUND_REQUEST,
     payload: {
@@ -52,7 +65,7 @@ export function postLoadRefundRequest():any {
   }
 }
 
-export function savedLoadRefundRequest():any {
+export function savedLoadRefundRequest():ActionPayload {
   return {
     type:    SAVED_REFUND_REQUEST,
     payload: {
@@ -62,16 +75,22 @@ export function savedLoadRefundRequest():any {
   }
 }
 
-export const fetchRefundRequestFile = (pdfFilePath:Url):Function => {
+export function resetState():ActionPayload {
+  return {
+    type: RESET_STATE
+  }
+}
+
+export const fetchPaymentHistory = (filePath, lookupFormData:LookupFormData):Function => {
   // return (dispatch:Function):Promise => {
   return (dispatch:Function, getState) => {
     // let state = getState();
     // console.out('State: ' + JSON.stringify(state));
-    dispatch(requestLoadRefundRequest(pdfFilePath))
-    
-    return fetch(pdfFilePath.format())
+    // dispatch(requestLoadRefundRequest(pdfFilePath))
+
+    return fetch(filePath.format())
       .then(data => data.text())
-      .then(text =>  dispatch(receiveLoadRefundRequest(text || '')))
+      .then(text => dispatch(pdfBinary(new Uint8Array([10], [11]))))
   }
 }
 
@@ -86,68 +105,97 @@ export const saveRefundRequest = (asciiPDF:string):Function => {
 }
 
 export const actions = {
-  requestLoadRefundRequest,
-  fetchRefundRequestFile,
-  receiveLoadRefundRequest,
+  loadingPdf,
+  pdfBinary,
+  pdfLoaded,
+  fetchPaymentHistory,
   postLoadRefundRequest,
   saveRefundRequest,
-  savedLoadRefundRequest
+  savedLoadRefundRequest,
+  resetState
 }
 
 /*eslint "key-spacing": 0*/
 const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
-  [REQUEST_LOAD_REFUND_REQUEST]: (state:LoadRefundRequestStateObject,
-                                  action:{payload: LoadRefundRequestObject}):LoadRefundRequestStateObject => {
+  [LOADING_PDF]:          (state:LoadRefundRequestStateObject,
+                           action:{payload: PdfLoadingPayload}):LoadRefundRequestStateObject => {
     return ({
       ...state,
-      isLoading:  action.payload.isLoading,
-      pdfContent: action.payload.pdfContent
+      isLoading: action.payload.isLoading,
+      pdf:       {
+        ...state.pdf,
+        file: action.payload.pdfFile
+      }
     })
   },
-  [RECEIVE_LOAD_REFUND_REQUEST]: (state:LoadRefundRequestStateObject,
-                                  action:{payload: LoadRefundRequestObject}):LoadRefundRequestStateObject => {
+  [PDF_BINARY]:           (state:LoadRefundRequestStateObject,
+                           action:{payload: PdfReadPayload}):LoadRefundRequestStateObject => {
     return ({
       ...state,
-      isLoading:  action.payload.isLoading,
-      pdfContent: action.payload.pdfContent
+      pdf: {
+        ...state.pdf,
+        binaryContent: action.payload.pdfRaw
+      }
     })
   },
-  [POST_REFUND_REQUEST]:         (state:LoadRefundRequestStateObject,
-                                  action:{payload: SaveRefundRequestObject}):LoadRefundRequestStateObject => {
+  [PDF_LOADED]:           (state:LoadRefundRequestStateObject,
+                           action:{payload: PdfLoadingPayload}):LoadRefundRequestStateObject => {
+    return ({
+      ...state,
+      isLoading: action.payload.isLoading
+    })
+  },
+  [POST_REFUND_REQUEST]:  (state:LoadRefundRequestStateObject,
+                           action:{payload: SaveRefundRequestPayload}):LoadRefundRequestStateObject => {
+    return ({
+      ...initialState,
+      isSaving: action.payload.isSaving,
+      isSaved:  action.payload.isSaved
+    })
+  },
+  [SAVED_REFUND_REQUEST]: (state:LoadRefundRequestStateObject,
+                           action:{payload: SaveRefundRequestPayload}):LoadRefundRequestStateObject => {
     return ({
       ...state,
       isSaving: action.payload.isSaving,
       isSaved:  action.payload.isSaved
     })
   },
-  [SAVED_REFUND_REQUEST]:        (state:LoadRefundRequestStateObject,
-                                  action:{payload: SaveRefundRequestObject}):LoadRefundRequestStateObject => {
+  [RESET_STATE]:          (state:LoadRefundRequestStateObject):LoadRefundRequestStateObject => {
     return ({
-      ...state,
-      isSaving:   action.payload.isSaving,
-      isSaved:    action.payload.isSaved,
-      pdfContent: null
+      ...initialState
     })
   }
 }
-
 
 // ------------------------------------
 // Reducer
 // ------------------------------------
 
 export const initialState:LoadRefundRequestStateObject = {
-  referenceNum: -1,
-  dateFrom:     null,
-  dateTo:       null,
-  isLoading:    false,
-  pdfContent:   null,
-  isSaving:     false,
-  isSaved:      false
+  pdf:       {
+    isLoading:     false,
+    file:          null,
+    content:       null,
+    binaryContent: null,
+    page:          0,
+    scale:         0
+  },
+  lookup:    {
+    referenceNum: null,
+    dateFrom:     null,
+    dateTo:       null,
+    email:        null
+  },
+  isLoading: false,
+  isSaving:  false,
+  isSaved:   false
 }
 
+export const unknownAction:ActionPayload = {type: "Unknown"}
+
 export default function loadRefundRequestReducer(state:LoadRefundRequestStateObject = initialState,
-                                                 action:any):LoadRefundRequestStateObject {
+                                                 action:ActionPayload = unknownAction):LoadRefundRequestStateObject {
   const handler = LOAD_REFUND_REQUEST_ACTION_HANDLERS[action.type]
 
   return handler ? handler(state, action) : state

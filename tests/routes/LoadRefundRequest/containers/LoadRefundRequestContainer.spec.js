@@ -13,14 +13,15 @@ import {useRouterHistory} from 'react-router'
 import url from 'url'
 import fetchMock from 'fetch-mock'
 import sinon from 'sinon';
-import { mount, shallow } from 'enzyme';
-   
+import {mount, shallow} from 'enzyme';
+import {base64ToBinary} from 'store/DataUtils'
+
 // Use the same middleware you use with Redux's applyMiddleware
 const browserHistory = useRouterHistory(createBrowserHistory)()
 const middleware = [thunk, routerMiddleware(browserHistory)]
 const mockStore = configureMockStore(middleware)
 
-describe('(Container) LoadRefundRequestContainer', () => {
+describe('(Route/Container) LoadRefundRequest/LoadRefundRequestContainer', () => {
   let store = null
 
   beforeEach(() => {
@@ -63,20 +64,28 @@ describe('(Container) LoadRefundRequestContainer', () => {
   // })
 
   describe('Test react-redux connect() actions', () => {
-    it('Test react-redux connect()\'ed store with requestLoadRefundRequest action.', () => {
-      const requestLoadRefundRequestAction = actions.requestLoadRefundRequest(url.parse('http://localhost/foo.pdf'))
-      store.dispatch(requestLoadRefundRequestAction)
+    it('Test react-redux connect()\'ed store with loadingPdf action.', () => {
+      const loadingPdfAction = actions.loadingPdf({})
+      store.dispatch(loadingPdfAction)
 
       const mockedActions = store.getActions()
-      expect(mockedActions).to.be.eql([requestLoadRefundRequestAction])
+      expect(mockedActions).to.be.eql([loadingPdfAction])
     })
 
-    it('Test react-redux connect()\'ed store with requestLoadRefundRequest action.', () => {
-      const receiveLoadRefundRequestAction = actions.receiveLoadRefundRequest('Yow')
-      store.dispatch(receiveLoadRefundRequestAction)
+    it('Test react-redux connect()\'ed store with pdfBinary action.', () => {
+      const pdfBinaryAction = actions.pdfBinary(base64ToBinary('Yow'))
+      store.dispatch(pdfBinaryAction)
 
       const mockedActions = store.getActions()
-      expect(mockedActions).to.be.eql([receiveLoadRefundRequestAction])
+      expect(mockedActions).to.be.eql([pdfBinaryAction])
+    })
+
+    it('Test react-redux connect()\'ed store with pdfLoaded action.', () => {
+      const pdfLoadAction = actions.pdfLoaded()
+      store.dispatch(pdfLoadAction)
+
+      const mockedActions = store.getActions()
+      expect(mockedActions).to.be.eql([pdfLoadAction])
     })
 
     it('Test react-redux connect()\'ed store with postLoadRefundRequest action.', () => {
@@ -95,21 +104,21 @@ describe('(Container) LoadRefundRequestContainer', () => {
       expect(mockedActions).to.be.eql([savedLoadRefundRequestAction])
     })
 
-    it('Test react-redux connect()\'ed store with fetchRefundRequestFile action.', () => {
-      
-      let pdfFilePath =  url.parse('http://localhost/foo.pdf')
-      
-      fetchMock.mock(pdfFilePath.format(), 'GET', 'I like turtles!')
-
-      // Return the promise to handle error
-      return store.dispatch(actions.fetchRefundRequestFile(pdfFilePath))
-        .then(data => {
-          const receiveLoadRefundRequest = actions.receiveLoadRefundRequest('I like turtles!')
-          expect(data).to.be.eql(receiveLoadRefundRequest)
-          const mockedActions = store.getActions()
-          expect(mockedActions).to.be.eql(
-            [actions.requestLoadRefundRequest(pdfFilePath), receiveLoadRefundRequest])
-        })
-    })
+    //it('Test react-redux connect()\'ed store with fetchPaymentHistory action.', () => {
+    //  
+    //  let pdfFilePath =  url.parse('http://localhost/foo.pdf')
+    //  
+    //  fetchMock.mock(pdfFilePath.format(), 'GET', 'I like turtles!')
+    //
+    //  // Return the promise to handle error
+    //  return store.dispatch(actions.fetchPaymentHistory(pdfFilePath))
+    //    .then(data => {
+    //      const pdfBinary = actions.pdfBinary(base64ToBinary('I like turtles!'))
+    //      expect(data).to.be.eql(pdfBinary)
+    //      const mockedActions = store.getActions()
+    //      expect(mockedActions).to.be.eql(
+    //        [actions.pdfBinary(pdfFilePath), pdfBinary])
+    //    })
+    //})
   })
 })
