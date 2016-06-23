@@ -2,6 +2,7 @@
 
 import {connect} from 'react-redux'
 import {
+  validLookup,
   loadingPdf, pdfBinary, pdfLoaded,
   fetchPaymentHistory,
   saveRefundRequest,
@@ -10,12 +11,12 @@ import {
 
 import LoadRefundRequest from '../components/LoadRefundRequest'
 
-const mapStateToProps = (state) => ({
-  pdfData:                {
+const mapStateToProps = (state:Object):Object => ({
+  pdfData: {
     isLoading: Boolean(state.loadRefundRequest.isLoading),
     pdf:       state.loadRefundRequest.pdf
   },
-  lookupFormData:         {
+  lookupFormData: {
     lookup: state.loadRefundRequest.lookup
   },
   savedRefundRequestData: {
@@ -25,6 +26,7 @@ const mapStateToProps = (state) => ({
 })
 
 const mapActionCreators:{
+  validLookup: Function,
   loadingPdf: Function,
   pdfBinary: Function,
   pdfLoaded: Function,
@@ -32,6 +34,7 @@ const mapActionCreators:{
   saveRefundRequest: Function,
   resetState: Function
 } = {
+  validLookup,
   loadingPdf,
   pdfBinary,
   pdfLoaded,

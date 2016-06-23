@@ -1,10 +1,11 @@
 /* flow */
 
+import type { ActionPayloadType } from 'reusable/interfaces/FpngTypes'
+
 import type {
-  ActionPayload,
-  LookupFormData,
-  SaveRefundRequestPayload,
-  LoadRefundRequestStateObject
+  LookupFormDataType,
+  SaveRefundRequestPayloadType,
+  LoadRefundRequestStateObjectType
 } from 'routes/LoadRefundRequest/interfaces/LoadRefundRequestTypes'
 
 import loadRefundRequestReducer, {
@@ -19,7 +20,7 @@ import loadRefundRequestReducer, {
 // Disregard any reference to nock as that is a server-side
 // only solution; using fetch-mock instead.
 import fetchMock from 'fetch-mock'
-import {binary2Base64, base64ToBinary} from 'store/DataUtils'
+import {binary2Base64, base64ToBinary} from 'reusable/utilities/dataUtils'
 import url from 'url'
 
 describe('(Route/Module) LoadRefundRequest/LoadRefundRequestMod', () => {
@@ -130,7 +131,7 @@ describe('(Route/Module) LoadRefundRequest/LoadRefundRequestMod', () => {
       })
 
       describe('fetchPaymentHistory', () => {
-        const lookupFormData:LookupFormData = {
+        const lookupFormData:LookupFormDataType = {
           referenceNum: '0123456',
           dateFrom: '2016-03-24',
           dateTo: '2016-06-15',
@@ -144,7 +145,7 @@ describe('(Route/Module) LoadRefundRequest/LoadRefundRequestMod', () => {
           _globalState = {
             loadRefundRequest: loadRefundRequestReducer(undefined, undefined)
           }
-          _dispatchSpy = sinon.spy((action:ActionPayload) => {
+          _dispatchSpy = sinon.spy((action:ActionPayloadType) => {
             _globalState = {
               ..._globalState,
               loadRefundRequest: loadRefundRequestReducer(_globalState.loadRefundRequest, action)

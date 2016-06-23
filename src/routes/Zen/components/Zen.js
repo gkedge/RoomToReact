@@ -5,18 +5,18 @@
 import React from 'react'
 import classes from './Zen.scss'
 
-import type {ZenObject} from '../interfaces/zen'
+import type {ZenObjectType} from '../interfaces/zen'
 
-type Props = {
-  zen: ?ZenObject,
-  saved: Array < ZenObject >,
+type PropType = {
+  zen: ?ZenObjectType,
+  saved: Array < ZenObjectType >,
   fetchZen: Function,
   saveCurrentZen: Function
 }
 
 export class Zen extends React.Component {
 
-  constructor(props:Props) {
+  constructor(props:PropType) {
     super(props)
   }
 
@@ -43,7 +43,7 @@ export class Zen extends React.Component {
                 Saved wisdoms
               </h3>
               <ul>
-                {this.props.saved.map(z =>
+                {this.props.saved.map((z:ZenObjectType):Object =>
                   <li key={z.id}>
                     {z.value}
                   </li>
@@ -59,10 +59,10 @@ export class Zen extends React.Component {
 
 Zen.displayName = 'Zen'
 Zen.propTypes = {
-  zen:            React.PropTypes.object,
-  saved:          React.PropTypes.array.isRequired,
   fetchZen:       React.PropTypes.func.isRequired,
-  saveCurrentZen: React.PropTypes.func.isRequired
+  saveCurrentZen: React.PropTypes.func.isRequired,
+  saved:          React.PropTypes.array.isRequired,
+  zen:            React.PropTypes.object
 }
 
 export default Zen

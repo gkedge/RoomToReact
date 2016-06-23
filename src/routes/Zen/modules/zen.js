@@ -1,6 +1,7 @@
 /* @flow */
 
-import type {ZenObject, ZenStateObject} from '../interfaces/zen'
+import type {ZenObjectType, ZenStateObjectType} from '../interfaces/zen'
+import type { ActionPayloadType } from 'reusable/interfaces/FpngTypes'
 import 'whatwg-fetch'
 
 // ------------------------------------
@@ -24,7 +25,7 @@ let availableId = 0
 export function testOnlyModuleReset() {
   availableId = 0
 }
-export function receiveZen(value:string):any {
+export function receiveZen(value:string):ActionPayloadType {
   return {
     type:    RECEIVE_ZEN,
     payload: {
@@ -34,7 +35,7 @@ export function receiveZen(value:string):any {
   }
 }
 
-export function saveCurrentZen():any {
+export function saveCurrentZen():ActionPayloadType {
   return {
     type: SAVE_CURRENT_ZEN
   }
@@ -42,12 +43,12 @@ export function saveCurrentZen():any {
 
 export const fetchZen = ():Function => {
   // return (dispatch: Function): Promise => {
-  return (dispatch:Function) => {
+  return (dispatch:Function):any /* Promise */ => {
     dispatch(requestZen())
 
     return fetch('https://api.github.com/zen')
-      .then(data => data.text())
-      .then(text => dispatch(receiveZen(text)))
+      .then((data:Object):any /* Promise*/ => data.text())
+      .then((text:string):any /* Promise*/ => dispatch(receiveZen(text)))
   }
 }
 
@@ -59,17 +60,17 @@ export const actions = {
 }
 
 const ZEN_ACTION_HANDLERS = {
-  [REQUEST_ZEN]: (state:ZenStateObject):ZenStateObject => {
+  [REQUEST_ZEN]: (state:ZenStateObjectType):ZenStateObjectType => {
     return ({...state, fetching: true})
   },
-  [RECEIVE_ZEN]: (state:ZenStateObject, action:{payload: ZenObject}):ZenStateObject => {
+  [RECEIVE_ZEN]: (state:ZenStateObjectType, action:{payload: ZenObjectType}):ZenStateObjectType => {
     return ({
       ...state,
       zens:     state.zens.concat(action.payload),
       current:  action.payload.id, fetching: false
     })
   },
-  [SAVE_CURRENT_ZEN]: (state:ZenStateObject):ZenStateObject => {
+  [SAVE_CURRENT_ZEN]: (state:ZenStateObjectType):ZenStateObjectType => {
     return state.current != null
       ? ({...state, saved: state.saved.concat(state.current)}) : state
   }
@@ -79,8 +80,9 @@ const ZEN_ACTION_HANDLERS = {
 // Reducer
 // ------------------------------------
 
-export const initialState:ZenStateObject = {fetching: false, current: null, zens: [], saved: []}
-export default function zenReducer(state:ZenStateObject = initialState, action:any):ZenStateObject {
+export const initialState:ZenStateObjectType = {fetching: false, current: null, zens: [], saved: []}
+export default function zenReducer(state:ZenStateObjectType = initialState,
+                                   action:ActionPayloadType):ZenStateObjectType {
   const handler = ZEN_ACTION_HANDLERS[action.type]
 
   return handler ? handler(state, action) : state

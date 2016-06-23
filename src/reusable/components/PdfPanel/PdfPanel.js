@@ -1,9 +1,10 @@
 /* flow */
 
 import React from 'react'
+import { Center } from 'react-layout-components'
 import PdfViewer from 'reusable/components/PdfViewer/PdfViewer'
 
-type Props = {
+type PropType = {
   isLoading: boolean,
   file: ?any,
   content: ?string,
@@ -17,7 +18,7 @@ type Props = {
 
 export default class PdfPanel extends React.Component {
 
-  constructor(props:Props) {
+  constructor(props:PropType) {
     super(props)
     this.onBinaryContentAvailable = this.onBinaryContentAvailable.bind(this)
     this.onFileOpen = this.onFileOpen.bind(this)
@@ -49,44 +50,40 @@ export default class PdfPanel extends React.Component {
 
     if (isPDF) {
       return (
-        <div className='left-half'>
-          <div className='pdf-panel flex-container'>
-            <PdfViewer { ...this.props }
-              onDocumentComplete={this.onDocumentComplete}
-              onBinaryContentAvailable={this.onBinaryContentAvailable} />
-          </div>
+        <div className='pdf-panel'>
+          <PdfViewer {...this.props}
+            onDocumentComplete={this.onDocumentComplete}
+            onBinaryContentAvailable={this.onBinaryContentAvailable} />
         </div>
       )
     } else {
       return (
-        <div className='left-half'>
-          <div className='scan-upload-btns-panel flex-container'>
-            <div className='scan-upload-btns-flex' >
-              <div className='scan-upload-btns' >
-                <button className='scan-btn btn'>Scan Document</button>
-                <div className='attach-document btn btn-primary'>
-                  <span>Attach Document</span>
-                  <input type='file' id='fileinput'
-                         className='attach-btn btn'
-                         accept='application/pdf'
-                         onChange={this.onFileOpen}/>
-                </div>
+        <div className='scan-upload-btns-panel'>
+          <div className='scan-upload-btns-outer' >
+            <Center className='scan-upload-btns' >
+              <button className='scan-btn btn'>Scan Document</button>
+              <div className='attach-document btn btn-primary'>
+                <span>Attach Document</span>
+                <input type='file' id='fileinput'
+                  className='attach-btn btn'
+                  accept='application/pdf'
+                  onChange={this.onFileOpen} />
               </div>
-            </div>
+            </Center>
           </div>
         </div>
-      )
+    )
     }
   }
 }
-
+PdfPanel.displayName = 'PdfPanel'
 PdfPanel.propTypes = {
-  isLoading:                React.PropTypes.bool,
-  file:                     React.PropTypes.any,
-  content:                  React.PropTypes.string,
   binaryContent:            React.PropTypes.object,
-  page:                     React.PropTypes.number,
-  scale:                    React.PropTypes.number,
+  content:                  React.PropTypes.string,
+  file:                     React.PropTypes.any,
+  isLoading:                React.PropTypes.bool,
+  onBinaryContentAvailable: React.PropTypes.func,
   onFileOpen:               React.PropTypes.func,
-  onBinaryContentAvailable: React.PropTypes.func
+  page:                     React.PropTypes.number,
+  scale:                    React.PropTypes.number
 }

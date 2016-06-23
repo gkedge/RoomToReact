@@ -1,14 +1,15 @@
 /* @flow */
-// import type { ZenObject } from '../interfaces/zen'
+import type { ZenObjectType, ZenStateObjectType } from '../interfaces/zen'
 
 import { connect } from 'react-redux'
 import { fetchZen, saveCurrentZen } from '../modules/zen'
 
 import Zen from '../components/Zen'
 
-const mapStateToProps = (state) /* : { zen: ?ZenObject, saved: ?Array<ZenObject> } */ => ({
-  zen:   state.zen.zens.find(zen => zen.id === state.zen.current),
-  saved: state.zen.zens.filter(zen => state.zen.saved.indexOf(zen.id) !== -1)
+/* TODO: Return type? { zen: ?ZenObjectType, saved: ?Array<ZenObjectType> } */
+const mapStateToProps = (state:ZenStateObjectType):Object => ({
+  zen:   state.zen.zens.find((zen:Zen):Zen => zen.id === state.zen.current),
+  saved: state.zen.zens.filter((zen:Zen):boolean => state.zen.saved.indexOf(zen.id) !== -1)
 })
 
 const mapActionCreators: {fetchZen: Function, saveCurrentZen: Function} = {

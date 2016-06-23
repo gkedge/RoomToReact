@@ -1,4 +1,5 @@
 /* @flow */
+import type { ActionPayloadType } from 'reusable/interfaces/FpngTypes'
 
 // ------------------------------------
 // Constants
@@ -8,7 +9,7 @@ export const COUNTER_INCREMENT = 'COUNTER_INCREMENT'
 // ------------------------------------
 // Actions
 // ------------------------------------
-export function increment(value = 1) {
+export function increment(value:number = 1):ActionPayloadType {
   return {
     type:    COUNTER_INCREMENT,
     payload: value
@@ -23,9 +24,9 @@ export function increment(value = 1) {
     you'd probably want to dispatch an action of COUNTER_DOUBLE and let the
     reducer take care of this logic.  */
 
-export const doubleAsync = () => {
-  return (dispatch, getState) => {
-    return new Promise((resolve) => {
+export const doubleAsync = ():Function => {
+  return (dispatch:Function, getState:Function):any /* Promise */ => {
+    return new Promise((resolve:Function) => {
       setTimeout(() => {
         dispatch(increment(getState().counter))
         resolve()
@@ -43,14 +44,14 @@ export const actions = {
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
-  [COUNTER_INCREMENT]: (state, action) => state + action.payload
+  [COUNTER_INCREMENT]: (state:number, action:ActionPayloadType):number => state + action.payload
 }
 
 // ------------------------------------
 // Reducer
 // ------------------------------------
 const initialState = 0
-export default function counterReducer(state = initialState, action) {
+export default function counterReducer(state:number = initialState, action:Object):number {
   const handler = ACTION_HANDLERS[action.type]
 
   return handler ? handler(state, action) : state

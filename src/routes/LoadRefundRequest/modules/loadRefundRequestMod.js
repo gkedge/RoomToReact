@@ -1,22 +1,25 @@
 /* @flow */
 
+import type {ActionPayloadType} from 'reusable/interfaces/FpngTypes'
+
 import type {
-  PdfLoadingPayload,
-  ActionPayload,
-  LookupFormData,
-  PdfReadPayload,
-  SaveRefundRequestPayload,
-  LoadRefundRequestStateObject
+  LookupFormPayloadType,
+  PdfLoadingPayloadType,
+  LookupFormDataType,
+  PdfReadPayloadType,
+  SaveRefundRequestPayloadType,
+  LoadRefundRequestStateObjectType
 } from '../interfaces/LoadRefundRequestTypes'
+
 // https://davidwalsh.name/fetch
 import 'whatwg-fetch'  // isomorphic-fetch contains the browser-specific whatwg-fetch
 import {Url} from 'url'
-
-import {reducer as formReducer} from 'redux-form'
+import {upper, lower} from 'reusable/utilities/dataUtils'
 
 // ------------------------------------
 // Constants
 // ------------------------------------
+export const VALID_LOOKUP = 'VALID_LOOKUP'
 export const LOADING_PDF = 'LOADING_PDF'
 export const PDF_BINARY = 'PDF_BINARY'
 export const PDF_LOADED = 'PDF_LOADED'
@@ -27,7 +30,16 @@ export const RESET_STATE = 'RESET_STATE'
 // ------------------------------------
 // Actions
 // ------------------------------------
-export function loadingPdf(pdfFile:Object):ActionPayload {
+export function validLookup(lookupFormData:LookupFormDataType):ActionPayloadType {
+  return {
+    type:    VALID_LOOKUP,
+    payload: {
+      lookup: lookupFormData
+    }
+  }
+}
+
+export function loadingPdf(pdfFile:Object):ActionPayloadType {
   return {
     type:    LOADING_PDF,
     payload: {
@@ -37,7 +49,7 @@ export function loadingPdf(pdfFile:Object):ActionPayload {
   }
 }
 
-export function pdfBinary(pdfRaw:Uint8Array):ActionPayload {
+export function pdfBinary(pdfRaw:Uint8Array):ActionPayloadType {
   return {
     type:    PDF_BINARY,
     payload: {
@@ -46,7 +58,7 @@ export function pdfBinary(pdfRaw:Uint8Array):ActionPayload {
   }
 }
 
-export function pdfLoaded():ActionPayload {
+export function pdfLoaded():ActionPayloadType {
   return {
     type:    PDF_LOADED,
     payload: {
@@ -55,7 +67,7 @@ export function pdfLoaded():ActionPayload {
   }
 }
 
-export function postLoadRefundRequest():ActionPayload {
+export function postLoadRefundRequest():ActionPayloadType {
   return {
     type:    POST_REFUND_REQUEST,
     payload: {
@@ -65,7 +77,7 @@ export function postLoadRefundRequest():ActionPayload {
   }
 }
 
-export function savedLoadRefundRequest():ActionPayload {
+export function savedLoadRefundRequest():ActionPayloadType {
   return {
     type:    SAVED_REFUND_REQUEST,
     payload: {
@@ -75,32 +87,42 @@ export function savedLoadRefundRequest():ActionPayload {
   }
 }
 
-export function resetState():ActionPayload {
+export function resetState():ActionPayloadType {
   return {
     type: RESET_STATE
   }
 }
 
-export const fetchPaymentHistory = (filePath, lookupFormData:LookupFormData):Function => {
-  // return (dispatch:Function):Promise => {
-  return (dispatch:Function, getState) => {
+// https://www.npmjs.com/package/redux-api 42/332/1770
+// https://www.npmjs.com/package/redux-rest-resource 81/107/181
+// https://www.npmjs.com/package/redux-fetch-api 0/16/119
+// https://github.com/wbinnssmith/redux-normalizr-middleware
+export const fetchPaymentHistory = (filePath:Url, lookupFormData:LookupFormDataType):Function => {
+  return (dispatch:Function):any /* Promise */ => {
     // let state = getState();
     // console.out('State: ' + JSON.stringify(state));
     // dispatch(requestLoadRefundRequest(pdfFilePath))
 
-    return fetch(filePath.format())
-      .then(data => data.text())
-      .then(text => dispatch(pdfBinary(new Uint8Array([10], [11]))))
+    return fetch(filePath.format(), {
+      //credentials: 'same-origin',
+      //method: 'post',
+      //headers: {
+      //  'Accept': 'application/json',
+      //  'Content-Type': 'application/json'
+      //},
+      //body: JSON.stringify(Object.assign({}, lookupFormData, {status: 'publish'}))
+    })
+      .then((data:Object):any /* Promise*/ => data.text())
+      .then((text:string):any /* Promise*/ => dispatch(pdfBinary(new Uint8Array([10], [11]))))
   }
 }
 
-export const saveRefundRequest = (asciiPDF:string):Function => {
-  // return (dispatch:Function):Promise => {
-  return (dispatch:Function) => {
+export const saveRefundRequest = (/* asciiPDF:string */):Function => {
+  return (dispatch:Function):any /* Promise */ => {
     dispatch(postLoadRefundRequest())
 
     return fetch('/refunds')
-      .then(data => dispatch(savedLoadRefundRequest()))
+      .then((/* data:Object */):any /* Promise */ => dispatch(savedLoadRefundRequest()))
   }
 }
 
@@ -117,8 +139,23 @@ export const actions = {
 
 /*eslint "key-spacing": 0*/
 const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
-  [LOADING_PDF]:          (state:LoadRefundRequestStateObject,
-                           action:{payload: PdfLoadingPayload}):LoadRefundRequestStateObject => {
+  [VALID_LOOKUP]: (state:LoadRefundRequestStateObjectType,
+                   action:{payload: LookupFormPayloadType}):LoadRefundRequestStateObjectType => {
+    // TODO: normalize API not published yet in redux-form@6.0.0-alpha-15 so
+    // I am 'case' normalizing here.  Once normalize API is published
+    // I am hoping that the lower/upper functions can be removed here.
+    return ({
+      ...state,
+      lookup: {
+        referenceNum: upper(action.payload.lookup.referenceNum),
+        dateFrom:     action.payload.lookup.dateFrom,
+        dateTo:       action.payload.lookup.dateTo,
+        email:        lower(action.payload.lookup.email)
+      }
+    })
+  },
+  [LOADING_PDF]:          (state:LoadRefundRequestStateObjectType,
+                           action:{payload: PdfLoadingPayloadType}):LoadRefundRequestStateObjectType => {
     return ({
       ...state,
       isLoading: action.payload.isLoading,
@@ -128,8 +165,8 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
       }
     })
   },
-  [PDF_BINARY]:           (state:LoadRefundRequestStateObject,
-                           action:{payload: PdfReadPayload}):LoadRefundRequestStateObject => {
+  [PDF_BINARY]:           (state:LoadRefundRequestStateObjectType,
+                           action:{payload: PdfReadPayloadType}):LoadRefundRequestStateObjectType => {
     return ({
       ...state,
       pdf: {
@@ -138,30 +175,30 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
       }
     })
   },
-  [PDF_LOADED]:           (state:LoadRefundRequestStateObject,
-                           action:{payload: PdfLoadingPayload}):LoadRefundRequestStateObject => {
+  [PDF_LOADED]:           (state:LoadRefundRequestStateObjectType,
+                           action:{payload: PdfLoadingPayloadType}):LoadRefundRequestStateObjectType => {
     return ({
       ...state,
       isLoading: action.payload.isLoading
     })
   },
-  [POST_REFUND_REQUEST]:  (state:LoadRefundRequestStateObject,
-                           action:{payload: SaveRefundRequestPayload}):LoadRefundRequestStateObject => {
+  [POST_REFUND_REQUEST]:  (state:LoadRefundRequestStateObjectType,
+                           action:{payload: SaveRefundRequestPayloadType}):LoadRefundRequestStateObjectType => {
     return ({
       ...initialState,
       isSaving: action.payload.isSaving,
       isSaved:  action.payload.isSaved
     })
   },
-  [SAVED_REFUND_REQUEST]: (state:LoadRefundRequestStateObject,
-                           action:{payload: SaveRefundRequestPayload}):LoadRefundRequestStateObject => {
+  [SAVED_REFUND_REQUEST]: (state:LoadRefundRequestStateObjectType,
+                           action:{payload: SaveRefundRequestPayloadType}):LoadRefundRequestStateObjectType => {
     return ({
       ...state,
       isSaving: action.payload.isSaving,
       isSaved:  action.payload.isSaved
     })
   },
-  [RESET_STATE]:          (state:LoadRefundRequestStateObject):LoadRefundRequestStateObject => {
+  [RESET_STATE]:          ():LoadRefundRequestStateObjectType => {
     return ({
       ...initialState
     })
@@ -172,7 +209,7 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
 // Reducer
 // ------------------------------------
 
-export const initialState:LoadRefundRequestStateObject = {
+export const initialState:LoadRefundRequestStateObjectType = {
   pdf:       {
     isLoading:     false,
     file:          null,
@@ -192,10 +229,12 @@ export const initialState:LoadRefundRequestStateObject = {
   isSaved:   false
 }
 
-export const unknownAction:ActionPayload = {type: "Unknown"}
+export const unknownAction:ActionPayloadType = {type: "Unknown"}
 
-export default function loadRefundRequestReducer(state:LoadRefundRequestStateObject = initialState,
-                                                 action:ActionPayload = unknownAction):LoadRefundRequestStateObject {
+type ShorterType = LoadRefundRequestStateObjectType;
+
+export default function loadRefundRequestReducer(state:ShorterType = initialState,
+                                                 action:ActionPayloadType = unknownAction):ShorterType {
   const handler = LOAD_REFUND_REQUEST_ACTION_HANDLERS[action.type]
 
   return handler ? handler(state, action) : state

@@ -9,12 +9,6 @@ describe('(View) Home', () => {
     _component = render(<HomeView />)
   })
 
-  it('Renders a welcome message', () => {
-    const welcome = _component.find('h4')
-    expect(welcome).to.exist
-    expect(welcome.text()).to.match(/Welcome!/)
-  })
-
   it('Renders an awesome USPTO seal', () => {
     const usptoSeal = _component.find('img')
     expect(usptoSeal).to.exist

@@ -1,4 +1,6 @@
 /* @flow */
+/*eslint no-useless-constructor: 0*/
+
 import React from 'react'
 import classes from './<%= pascalEntityName %>.scss'
 
@@ -12,7 +14,12 @@ type Props = {
 }
 
 export class <%= pascalEntityName %> extends React.Component {
-  props: Props;
+
+  constructor(props:Props) {
+    super(props)
+    //this.onFileOpen = this.onFileOpen.bind(this)
+    //this.onBinaryContentAvailable = this.onBinaryContentAvailable.bind(this)
+  }
 
   render () {
     return (

@@ -1,6 +1,6 @@
 /* @flow */
 
-export type PdfState = {
+export type PdfStateType = {
   isLoading: boolean,
   file: any,
   content: ?string, // binary
@@ -9,44 +9,40 @@ export type PdfState = {
   scale: ?number
 }
 
-export type LookupState = {
+export type LookupStateType = {
   referenceNum: ?string,
   dateFrom: ?string,
   dateTo: ?string,
   email: ?string
 }
 
-export type ActionPayload = {
-  type: string,
-  meta: ?Object,
-  payload: ?any
+export type PdfDataType = {
+  pdf: ?PdfStateType
 }
 
-export type PdfData = {
-  pdf: ?PdfState
-}
+export type LookupFormDataType = LookupStateType
 
-export type LookupFormData = {
-  lookup: ?LookupState
-}
-
-export type PdfLoadingPayload = {
+export type PdfLoadingPayloadType = {
   isLoading: boolean,
   pdfFile: ?Object
 }
 
-export type PdfReadPayload = {
+export type LookupFormPayloadType = {
+  lookup: LookupFormDataType
+}
+
+export type PdfReadPayloadType = {
   pdfRaw: Uint8Array
 }
 
-export type SaveRefundRequestPayload = {
+export type SaveRefundRequestPayloadType = {
   isSaving: boolean,
   isSaved: boolean
 }
 
-export type LoadRefundRequestStateObject = {
-  pdf: PdfState,
-  lookup: LookupState,
+export type LoadRefundRequestStateObjectType = {
+  pdf: PdfStateType,
+  lookup: LookupStateType,
   isLoading: boolean,
   isSaving: boolean,
   isSaved: boolean

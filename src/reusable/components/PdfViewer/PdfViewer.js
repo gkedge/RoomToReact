@@ -2,7 +2,7 @@
 import React from 'react'
 import PDF from 'react-pdf-js'
 
-type Props = {
+type PropType = {
   isLoading: boolean,
   file: ?any,
   content: ?string,
@@ -15,7 +15,7 @@ type Props = {
 }
 
 class PdfViewer extends React.Component {
-  constructor(props:Props) {
+  constructor(props:PropType) {
     super(props)
     this.onDocumentComplete = this.onDocumentComplete.bind(this)
     this.onPageCompleted = this.onPageCompleted.bind(this)
@@ -96,30 +96,30 @@ class PdfViewer extends React.Component {
     return (
       <div className='pdf-viewer'>
         <PDF file={this.props.file}
-             content={this.props.content}
-             binaryContent={this.props.binaryContent}
-             scale={this.props.scale ? this.props.scale : 1.0}
-             onDocumentComplete={this.onDocumentComplete}
-             onPageCompleted={this.onPageCompleted}
-             onBinaryContentAvailable={this.props.onBinaryContentAvailable}
-             onContentAvailable={this.props.onContentAvailable}
-             page={(this.state || {}).page}/>
+          content={this.props.content}
+          binaryContent={this.props.binaryContent}
+          scale={this.props.scale ? this.props.scale : 1.0}
+          onDocumentComplete={this.onDocumentComplete}
+          onPageCompleted={this.onPageCompleted}
+          onBinaryContentAvailable={this.props.onBinaryContentAvailable}
+          onContentAvailable={this.props.onContentAvailable}
+          page={(this.state || {}).page} />
         {pagination}
       </div>
     )
   }
 }
-
+PdfViewer.displayName = 'PdfViewer'
 PdfViewer.propTypes = {
-  isLoading:                React.PropTypes.bool,
-  file:                     React.PropTypes.any,
-  content:                  React.PropTypes.string,
   binaryContent:            React.PropTypes.object,
-  page:                     React.PropTypes.number,
-  scale:                    React.PropTypes.number,
-  onContentAvailable:       React.PropTypes.func,
+  content:                  React.PropTypes.string,
+  file:                     React.PropTypes.any,
+  isLoading:                React.PropTypes.bool,
   onBinaryContentAvailable: React.PropTypes.func,
-  onDocumentComplete:       React.PropTypes.func
+  onContentAvailable:       React.PropTypes.func,
+  onDocumentComplete:       React.PropTypes.func,
+  page:                     React.PropTypes.number,
+  scale:                    React.PropTypes.number
 }
 
 module.exports = PdfViewer

@@ -3,13 +3,13 @@
 import React from 'react'
 import classes from './Counter.scss'
 
-type Props = {
+type PropType = {
   counter: number,
   doubleAsync: Function,
   increment: Function
 }
 
-export const Counter = (props: Props) => (
+export const Counter = (props:PropType):Object => (
   <div>
     <h2 className={classes.counterContainer}>
       Counter:
@@ -28,6 +28,7 @@ export const Counter = (props: Props) => (
   </div>
 )
 
+Counter.displayName = 'Counter'
 Counter.propTypes = {
   counter:     React.PropTypes.number.isRequired,
   doubleAsync: React.PropTypes.func.isRequired,

@@ -20,38 +20,17 @@
     box-sizing: inherit;
   }
 
-  .uspto-seal-panel {
+  .react-layout-components--box {
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
     display: flex;
-    justify-content: center;
   }
 
   .uspto-seal {
     width: 260px;
     margin: 1.5rem auto;
-  }
-
-  .flex-container {
-    display: flex;
-  }
-
-  .flex-div {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-
-  .left-half {
-    flex: 1;
-    padding: 1rem;
-  }
-
-  .right-half {
-    flex: 1;
-    padding: 1rem;
-  }
-
-  .pdf-panel, .scan-upload-btns-panel {
-    justify-content: center;
   }
 
   .pdf-viewer {
@@ -86,7 +65,7 @@
     -webkit-filter: opacity(0)
   }
 
-  .scan-upload-btns-flex {
+  .scan-upload-btns-outer {
     border: 1px solid #d3d3d3;
     height: 815px;
     width: 635px;
@@ -98,17 +77,13 @@
     height: 792px;
     width: 612px;
     box-shadow: 1px 1px 3px 4px #D7D2D2;
-
-    display: flex;
-    align-items: center;
-    text-align: center;
-    justify-content: center;
   }
 
-  div.lookup {
-    display: flex;
-    justify-content: center; /* Optional, to align inner flex-items
-                              horizontally within the column  */
+  div.form-field div.error {
+    color: darkred;
+  }
+
+  div.referenceNum-field {
   }
 
   div.dateFrom-field {
@@ -126,5 +101,9 @@
     vertical-align: bottom;
   }
 
-
+  label.questionmark {
+    //font-family: "symbols";
+    color: darkred;
+    align-items: flex-end;
+  }
 }

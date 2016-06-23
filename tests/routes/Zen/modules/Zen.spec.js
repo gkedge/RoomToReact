@@ -9,7 +9,7 @@ import zenReducer, {
 // Disregard any reference to nock as that is a server-side
 // only solution; using fetch-mock instead.
 import fetchMock from 'fetch-mock'
-import mockery from 'mockery'
+// import mockery from 'mockery'
 
 describe('(Route Module) Zen', () => {
   describe('(Actions)', () => {
@@ -72,7 +72,7 @@ describe('(Route Module) Zen', () => {
 
       beforeEach(() => {
         _globalState = {
-          zen: zenReducer(undefined, {})
+          zen: zenReducer(undefined, { type: 'Idunno'})
         }
         _dispatchSpy = sinon.spy((action) => {
           _globalState = {
@@ -120,11 +120,11 @@ describe('(Route Module) Zen', () => {
       })
 
       it('Should initialize with `initialState`.', () => {
-        expect(zenReducer(undefined, {})).to.equal(initialState)
+        expect(zenReducer(undefined, { type: 'Idunno' })).to.equal(initialState)
       })
 
       it('Passing `undefined` to reducer should produce initialState', () => {
-        let state = zenReducer(undefined, {})
+        let state = zenReducer(undefined, { type: 'Idunno' })
         expect(state).to.eql(initialState)
         state = zenReducer(state, {type: '@@@@@@@'})
         expect(state).to.eql(initialState)

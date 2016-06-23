@@ -14,7 +14,7 @@ import url from 'url'
 import fetchMock from 'fetch-mock'
 import sinon from 'sinon';
 import {mount, shallow} from 'enzyme';
-import {base64ToBinary} from 'store/DataUtils'
+import {base64ToBinary} from 'reusable/utilities/dataUtils'
 
 // Use the same middleware you use with Redux's applyMiddleware
 const browserHistory = useRouterHistory(createBrowserHistory)()

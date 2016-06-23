@@ -1,16 +1,18 @@
 /* @flow */
 
 import React from 'react'
-import Header from '../../components/Header'
+import Header from 'reusable/components/Header'
 import classes from './CoreLayout.scss'
 import '../../styles/core.scss'
 
-export const CoreLayout = ({ children }) => (
-  <div className='container text-center'>
+/*eslint-disable flowtype/require-parameter-type*/
+
+export const CoreLayout = ({children}):Object => (
+  <div>
     <Header />
-    <div className={classes.mainContainer}>
+    <section className='{classes.mainContainer}'>
       {children}
-    </div>
+    </section>
   </div>
 )
 

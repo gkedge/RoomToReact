@@ -1,13 +1,13 @@
 /* @flow */
 
-export type ZenObject = {
+export type ZenObjectType = {
   id: number,
   value: string
 }
 
-export type ZenStateObject = {
+export type ZenStateObjectType = {
   current: ?number,
   fetching: boolean,
   saved: Array<number>,
-  zens: Array<ZenObject>
+  zens: Array<ZenObjectType>
 }
