@@ -9,6 +9,7 @@ import zenReducer, {
 // Disregard any reference to nock as that is a server-side
 // only solution; using fetch-mock instead.
 import fetchMock from 'fetch-mock'
+import mockery from 'mockery'
 
 describe('(Route Module) Zen', () => {
   describe('(Actions)', () => {
