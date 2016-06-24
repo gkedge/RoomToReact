@@ -47,7 +47,8 @@ export function binary2Base64(binaryPDF:ArrayBuffer):string {
     b = (chunk & 3) << 4 // 3   = 2^2 - 1
 
     base64 += encodings[a] + encodings[b] + '=='
-  } else if (byteRemainder === 2) {
+  }
+  else if (byteRemainder === 2) {
     chunk = (bytes[mainLength] << 8) | bytes[mainLength + 1]
 
     a = (chunk & 64512) >> 10 // 64512 = (2^6 - 1) << 10

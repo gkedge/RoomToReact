@@ -104,13 +104,13 @@ export const fetchPaymentHistory = (filePath:Url, lookupFormData:LookupFormDataT
     // dispatch(requestLoadRefundRequest(pdfFilePath))
 
     return fetch(filePath.format(), {
-      //credentials: 'same-origin',
-      //method: 'post',
-      //headers: {
+      // credentials: 'same-origin',
+      // method: 'post',
+      // headers: {
       //  'Accept': 'application/json',
       //  'Content-Type': 'application/json'
-      //},
-      //body: JSON.stringify(Object.assign({}, lookupFormData, {status: 'publish'}))
+      // },
+      // body: JSON.stringify(Object.assign({}, lookupFormData, {status: 'publish'}))
     })
       .then((data:Object):any /* Promise*/ => data.text())
       .then((text:string):any /* Promise*/ => dispatch(pdfBinary(new Uint8Array([10], [11]))))

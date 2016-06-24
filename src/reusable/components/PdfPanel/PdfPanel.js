@@ -1,7 +1,7 @@
 /* flow */
 
 import React from 'react'
-import { Center } from 'react-layout-components'
+import {Center} from 'react-layout-components'
 import PdfViewer from 'reusable/components/PdfViewer/PdfViewer'
 
 type PropType = {
@@ -53,26 +53,27 @@ export default class PdfPanel extends React.Component {
         <div className='pdf-panel'>
           <PdfViewer {...this.props}
             onDocumentComplete={this.onDocumentComplete}
-            onBinaryContentAvailable={this.onBinaryContentAvailable} />
+            onBinaryContentAvailable={this.onBinaryContentAvailable}/>
         </div>
       )
-    } else {
+    }
+    else {
       return (
         <div className='scan-upload-btns-panel'>
-          <div className='scan-upload-btns-outer' >
-            <Center className='scan-upload-btns' >
+          <div className='scan-upload-btns-outer'>
+            <Center className='scan-upload-btns'>
               <button className='scan-btn btn'>Scan Document</button>
               <div className='attach-document btn btn-primary'>
                 <span>Attach Document</span>
                 <input type='file' id='fileinput'
-                  className='attach-btn btn'
-                  accept='application/pdf'
-                  onChange={this.onFileOpen} />
+                       className='attach-btn btn'
+                       accept='application/pdf'
+                       onChange={this.onFileOpen}/>
               </div>
             </Center>
           </div>
         </div>
-    )
+      )
     }
   }
 }

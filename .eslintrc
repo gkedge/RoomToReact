@@ -3,10 +3,10 @@
   "extends": [
     "eslint:recommended",
     "standard",
-    "standard-react"
   ],
   "plugins": [
     "babel",
+    "react",
     "flow-vars",
     "flowtype",
     // prevent require('lodash') in order to encourage things like require('lodash/collection/map').
@@ -115,7 +115,7 @@
       }
     ],
     "brace-style": [
-      "error"
+      "error", "stroustrup"
     ],
     "flow-vars/define-flow-type": 1,
     "flow-vars/use-flow-type": 1,
@@ -144,8 +144,11 @@
     "react/jsx-no-bind": [
       0
     ],
+    "react/jsx-space-before-closing": 0,
     "react/jsx-uses-react": 1,
     "react/jsx-uses-vars": 1,
+
+    "react/jsx-indent-props": [0, 2],
     "react/no-did-mount-set-state": 1,
     "react/no-did-update-set-state": 1,
     "react/no-unknown-property": 1,

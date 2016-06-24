@@ -66,13 +66,13 @@ export class LoadRefundRequest extends React.Component {
                 onFileOpen={this.onFileOpen}
                 onDocumentComplete={this.onDocumentComplete}
                 onBinaryContentAvailable={this.onBinaryContentAvailable}
-                key='load-refund-request-pdf-panel' 
+                key='load-refund-request-pdf-panel'
               />
             </Container>
           </Center>
           <Box flex='1 0 auto' key='load-refund-request-layout-1' >
             <Container padding='1rem' key='load-refund-request-layout-1-1' >
-              <LookupForm {...this.props.lookupFormData} 
+              <LookupForm {...this.props.lookupFormData}
                 key='load-refund-lookup-form'
                 onSubmit={this.handleSubmit} />
             </Container>
