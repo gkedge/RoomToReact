@@ -5,16 +5,16 @@ import type { ActionPayloadType } from 'reusable/interfaces/FpngTypes'
 import type {
   LookupFormDataType,
   SaveRefundRequestPayloadType,
-  LoadRefundRequestStateObjectType
-} from 'routes/LoadRefundRequest/interfaces/LoadRefundRequestTypes'
+  RefundRequestStateObjectType
+} from 'routes/RefundRequest/interfaces/RefundRequestTypes'
 
-import loadRefundRequestReducer, {
+import refundRequestReducer, {
   // Add action constants:
   LOADING_PDF, PDF_BINARY, PDF_LOADED,
   POST_REFUND_REQUEST, SAVED_REFUND_REQUEST,
   actions,
   initialState
-} from 'routes/LoadRefundRequest/modules/LoadRefundRequestMod'
+} from 'routes/RefundRequest/modules/RefundRequestMod'
 
 // http://redux.js.org/docs/recipes/WritingTests.html
 // Disregard any reference to nock as that is a server-side
@@ -23,7 +23,7 @@ import fetchMock from 'fetch-mock'
 import {binary2Base64, base64ToBinary} from 'reusable/utilities/dataUtils'
 import url from 'url'
 
-describe('(Route/Module) LoadRefundRequest/LoadRefundRequestMod', () => {
+describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
   describe('Actions', () => {
     const pdfFile = {}
 
@@ -103,29 +103,29 @@ describe('(Route/Module) LoadRefundRequest/LoadRefundRequestMod', () => {
         })
       })
 
-      describe('postLoadRefundRequest', () => {
+      describe('postRefundRequest', () => {
         it('Should be exported as a function.', () => {
-          expect(actions.postLoadRefundRequest).to.be.a('function')
+          expect(actions.postRefundRequest).to.be.a('function')
         })
 
         it('Should return an action with type "POST_REFUND_REQUEST".', () => {
-          expect(actions.postLoadRefundRequest())
+          expect(actions.postRefundRequest())
             .to.have.property('type', POST_REFUND_REQUEST)
         })
       })
 
-      describe('savedLoadRefundRequest', () => {
+      describe('savedRefundRequest', () => {
         it('Should be exported as a function.', () => {
-          expect(actions.savedLoadRefundRequest).to.be.a('function')
+          expect(actions.savedRefundRequest).to.be.a('function')
         })
 
         it('Should return an action with type "SAVED_REFUND_REQUEST".', () => {
-          expect(actions.savedLoadRefundRequest())
+          expect(actions.savedRefundRequest())
             .to.have.property('type', SAVED_REFUND_REQUEST)
         })
 
         it('Should return an action with "payload.isSaving && payload.isSaved" properties.', () => {
-          expect(actions.savedLoadRefundRequest())
+          expect(actions.savedRefundRequest())
             .to.have.property('payload').and.eql({isSaving: false, isSaved: true})
         })
       })
@@ -143,12 +143,12 @@ describe('(Route/Module) LoadRefundRequest/LoadRefundRequestMod', () => {
 
         beforeEach(() => {
           _globalState = {
-            loadRefundRequest: loadRefundRequestReducer(undefined, undefined)
+            refundRequest: refundRequestReducer(undefined, undefined)
           }
           _dispatchSpy = sinon.spy((action:ActionPayloadType) => {
             _globalState = {
               ..._globalState,
-              loadRefundRequest: loadRefundRequestReducer(_globalState.loadRefundRequest, action)
+              refundRequest: refundRequestReducer(_globalState.refundRequest, action)
             }
           })
           _getStateSpy = sinon.spy(() => {
@@ -180,7 +180,7 @@ describe('(Route/Module) LoadRefundRequest/LoadRefundRequestMod', () => {
         //    .then(() => {
         //      expect(_dispatchSpy).to.have.been.calledOnce;
         //      expect(fetchMock.called(file.format())).to.be.true
-        //      //expect(_globalState.loadRefundRequest.pdfContent).to.eql('I like turtles!')
+        //      //expect(_globalState.refundRequest.pdfContent).to.eql('I like turtles!')
         //    })
         //})
       })
@@ -190,12 +190,12 @@ describe('(Route/Module) LoadRefundRequest/LoadRefundRequestMod', () => {
 
         beforeEach(() => {
           _globalState = {
-            loadRefundRequest: loadRefundRequestReducer(undefined, undefined)
+            refundRequest: refundRequestReducer(undefined, undefined)
           }
           _dispatchSpy = sinon.spy((action) => {
             _globalState = {
               ..._globalState,
-              loadRefundRequest: loadRefundRequestReducer(_globalState.loadRefundRequest, action)
+              refundRequest: refundRequestReducer(_globalState.refundRequest, action)
             }
           })
           _getStateSpy = sinon.spy(() => {
@@ -227,7 +227,7 @@ describe('(Route/Module) LoadRefundRequest/LoadRefundRequestMod', () => {
             .then(() => {
               expect(_dispatchSpy).to.have.been.calledTwice;
               // TODO: expect(fetchMock.called('/refunds')).to.be.true
-              // TODO: expect(_globalState.loadRefundRequest.loadRefundRequests[0].value).to.equal('I like turtles!')
+              // TODO: expect(_globalState.refundRequest.refundRequests[0].value).to.equal('I like turtles!')
             })
         })
       })
@@ -238,17 +238,17 @@ describe('(Route/Module) LoadRefundRequest/LoadRefundRequestMod', () => {
       // NOTE: Probably want to verify that state hasn't been mutated).
       describe('Basic reduce tests', () => {
         it('Should be a function.', () => {
-          expect(loadRefundRequestReducer).to.be.a('function')
+          expect(refundRequestReducer).to.be.a('function')
         })
 
         it('Should initialize with `initialState`.', () => {
-          expect(loadRefundRequestReducer(undefined, undefined)).to.equal(initialState)
+          expect(refundRequestReducer(undefined, undefined)).to.equal(initialState)
         })
 
         it('Passing unexpected action type to reducer should produce current or initial state', () => {
-          let state = loadRefundRequestReducer(undefined, {type: 'Yow!'})
+          let state = refundRequestReducer(undefined, {type: 'Yow!'})
           expect(state).to.eql(initialState)
-          state = loadRefundRequestReducer(state, {type: '@@@@@@@'})
+          state = refundRequestReducer(state, {type: '@@@@@@@'})
           expect(state).to.eql(initialState)
         })
       })
@@ -260,10 +260,10 @@ describe('(Route/Module) LoadRefundRequest/LoadRefundRequestMod', () => {
           const expected = Object.assign({}, initialState)
           expected.isLoading = true;
           expected.pdf.file = {};
-          let state = loadRefundRequestReducer(initialState, actions.loadingPdf({}))
+          let state = refundRequestReducer(initialState, actions.loadingPdf({}))
 
           expect(state).to.eql(expected)
-          state = loadRefundRequestReducer(state, {type: '@@@@@@@'})
+          state = refundRequestReducer(state, {type: '@@@@@@@'})
           expect(state).to.eql(expected)
         })
 
@@ -272,8 +272,8 @@ describe('(Route/Module) LoadRefundRequest/LoadRefundRequestMod', () => {
           expected.isLoading = true;
           expected.pdf.flie = {}
           expected.pdf.binaryContent = pdfBinaryData
-          let state = loadRefundRequestReducer(initialState, actions.loadingPdf({}))
-          state = loadRefundRequestReducer(state, actions.pdfBinary(pdfBinaryData))
+          let state = refundRequestReducer(initialState, actions.loadingPdf({}))
+          state = refundRequestReducer(state, actions.pdfBinary(pdfBinaryData))
           expect(state).to.eql(expected)
         })
 
@@ -281,36 +281,36 @@ describe('(Route/Module) LoadRefundRequest/LoadRefundRequestMod', () => {
           const expected = Object.assign({}, initialState)
           expected.pdf.file = {}
           expected.pdf.binaryContent = pdfBinaryData
-          let state = loadRefundRequestReducer(initialState, actions.loadingPdf({}))
-          state = loadRefundRequestReducer(state, actions.pdfBinary(pdfBinaryData))
-          state = loadRefundRequestReducer(state, actions.pdfLoaded())
+          let state = refundRequestReducer(initialState, actions.loadingPdf({}))
+          state = refundRequestReducer(state, actions.pdfBinary(pdfBinaryData))
+          state = refundRequestReducer(state, actions.pdfLoaded())
 
           expect(state).to.eql(expected)
         })
 
-        it('Passing `postLoadRefundRequest()` to reducer should produce...', () => {
+        it('Passing `postRefundRequest()` to reducer should produce...', () => {
           const expected = Object.assign({}, initialState)
           expected.pdf.flie = {}
           expected.pdf.binaryContent = pdfBinaryData
           expected.isSaving = true;
-          let state = loadRefundRequestReducer(initialState, actions.loadingPdf({}))
-          state = loadRefundRequestReducer(state, actions.pdfBinary(pdfBinaryData))
-          state = loadRefundRequestReducer(state, actions.pdfLoaded())
-          state = loadRefundRequestReducer(state, actions.postLoadRefundRequest())
+          let state = refundRequestReducer(initialState, actions.loadingPdf({}))
+          state = refundRequestReducer(state, actions.pdfBinary(pdfBinaryData))
+          state = refundRequestReducer(state, actions.pdfLoaded())
+          state = refundRequestReducer(state, actions.postRefundRequest())
 
           expect(state).to.eql(expected)
         })
 
-        it('Passing `savedLoadRefundRequest()` to reducer should produce...', () => {
+        it('Passing `savedRefundRequest()` to reducer should produce...', () => {
           const expected = Object.assign({}, initialState)
           expected.pdf.flie = {}
           expected.pdf.binaryContent = pdfBinaryData
           expected.isSaved = true;
-          let state = loadRefundRequestReducer(initialState, actions.loadingPdf({}))
-          state = loadRefundRequestReducer(state, actions.pdfBinary(pdfBinaryData))
-          state = loadRefundRequestReducer(state, actions.pdfLoaded())
-          state = loadRefundRequestReducer(state, actions.postLoadRefundRequest())
-          state = loadRefundRequestReducer(state, actions.savedLoadRefundRequest())
+          let state = refundRequestReducer(initialState, actions.loadingPdf({}))
+          state = refundRequestReducer(state, actions.pdfBinary(pdfBinaryData))
+          state = refundRequestReducer(state, actions.pdfLoaded())
+          state = refundRequestReducer(state, actions.postRefundRequest())
+          state = refundRequestReducer(state, actions.savedRefundRequest())
 
           expect(state).to.eql(expected)
         })

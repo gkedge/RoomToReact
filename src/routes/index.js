@@ -16,7 +16,7 @@ export const createRoutes = (store) => {
         next(null, [
           // Provide store for async reducers and middleware
           // WITHOUT imports!
-          require('./LoadRefundRequest').default(store),
+          require('./RefundRequest').default(store),
           require('./Counter').default(store),
           require('./Zen').default(store)
         ])

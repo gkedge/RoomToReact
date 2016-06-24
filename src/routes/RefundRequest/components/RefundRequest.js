@@ -1,9 +1,9 @@
 /* @flow */
 import type {
   PdfDataType,
-  LoadRefundRequestStateObjectType,
+  RefundRequestStateObjectType,
   LookupFormDataType,
-  SaveRefundRequestPayloadType} from '../interfaces/LoadRefundRequestTypes'
+  SaveRefundRequestPayloadType} from '../interfaces/RefundRequestTypes'
 import React from 'react'
 import {Box, Center, Container} from 'react-layout-components'
 import PdfPanel from 'reusable/components/PdfPanel/PdfPanel'
@@ -21,7 +21,7 @@ type PropType = {
   validLookup: Function
 }
 
-export class LoadRefundRequest extends React.Component {
+export class RefundRequest extends React.Component {
   constructor(props:PropType) {
     super(props)
     this.onFileOpen = this.onFileOpen.bind(this)
@@ -83,8 +83,8 @@ export class LoadRefundRequest extends React.Component {
   }
 }
 
-LoadRefundRequest.displayName = 'LoadRefundRequest'
-LoadRefundRequest.propTypes = {
+RefundRequest.displayName = 'RefundRequest'
+RefundRequest.propTypes = {
   loadingPdf:            React.PropTypes.func.isRequired,
   lookupFormData:        React.PropTypes.object,
   onFileOpen:            React.PropTypes.func,
@@ -96,5 +96,5 @@ LoadRefundRequest.propTypes = {
   validLookup:           React.PropTypes.func.isRequired
 }
 
-export default LoadRefundRequest
+export default RefundRequest
 

@@ -40,7 +40,7 @@ export type SaveRefundRequestPayloadType = {
   isSaved: boolean
 }
 
-export type LoadRefundRequestStateObjectType = {
+export type RefundRequestStateObjectType = {
   pdf: PdfStateType,
   lookup: LookupStateType,
   isLoading: boolean,

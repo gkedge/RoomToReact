@@ -7,21 +7,21 @@ import {
   fetchPaymentHistory,
   saveRefundRequest,
   resetState
-} from '../modules/LoadRefundRequestMod'
+} from '../modules/RefundRequestMod'
 
-import LoadRefundRequest from '../components/LoadRefundRequest'
+import RefundRequest from '../components/RefundRequest'
 
 const mapStateToProps = (state:Object):Object => ({
   pdfData: {
-    isLoading: Boolean(state.loadRefundRequest.isLoading),
-    pdf:       state.loadRefundRequest.pdf
+    isLoading: Boolean(state.refundRequest.isLoading),
+    pdf:       state.refundRequest.pdf
   },
   lookupFormData: {
-    lookup: state.loadRefundRequest.lookup
+    lookup: state.refundRequest.lookup
   },
   savedRefundRequestData: {
-    isSaving: Boolean(state.loadRefundRequest.isSaving),
-    isSaved:  Boolean(state.loadRefundRequest.isSaved)
+    isSaving: Boolean(state.refundRequest.isSaving),
+    isSaved:  Boolean(state.refundRequest.isSaved)
   }
 })
 
@@ -43,4 +43,4 @@ const mapActionCreators:{
   resetState
 }
 
-export default connect(mapStateToProps, mapActionCreators)(LoadRefundRequest)
+export default connect(mapStateToProps, mapActionCreators)(RefundRequest)

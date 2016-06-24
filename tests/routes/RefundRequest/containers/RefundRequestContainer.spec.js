@@ -2,9 +2,9 @@
 // http://stackoverflow.com/a/36890932
 
 import React from 'react'
-import LoadRefundRequest from 'routes/LoadRefundRequest/components/LoadRefundRequest'
-import LoadRefundRequestContainer from 'routes/LoadRefundRequest/containers/LoadRefundRequestContainer'
-import {actions, initialState} from 'routes/LoadRefundRequest/modules/LoadRefundRequestMod'
+import RefundRequest from 'routes/RefundRequest/components/RefundRequest'
+import RefundRequestContainer from 'routes/RefundRequest/containers/RefundRequestContainer'
+import {actions, initialState} from 'routes/RefundRequest/modules/RefundRequestMod'
 import configureMockStore from 'redux-mock-store';
 import {routerMiddleware} from 'react-router-redux'
 import thunk from 'redux-thunk'
@@ -21,7 +21,7 @@ const browserHistory = useRouterHistory(createBrowserHistory)()
 const middleware = [thunk, routerMiddleware(browserHistory)]
 const mockStore = configureMockStore(middleware)
 
-describe('(Route/Container) LoadRefundRequest/LoadRefundRequestContainer', () => {
+describe('(Route/Container) RefundRequest/RefundRequestContainer', () => {
   let store = null
 
   beforeEach(() => {
@@ -32,9 +32,9 @@ describe('(Route/Container) LoadRefundRequest/LoadRefundRequestContainer', () =>
     })
   })
 
-  it('LoadRefundRequest & LoadRefundRequestContainer should exist', () => {
-    expect(LoadRefundRequest).to.not.be.null
-    expect(LoadRefundRequestContainer).to.not.be.null
+  it('RefundRequest & RefundRequestContainer should exist', () => {
+    expect(RefundRequest).to.not.be.null
+    expect(RefundRequestContainer).to.not.be.null
   })
 
   // describe('Test react-redux connect()', () => {
@@ -42,23 +42,23 @@ describe('(Route/Container) LoadRefundRequest/LoadRefundRequestContainer', () =>
   //   it('Test react-redux connect()\'ed store.', () => {
   //     const wrapper = mount(
   //       <Provider store={store}>
-  //         <LoadRefundRequest
-  //           loadRefundRequest={null}
+  //         <RefundRequest
+  //           refundRequest={null}
   //           saved={[]}
-  //           fetchLoadRefundRequest={fetchLoadRefundRequest}
-  //           saveCurrentLoadRefundRequest={saveCurrentLoadRefundRequest}
+  //           fetchRefundRequest={fetchRefundRequest}
+  //           saveCurrentRefundRequest={saveCurrentRefundRequest}
   //         />
   //       </Provider>
   //     )
   //
   //     // enzyme
-  //     const propsFromReduxLoadRefundRequest = wrapper.find(LoadRefundRequest).props()
+  //     const propsFromReduxRefundRequest = wrapper.find(RefundRequest).props()
   //
-  //     expect(propsFromReduxLoadRefundRequest).to.be.eql({
-  //       loadRefundRequest           : null,
+  //     expect(propsFromReduxRefundRequest).to.be.eql({
+  //       refundRequest           : null,
   //       saved                       : [],
-  //       fetchLoadRefundRequest      : fetchLoadRefundRequest,
-  //       saveCurrentLoadRefundRequest: saveCurrentLoadRefundRequest
+  //       fetchRefundRequest      : fetchRefundRequest,
+  //       saveCurrentRefundRequest: saveCurrentRefundRequest
   //     })
   //   })
   // })
@@ -88,20 +88,20 @@ describe('(Route/Container) LoadRefundRequest/LoadRefundRequestContainer', () =>
       expect(mockedActions).to.be.eql([pdfLoadAction])
     })
 
-    it('Test react-redux connect()\'ed store with postLoadRefundRequest action.', () => {
-      const postLoadRefundRequestAction = actions.postLoadRefundRequest()
-      store.dispatch(postLoadRefundRequestAction)
+    it('Test react-redux connect()\'ed store with postRefundRequest action.', () => {
+      const postRefundRequestAction = actions.postRefundRequest()
+      store.dispatch(postRefundRequestAction)
 
       const mockedActions = store.getActions()
-      expect(mockedActions).to.be.eql([postLoadRefundRequestAction])
+      expect(mockedActions).to.be.eql([postRefundRequestAction])
     })
 
-    it('Test react-redux connect()\'ed store with savedLoadRefundRequest action.', () => {
-      const savedLoadRefundRequestAction = actions.savedLoadRefundRequest()
-      store.dispatch(savedLoadRefundRequestAction)
+    it('Test react-redux connect()\'ed store with savedRefundRequest action.', () => {
+      const savedRefundRequestAction = actions.savedRefundRequest()
+      store.dispatch(savedRefundRequestAction)
 
       const mockedActions = store.getActions()
-      expect(mockedActions).to.be.eql([savedLoadRefundRequestAction])
+      expect(mockedActions).to.be.eql([savedRefundRequestAction])
     })
 
     //it('Test react-redux connect()\'ed store with fetchPaymentHistory action.', () => {

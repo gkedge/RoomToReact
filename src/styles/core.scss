@@ -79,26 +79,26 @@
     box-shadow: 1px 1px 3px 4px #D7D2D2;
   }
 
+  div.form-field div.error {
+    color: darkred;
+  }
+
+  div.referenceNum-field {
+  }
+
+  div.dateFrom-field {
+    //width: 140px;
+  }
+
+  div.dateTo-field {
+    padding-left: 1rem;
+    //width: 140px;
+  }
+
   div.form-field {
     padding-right: 1rem;
     padding-left: 1rem;
     vertical-align: bottom;
-    div.invalid {
-        color: darkred;
-    }
-    // If embedded 'form-filed's, defer to the parent's padding.
-    div.form-field {
-      padding-right: 0;
-      padding-left: 0;
-    }
-    // ... there's always a some widget that thinks it's special.
-    div.dateTo-field {
-      padding-left: 1rem;
-      //width: 140px;
-    }
-    div.dateFrom-field {
-      //width: 140px;
-    }
   }
 
   label.questionmark {

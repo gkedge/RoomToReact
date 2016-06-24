@@ -1,5 +1,5 @@
 import React from 'react'
-import {LookupForm} from 'routes/LoadRefundRequest/components/LookupForm'
+import {LookupForm} from 'routes/RefundRequest/components/LookupForm'
 import sinon from 'sinon';
 import {mount, shallow} from 'enzyme';
 

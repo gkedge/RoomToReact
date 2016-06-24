@@ -1,6 +1,6 @@
 /* @flow */
 
-import type {LookupFormDataType} from '../interfaces/LoadRefundRequestTypes'
+import type {LookupFormDataType} from '../interfaces/RefundRequestTypes'
 
 type PropType = {
   lookup: LookupFormDataType,
@@ -26,7 +26,7 @@ import compare from 'reusable/utilities/dates'
 import {upper, lower} from 'reusable/utilities/dataUtils'
 import adapter, {FieldWrapper, validEmail} from 'reusable/utilities/reduxFormFieldAdapters'
 
-// import {load as initialValues} from '../modules/LoadRefundRequestMod'
+// import {load as initialValues} from '../modules/RefundRequestMod'
 import classes from './LookupForm.scss'
 
 const invalidKeyToMessageMap = {
@@ -204,8 +204,8 @@ LookupForm = reduxForm(
 
 LookupForm = connect(
   (state:Object):Object => ({
-    // pull initial values from loadRefundRequest
-    initialValues: state.loadRefundRequest.lookup
+    // pull initial values from refundRequest
+    initialValues: state.refundRequest.lookup
   })
 )(LookupForm)
 

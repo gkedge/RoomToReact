@@ -2,13 +2,13 @@
 // Disregard any reference to nock as that is a server-side
 // only solution; using fetch-mock instead.
 
-import LoadRefundRequestRoute from 'routes/LoadRefundRequest'
+import RefundRequestRoute from 'routes/RefundRequest'
 
-describe('(Route) LoadRefundRequest', () => {
+describe('(Route) RefundRequest', () => {
   let _route
 
   beforeEach(() => {
-    _route = LoadRefundRequestRoute({})
+    _route = RefundRequestRoute({})
   })
 
   it('Should return a route configuration object', () => {

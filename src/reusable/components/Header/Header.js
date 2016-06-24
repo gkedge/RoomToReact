@@ -18,7 +18,7 @@ export const Header = () => (
     </IndexLink>
     {' · '}
     <Link to='/load' activeClassName={classes.activeRoute}>
-      Load Refund Request
+      Refund Request
     </Link>
   </div>
 )

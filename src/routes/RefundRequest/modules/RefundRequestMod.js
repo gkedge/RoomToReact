@@ -8,8 +8,8 @@ import type {
   LookupFormDataType,
   PdfReadPayloadType,
   SaveRefundRequestPayloadType,
-  LoadRefundRequestStateObjectType
-} from '../interfaces/LoadRefundRequestTypes'
+  RefundRequestStateObjectType
+} from '../interfaces/RefundRequestTypes'
 
 // https://davidwalsh.name/fetch
 import 'whatwg-fetch'  // isomorphic-fetch contains the browser-specific whatwg-fetch
@@ -67,7 +67,7 @@ export function pdfLoaded():ActionPayloadType {
   }
 }
 
-export function postLoadRefundRequest():ActionPayloadType {
+export function postRefundRequest():ActionPayloadType {
   return {
     type:    POST_REFUND_REQUEST,
     payload: {
@@ -77,7 +77,7 @@ export function postLoadRefundRequest():ActionPayloadType {
   }
 }
 
-export function savedLoadRefundRequest():ActionPayloadType {
+export function savedRefundRequest():ActionPayloadType {
   return {
     type:    SAVED_REFUND_REQUEST,
     payload: {
@@ -101,7 +101,7 @@ export const fetchPaymentHistory = (filePath:Url, lookupFormData:LookupFormDataT
   return (dispatch:Function):any /* Promise */ => {
     // let state = getState();
     // console.out('State: ' + JSON.stringify(state));
-    // dispatch(requestLoadRefundRequest(pdfFilePath))
+    // dispatch(requestRefundRequest(pdfFilePath))
 
     return fetch(filePath.format(), {
       // credentials: 'same-origin',
@@ -119,10 +119,10 @@ export const fetchPaymentHistory = (filePath:Url, lookupFormData:LookupFormDataT
 
 export const saveRefundRequest = (/* asciiPDF:string */):Function => {
   return (dispatch:Function):any /* Promise */ => {
-    dispatch(postLoadRefundRequest())
+    dispatch(postRefundRequest())
 
     return fetch('/refunds')
-      .then((/* data:Object */):any /* Promise */ => dispatch(savedLoadRefundRequest()))
+      .then((/* data:Object */):any /* Promise */ => dispatch(savedRefundRequest()))
   }
 }
 
@@ -131,16 +131,16 @@ export const actions = {
   pdfBinary,
   pdfLoaded,
   fetchPaymentHistory,
-  postLoadRefundRequest,
+  postRefundRequest,
   saveRefundRequest,
-  savedLoadRefundRequest,
+  savedRefundRequest,
   resetState
 }
 
 /*eslint "key-spacing": 0*/
 const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
-  [VALID_LOOKUP]: (state:LoadRefundRequestStateObjectType,
-                   action:{payload: LookupFormPayloadType}):LoadRefundRequestStateObjectType => {
+  [VALID_LOOKUP]: (state:RefundRequestStateObjectType,
+                   action:{payload: LookupFormPayloadType}):RefundRequestStateObjectType => {
     // TODO: normalize API not published yet in redux-form@6.0.0-alpha-15 so
     // I am 'case' normalizing here.  Once normalize API is published
     // I am hoping that the lower/upper functions can be removed here.
@@ -154,8 +154,8 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
       }
     })
   },
-  [LOADING_PDF]:          (state:LoadRefundRequestStateObjectType,
-                           action:{payload: PdfLoadingPayloadType}):LoadRefundRequestStateObjectType => {
+  [LOADING_PDF]:          (state:RefundRequestStateObjectType,
+                           action:{payload: PdfLoadingPayloadType}):RefundRequestStateObjectType => {
     return ({
       ...state,
       isLoading: action.payload.isLoading,
@@ -165,8 +165,8 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
       }
     })
   },
-  [PDF_BINARY]:           (state:LoadRefundRequestStateObjectType,
-                           action:{payload: PdfReadPayloadType}):LoadRefundRequestStateObjectType => {
+  [PDF_BINARY]:           (state:RefundRequestStateObjectType,
+                           action:{payload: PdfReadPayloadType}):RefundRequestStateObjectType => {
     return ({
       ...state,
       pdf: {
@@ -175,30 +175,30 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
       }
     })
   },
-  [PDF_LOADED]:           (state:LoadRefundRequestStateObjectType,
-                           action:{payload: PdfLoadingPayloadType}):LoadRefundRequestStateObjectType => {
+  [PDF_LOADED]:           (state:RefundRequestStateObjectType,
+                           action:{payload: PdfLoadingPayloadType}):RefundRequestStateObjectType => {
     return ({
       ...state,
       isLoading: action.payload.isLoading
     })
   },
-  [POST_REFUND_REQUEST]:  (state:LoadRefundRequestStateObjectType,
-                           action:{payload: SaveRefundRequestPayloadType}):LoadRefundRequestStateObjectType => {
+  [POST_REFUND_REQUEST]:  (state:RefundRequestStateObjectType,
+                           action:{payload: SaveRefundRequestPayloadType}):RefundRequestStateObjectType => {
     return ({
       ...initialState,
       isSaving: action.payload.isSaving,
       isSaved:  action.payload.isSaved
     })
   },
-  [SAVED_REFUND_REQUEST]: (state:LoadRefundRequestStateObjectType,
-                           action:{payload: SaveRefundRequestPayloadType}):LoadRefundRequestStateObjectType => {
+  [SAVED_REFUND_REQUEST]: (state:RefundRequestStateObjectType,
+                           action:{payload: SaveRefundRequestPayloadType}):RefundRequestStateObjectType => {
     return ({
       ...state,
       isSaving: action.payload.isSaving,
       isSaved:  action.payload.isSaved
     })
   },
-  [RESET_STATE]:          ():LoadRefundRequestStateObjectType => {
+  [RESET_STATE]:          ():RefundRequestStateObjectType => {
     return ({
       ...initialState
     })
@@ -209,7 +209,7 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
 // Reducer
 // ------------------------------------
 
-export const initialState:LoadRefundRequestStateObjectType = {
+export const initialState:RefundRequestStateObjectType = {
   pdf:       {
     isLoading:     false,
     file:          null,
@@ -231,9 +231,9 @@ export const initialState:LoadRefundRequestStateObjectType = {
 
 export const unknownAction:ActionPayloadType = {type: "Unknown"}
 
-type ShorterType = LoadRefundRequestStateObjectType;
+type ShorterType = RefundRequestStateObjectType;
 
-export default function loadRefundRequestReducer(state:ShorterType = initialState,
+export default function refundRequestReducer(state:ShorterType = initialState,
                                                  action:ActionPayloadType = unknownAction):ShorterType {
   const handler = LOAD_REFUND_REQUEST_ACTION_HANDLERS[action.type]
 
