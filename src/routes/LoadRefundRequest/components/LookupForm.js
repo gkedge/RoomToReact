@@ -19,7 +19,7 @@ type PropType = {
 
 import React from 'react'
 import {connect} from 'react-redux'
-import {reduxForm, formValueSelector, Field} from 'redux-form'
+import {reduxForm, Field} from 'redux-form'
 import {Box, Flex} from 'react-layout-components'
 import ReactTooltip from 'react-tooltip'
 import compare from 'reusable/utilities/dates'
@@ -157,6 +157,12 @@ let LookupForm = (props:PropType):Object => {
           <Field name='email' label="Email Address"
                  messageMap={invalidKeyToMessageMap}
                  normalize={lower} component={FieldWrapper} />
+
+          { /* Adapter doesn't work for some reason.
+          <Field name='email' label="Email Address"
+                 messageMap={invalidKeyToMessageMap}
+                 normalize={lower} component='EmailAdapter' />
+          */ }
 
           <div className='lookup-btns form-field' key='lookup-submit-layout'>
             <br key='lookup-submit-spacer'/>
