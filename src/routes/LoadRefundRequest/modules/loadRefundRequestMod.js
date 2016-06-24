@@ -94,8 +94,8 @@ export function resetState():ActionPayloadType {
 }
 
 // https://www.npmjs.com/package/redux-api 42/332/1770
-// https://www.npmjs.com/package/redux-rest-resource 81/107/181
 // https://www.npmjs.com/package/redux-fetch-api 0/16/119
+// https://www.npmjs.com/package/redux-rest-resource 81/107/181  <----
 // https://github.com/wbinnssmith/redux-normalizr-middleware
 export const fetchPaymentHistory = (filePath:Url, lookupFormData:LookupFormDataType):Function => {
   return (dispatch:Function):any /* Promise */ => {

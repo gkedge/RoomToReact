@@ -1,21 +1,6 @@
 /* @flow */
 
-import React from 'react'
-import {connect} from 'react-redux'
-import {reduxForm, formValueSelector, Field} from 'redux-form'
-import {Box, Flex} from 'react-layout-components'
-import ReactTooltip from 'react-tooltip'
-import Transition from 'react-motion-ui-pack'
-import compare from 'reusable/utilities/dates'
-import {upper, lower} from 'reusable/utilities/dataUtils'
-
-// import {load as initialValues} from '../modules/LoadRefundRequestMod'
-import classes from './LookupForm.scss'
-
-import type {
-  LookupFormDataType,
-  LoadRefundRequestStateObjectType
-} from '../interfaces/LoadRefundRequestTypes'
+import type {LookupFormDataType} from '../interfaces/LoadRefundRequestTypes'
 
 type PropType = {
   lookup: LookupFormDataType,
@@ -32,7 +17,19 @@ type PropType = {
   handleSubmit: Function
 }
 
-const errorKeyToMessageMap = {
+import React from 'react'
+import {connect} from 'react-redux'
+import {reduxForm, formValueSelector, Field} from 'redux-form'
+import {Box, Flex} from 'react-layout-components'
+import ReactTooltip from 'react-tooltip'
+import compare from 'reusable/utilities/dates'
+import {upper, lower} from 'reusable/utilities/dataUtils'
+import adapter, {FieldWrapper, validEmail} from 'reusable/utilities/reduxFormFieldAdapters'
+
+// import {load as initialValues} from '../modules/LoadRefundRequestMod'
+import classes from './LookupForm.scss'
+
+const invalidKeyToMessageMap = {
   'bad-alpha-position'          : "Misplaced alpha character",
   'bad-alpha-position-tip'      : "Only first 2 characters can ba alphabetic",
   'bad-email-format'            : "Invalid format",
@@ -52,10 +49,7 @@ const errorKeyToMessageMap = {
 
 const validate = (values:LookupFormDataType):Object => {
   const errors       = { lookup: {} }
-  const referenceNum = values.referenceNum
-  const dateFrom     = values.dateFrom
-  const dateTo       = values.dateTo
-  const email        = values.email
+  const {referenceNum, dateFrom, dateTo, email} = values
 
   if (!referenceNum) {
     errors.referenceNum = 'required'
@@ -89,51 +83,11 @@ const validate = (values:LookupFormDataType):Object => {
     if (!(/\S*@\S*\./).test(email)) {
       errors.email = 'email-missing-separators'
     }
-    else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(email)) {
+    else if (!validEmail.test(email)) {
       errors.email = 'bad-email-format'
     }
   }
   return errors
-}
-
-const errorSpan = (field:Object):Object => {
-  const errMsg    = errorKeyToMessageMap[field.error] || 'Invalid'
-  const errMsgTip = errorKeyToMessageMap[field.error + '-tip'] || null
-  return (
-    <div className='error'>
-      <Transition component='span'>
-        <span className='error'
-              data-html='true'
-              data-tip={errMsgTip}
-              key={field.name + '-error-message'}> {errMsg} </span>
-        <ReactTooltip key={field.name + '-error-tooltip'}/>
-      </ Transition >
-    </div>
-  )
-}
-
-const renderInputLabel = (fieldProps:Object):Object => {
-  return (
-    <div>
-      <label forHtml={fieldProps.name + '-input'}>{fieldProps.label}</label>
-    </div>)
-}
-
-const renderInput = (fieldProps:Object):?Object => {
-  const type = fieldProps.visited ?
-               fieldProps.visitedType ? fieldProps.visitedType :
-               fieldProps.type ? fieldProps.type : 'text' :
-               fieldProps.type ? fieldProps.type : 'text'
-
-  return (
-    <div className={fieldProps.name + ' form-field'}>
-      {fieldProps.label && renderInputLabel(fieldProps)}
-      <div>
-        <input type={type} {...fieldProps}
-               placeholder={fieldProps.placeholder}/>
-        {fieldProps.touched && fieldProps.error && errorSpan(fieldProps)}
-      </div>
-    </div>)
 }
 
 const renderReferenceNum = (fieldProps:Object):?Object => {
@@ -154,24 +108,26 @@ const renderReferenceNum = (fieldProps:Object):?Object => {
                '</ul>' +
                '</ul>'
   return (
-    <div className='reference-num form-field'>
+    <div className={fieldProps.name + '-field form-field'}>
       <div>
         <Flex justifyContent='space-between'>
-          <label className='referenceNum-label'>Reference #</label>
+          <label className={fieldProps.name + '-label'}
+                 htmlFor={fieldProps.id ? fieldProps.id : 
+                          fieldProps.name + '-input'}>Reference #</label>
           <label className='questionmark'
                  data-html='true'
                  data-tip={info}>[&#x2753;]</label>
           <ReactTooltip />
         </Flex>
       </div>
-      {renderInput(fieldProps)}
+      {FieldWrapper(fieldProps)}
     </div>)
 }
 
 let LookupForm = (props:PropType):Object => {
   const { handleSubmit, submitting } = props
   // TODO: normalize API not published yet in redux-form@6.0.0-alpha-15
-  
+
   // WARNING: the 'component' property on <Field /> CANNOT be a '=>'
   // function! It will cause a re-render of the Field component every time.
   // Though the performance hit may be insignificant, it causes loss of focus
@@ -180,10 +136,9 @@ let LookupForm = (props:PropType):Object => {
     <section className='lookup-section' key='lookup-section'>
       <form onSubmit={handleSubmit} className='lookup-form' key='lookup-form-form'>
         <Box justify-content='center' key='lookup-form-layout'>
-          <Field key='referenceNum-field'
-                 name='referenceNum'
-                 normalize={upper}
-                 component={renderReferenceNum}/>
+          <Field name='referenceNum' id='referenceNum-id'
+                 messageMap={invalidKeyToMessageMap}
+                 normalize={upper} component={renderReferenceNum} />
 
           <div className='date-range form-field'>
             <div>
@@ -191,16 +146,17 @@ let LookupForm = (props:PropType):Object => {
             </div>
             <Flex className='mailroom-date'>
               <Field name='dateFrom' placeholder='From'
-                     visitedType='date'
-                     normalize={lower} component={renderInput}/>
+                     visitedType='date' messageMap={invalidKeyToMessageMap}
+                     normalize={lower} component={FieldWrapper} />
               <Field name='dateTo' placeholder='To'
-                     visitedType='date'
-                     normalize={lower} component={renderInput}/>
+                     visitedType='date' messageMap={invalidKeyToMessageMap}
+                     normalize={lower} component={FieldWrapper} />
             </Flex>
           </div>
 
           <Field name='email' label="Email Address"
-                 normalize={lower} component={renderInput}/>
+                 messageMap={invalidKeyToMessageMap}
+                 normalize={lower} component={FieldWrapper} />
 
           <div className='lookup-btns form-field' key='lookup-submit-layout'>
             <br key='lookup-submit-spacer'/>
@@ -235,6 +191,7 @@ LookupForm.propTypes   = {
 LookupForm = reduxForm(
   {
     form: 'lookupForm',
+    adapter,
     validate
   }
 )(LookupForm)
@@ -246,15 +203,4 @@ LookupForm = connect(
   })
 )(LookupForm)
 
-// const selector = formValueSelector('lookupForm') // <-- same as form name
-//
-// LookupForm = connect(
-//  state => {
-//    const {referenceNum, dateFrom, dateTo} =
-//            selector(state, 'referenceNum', 'dateFrom', 'dateTo')
-//    return {
-//      referenceNum, dateFrom, dateTo
-//    }
-//  }
-// )(LookupForm)
 export default LookupForm
