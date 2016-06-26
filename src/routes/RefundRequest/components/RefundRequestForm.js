@@ -1,21 +1,10 @@
 /* @flow */
-
-import type {LookupFormDataType} from '../interfaces/RefundRequestTypes'
-
-type PropType = {
-  lookup: LookupFormDataType,
-  form: string,
-  anyTouched: boolean,
-  dirty: boolean,
-  initialized: boolean,
-  invalid: boolean,
-  pristine: boolean,
-  submitting: boolean,
-  submitFailed: boolean,
-  valid: boolean,
-  array: Object,
-  handleSubmit: Function
-}
+import type {
+  PdfDataType,
+  RefundRequestStateObjectType,
+  LookupFormDataType,
+  SaveRefundRequestPayloadType
+} from '../interfaces/RefundRequestTypes'
 
 import React from 'react'
 import {connect} from 'react-redux'
@@ -26,8 +15,16 @@ import compare from 'reusable/utilities/dates'
 import {upper, lower} from 'reusable/utilities/dataUtils'
 import adapter, {FieldWrapper, validEmail} from 'reusable/utilities/reduxFormFieldAdapters'
 
-// import {load as initialValues} from '../modules/RefundRequestMod'
-import classes from './LookupForm.scss'
+type PropType = {
+  loadingPdf: Function,
+  lookupFormData: ? LookupFormDataType,
+  pdfBinary: Function,
+  pdfData: ? PdfDataType,
+  pdfLoaded: Function,
+  resetState: Function,
+  saveRefundRequestData: ? SaveRefundRequestPayloadType,
+  validLookup: Function
+}
 
 const invalidKeyToMessageMap = {
   'bad-alpha-position'          : "Misplaced alpha character",
@@ -124,88 +121,92 @@ const renderReferenceNum = (fieldProps:Object):?Object => {
     </div>)
 }
 
-let LookupForm = (props:PropType):Object => {
-  const { handleSubmit, submitting } = props
+export class RefundRequestForm extends React.Component {
+
+  constructor(props:PropType) {
+    super(props)
+  }
+
   // TODO: normalize API not published yet in redux-form@6.0.0-alpha-15
 
   // WARNING: the 'component' property on <Field /> CANNOT be a '=>'
   // function! It will cause a re-render of the Field component every time.
   // Though the performance hit may be insignificant, it causes loss of focus
   // on HTML <input /> fields after entering the 1st charater into the <input />.
-  return (
-    <section className='lookup-section'>
-      <form onSubmit={handleSubmit} className='lookup-form'>
-        <Box justify-content='center'>
-          <Field name='referenceNum' id='referenceNum-id'
-                 messageMap={invalidKeyToMessageMap}
-                 normalize={upper} component={renderReferenceNum}/>
-
-          <div className='date-range form-field'>
-            <div>
-              <label>Mailroom Date Range</label>
-            </div>
-            <Flex className='mailroom-date'>
-              <Field name='dateFrom' placeholder='From'
-                     visitedType='date' messageMap={invalidKeyToMessageMap}
+  render() {
+    return (
+        <section className='request-section'>
+          <form onSubmit={this.props.handleSubmit} className='request-form'>
+            <Box justify-content='center'>
+              <Field name='referenceNum' id='referenceNum-id'
+                     messageMap={invalidKeyToMessageMap}
+                     normalize={upper} component={renderReferenceNum}/>
+    
+              <div className='date-range form-field'>
+                <div>
+                  <label>Mailroom Date Range</label>
+                </div>
+                <Flex className='mailroom-date'>
+                  <Field name='dateFrom' placeholder='From'
+                         visitedType='date' messageMap={invalidKeyToMessageMap}
+                         normalize={lower} component={FieldWrapper}/>
+                  <Field name='dateTo' placeholder='To'
+                         visitedType='date' messageMap={invalidKeyToMessageMap}
+                         normalize={lower} component={FieldWrapper}/>
+                </Flex>
+              </div>
+    
+              <Field name='email' label='Email Address'
+                     messageMap={invalidKeyToMessageMap}
                      normalize={lower} component={FieldWrapper}/>
-              <Field name='dateTo' placeholder='To'
-                     visitedType='date' messageMap={invalidKeyToMessageMap}
-                     normalize={lower} component={FieldWrapper}/>
-            </Flex>
-          </div>
-
-          <Field name='email' label='Email Address'
-                 messageMap={invalidKeyToMessageMap}
-                 normalize={lower} component={FieldWrapper}/>
-
-          { /*
-           Adapter doesn't work for some reason.
-           <Field name='email' label="Email Address"
-           messageMap={invalidKeyToMessageMap}
-           normalize={lower} component='EmailAdapter' />
-           */}
-
-          <div className='lookup-btns form-field'>
-            <br/>
-            <button type='submit' className='btn btn-primary'
-                    disable={submitting}>Search
-            </button>
-          </div>
-        </Box>
-      </form>
-    </section>
-  )
+    
+              { /*
+               Adapter doesn't work for some reason.
+               <Field name='email' label="Email Address"
+               messageMap={invalidKeyToMessageMap}
+               normalize={lower} component='EmailAdapter' />
+               */}
+    
+              <div className='lookup-btns form-field'>
+                <br/>
+                <button type='submit' className='btn btn-primary'
+                        disable={this.props.submitting}>Search
+                </button>
+              </div>
+            </Box>
+          </form>
+        </section>
+    )
+  }
 }
 
-LookupForm.displayName = 'LookupForm'
-LookupForm.propTypes   = {
-  anyTouched  : React.PropTypes.bool.isRequired,
-  array       : React.PropTypes.object.isRequired,
-  dirty       : React.PropTypes.bool.isRequired,
-  form        : React.PropTypes.string.isRequired,
-  handleSubmit: React.PropTypes.func.isRequired,
-  initialized : React.PropTypes.bool.isRequired,
-  invalid     : React.PropTypes.bool.isRequired,
-  lookup      : React.PropTypes.object.isRequired,
-  pristine    : React.PropTypes.bool.isRequired,
-  submitFailed: React.PropTypes.bool.isRequired,
-  submitting  : React.PropTypes.bool.isRequired,
-  valid       : React.PropTypes.bool.isRequired
+RefundRequestForm.displayName = 'RefundRequest'
+RefundRequestForm.propTypes   = {
+  loadingPdf           : React.PropTypes.func.isRequired,
+  lookupFormData       : React.PropTypes.object,
+  onFileOpen           : React.PropTypes.func,
+  pdfBinary            : React.PropTypes.func.isRequired,
+  pdfData              : React.PropTypes.object,
+  pdfLoaded            : React.PropTypes.func.isRequired,
+  resetState           : React.PropTypes.func.isRequired,
+  saveRefundRequestData: React.PropTypes.object,
+  validLookup          : React.PropTypes.func.isRequired
 }
 
-LookupForm = reduxForm(
+RefundRequestForm = reduxForm(
   {
     form: 'lookupForm',
     adapter,
     validate
   }
-)(LookupForm)
+)(RefundRequestForm)
 
-LookupForm = connect(
+RefundRequestForm = connect(
   (state:Object):Object => ({
     // pull initial values from refundRequest
     initialValues: state.refundRequest.lookup
   })
-)(LookupForm)
+)(RefundRequestForm)
 
-export default LookupForm
+export default RefundRequestForm
+export default RefundRequestForm
