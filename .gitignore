@@ -8,3 +8,7 @@ application.iml
 /dist/
 /*.zip
 /Home/
+.eslintrc_BACKUP_10500
+.eslintrc_BASE_10500
+.eslintrc_LOCAL_10500
+.eslintrc_REMOTE_10500
