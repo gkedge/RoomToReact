@@ -32,12 +32,12 @@
       "onlyFilesWithFlowAnnotation": true
     }
   },
-  "globals": {
-    "__DEV__": false,
-    "__PROD__": false,
-    "__DEBUG__": false,
-    "__COVERAGE__": false,
-    "__BASENAME__": false
+  "globals" : {
+    "__DEV__"      : false,
+    "__PROD__"     : false,
+    "__DEBUG__"    : false,
+    "__COVERAGE__" : false,
+    "__BASENAME__" : false
   },
   "rules": {
     "no-console": 0,
