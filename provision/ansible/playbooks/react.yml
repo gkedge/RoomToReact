@@ -1,0 +1,47 @@
+---
+- hosts: react-ui
+  remote_user: deployer
+
+  vars_files:
+    - vars/main.yml
+
+  pre_tasks:
+    - debug: msg="VM type = {{ ansible_virtualization_type }}"
+    - debug: msg="User = {{ ansible_ssh_user }}"
+
+  tasks:
+#    - name: Dump all vars
+#      template: src=templates/dumpall.j2 dest=/tmp/react.all
+
+    - name: ensure git.kedges.com is a known host
+      lineinfile:
+        dest: "/home/{{ansible_ssh_user}}/.ssh/known_hosts"
+        create: yes
+        state: present
+        line: "{{ lookup('pipe', 'ssh-keyscan -t rsa git.kedges.com') }}"
+        regexp: "^git\\.kedges\\.com"
+
+    - name: ensure github.com is a known host
+      lineinfile:
+        dest: "/home/{{ansible_ssh_user}}/.ssh/known_hosts"
+        create: yes
+        state: present
+        line: "{{ lookup('pipe', 'ssh-keyscan -t rsa github.com') }}"
+        regexp: "^github\\.com"
+
+    # 'version' appears to only support branches that start with 'origin' as in
+    # version: develop mean: 'origin/develop'; version: master means: 'origin/master'
+    # Hopefully, the next Ansible update will fix that!
+    - name: clone or pull new code
+      git:
+        repo: git@github.com:atsid/RoomToReact.git
+        dest: "/home/{{ansible_ssh_user}}/react"
+        force: yes
+#        version: develop
+
+    # This is a LOT faster than installing using ansible npm module.
+    - name: install npm packages
+      command: npm install
+      args:
+        chdir: "/home/{{ansible_ssh_user}}/react"
+#        creates: "/home/{{ansible_ssh_user}}/react/node_modules"

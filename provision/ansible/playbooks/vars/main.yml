@@ -1,0 +1,89 @@
+---
+
+zoneeditPassword: "{{ vaulted_zoneedit_password }}"
+timezone: America/New_York
+subDomain: ui
+domain: react
+domainExt: dev
+
+download_dir: /tmp
+firewall_allowed_tcp_ports:
+  - "22"
+  - "80"
+  - "8080"
+  - "8888"
+  - "9990"
+
+firewall_forwarded_tcp_ports:
+  - { src: "80", dest: "8080" }
+
+wildfly_mgmt_bind_address: "{{ansible_ssh_host}}" 
+wildfly_public_bind_address: "{{ansible_ssh_host}}"
+
+wildfly_alt_dir: wildfly-alt
+
+vhost_root: "http://{{subDomain}}.{{domain}}.{{domainExt}}:80"
+
+apache_listen_port: 8888
+apache_remove_default_vhost: true
+apache_vhosts:
+  # Additional properties: 'serveradmin, serveralias, extra_parameters'.
+  - servername: "{{subDomain}}.{{domain}}.{{domainExt}}"
+    documentroot: "/var/www/{{subDomain}}.{{domain}}.{{domainExt}}"
+    directory_extra: |
+      RewriteEngine on
+      # Don't rewrite files or directories
+      RewriteCond %{REQUEST_FILENAME} -f [OR]
+      RewriteCond %{REQUEST_FILENAME} -d
+      RewriteRule ^ - [L]
+      # Rewrite everything else to index.html to allow html5 state links
+      RewriteRule ^ index.html [L]
+
+nginx_remove_default_vhost: true
+
+nginx_vhosts:
+  - listen: "80 default_server" # default: "80 default_server"
+    server_name: "{{subDomain}}.{{domain}}.{{domainExt}}" # default: N/A
+    root: "/var/www/{{subDomain}}.{{domain}}.{{domainExt}}" # default: N/A
+    index: "index.html index.htm" # default: "index.html index.htm"
+    extra_parameters: |
+      location ~* \.(?:manifest|appcache|html?|xml|json)$ {
+          expires -1;
+          # access_log logs/static.log; # I don't usually include a static log
+      }
+      
+      location ~* \.(?:css|js)$ {
+          try_files $uri =404;
+          expires 1y;
+          access_log off;
+          add_header Cache-Control "public";
+      }
+      
+      # Any route containing a file extension (e.g. /devicesfile.js)
+      location ~ ^.+\..+$ {
+          try_files $uri =404;
+      }
+      
+      # Any route that doesn't have a file extension (e.g. /devices)
+      location / {
+          try_files $uri $uri/ /index.html;
+      }
+
+nodejs_version: "5.x"
+
+node_modules:
+#  - gulp
+#  - bower
+#  - babel-core
+#  - babel
+#  - gulp
+#  - gulp-util
+#  - gulp-jslint
+#  - lint
+#  - gulp-jshint
+#  - gulp-load-plugins
+#  - gulp-uglify
+#  - wiredep
+#  - del
+#  - require
+  - yo

@@ -1,0 +1,7 @@
+---
+# file: roles/wildfly/install/meta/main.yml
+
+dependencies:
+- { role: ansiblebit.oracle-java, 
+    oracle_java_set_as_default: yes}
+

@@ -1,0 +1,4 @@
+[crisp]
+crisp-ui
+
+crisp-ui ansible_ssh_host=104.236.79.160
