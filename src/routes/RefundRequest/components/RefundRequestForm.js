@@ -46,41 +46,41 @@ const invalidKeyToMessageMap = {
 
 const validate = (values:LookupFormDataType):Object => {
   const errors = { lookup: {} }
-  const { referenceNum, dateFrom, dateTo, email } = values
+  const { referenceNumX, dateFromX, dateToX, emailX } = values
 
-  if (!referenceNum) {
-    errors.referenceNum = 'required'
+  if (!referenceNumX) {
+    errors.referenceNumX = 'required'
   }
-  else if (referenceNum.length < 7) {
-    errors.referenceNum = 'low-range'
+  else if (referenceNumX.length < 7) {
+    errors.referenceNumX = 'low-range'
   }
-  else if (referenceNum.length > 8) {
-    errors.referenceNum = 'high-range'
+  else if (referenceNumX.length > 8) {
+    errors.referenceNumX = 'high-range'
   }
-  else if (/^(([\d][A-Za-z])|([A-Za-z][\d])).*/.test(referenceNum)) {
-    errors.referenceNum = 'bad-first-two-chars'
+  else if (/^(([\d][A-Za-z])|([A-Za-z][\d])).*/.test(referenceNumX)) {
+    errors.referenceNumX = 'bad-first-two-chars'
   }
-  else if (!/^[A-Za-z\d][A-Za-z\d]\d*$/.test(referenceNum)) {
-    errors.referenceNum = 'bad-alpha-position'
+  else if (!/^[A-Za-z\d][A-Za-z\d]\d*$/.test(referenceNumX)) {
+    errors.referenceNumX = 'bad-alpha-position'
   }
-  if (!dateFrom) {
-    errors.dateFrom = 'required'
+  if (!dateFromX) {
+    errors.dateFromX = 'required'
   }
-  if (!dateTo) {
-    errors.dateTo = 'required'
+  if (!dateToX) {
+    errors.dateToX = 'required'
   }
-  if (dateFrom && dateTo) {
-    const diff = compare(dateFrom, dateTo)
+  if (dateFromX && dateToX) {
+    const diff = compare(dateFromX, dateToX)
     if (diff > 0) {
-      errors.dateFrom = 'less-than-data-to'
-      errors.dateTo   = 'less-than-data-to'
+      errors.dateFromX = 'less-than-data-to'
+      errors.dateToX   = 'less-than-data-to'
     }
   }
-  if (email) {
-    if (!(/\S*@\S*\./).test(email)) {
+  if (emailX) {
+    if (!(/\S*@\S*\./).test(emailX)) {
       errors.email = 'email-missing-separators'
     }
-    else if (!validEmail.test(email)) {
+    else if (!validEmail.test(emailX)) {
       errors.email = 'bad-email-format'
     }
   }
@@ -138,7 +138,7 @@ export class RefundRequestForm extends React.Component {
         <section className='request-section'>
           <form onSubmit={this.props.handleSubmit} className='request-form'>
             <Box justify-content='center'>
-              <Field name='referenceNum' id='referenceNum-id'
+              <Field name='referenceNumX' id='referenceNum-id'
                      messageMap={invalidKeyToMessageMap}
                      normalize={upper} component={renderReferenceNum}/>
     
@@ -147,16 +147,16 @@ export class RefundRequestForm extends React.Component {
                   <label>Mailroom Date Range</label>
                 </div>
                 <Flex className='mailroom-date'>
-                  <Field name='dateFrom' placeholder='From'
+                  <Field name='dateFromX' placeholder='From'
                          visitedType='date' messageMap={invalidKeyToMessageMap}
                          normalize={lower} component={FieldWrapper}/>
-                  <Field name='dateTo' placeholder='To'
+                  <Field name='dateToX' placeholder='To'
                          visitedType='date' messageMap={invalidKeyToMessageMap}
                          normalize={lower} component={FieldWrapper}/>
                 </Flex>
               </div>
     
-              <Field name='email' label='Email Address'
+              <Field name='emailX' label='Email Address'
                      messageMap={invalidKeyToMessageMap}
                      normalize={lower} component={FieldWrapper}/>
     
@@ -167,7 +167,7 @@ export class RefundRequestForm extends React.Component {
                normalize={lower} component='EmailAdapter' />
                */}
     
-              <div className='lookup-btns form-field'>
+              <div className='lookup-btnsX form-field'>
                 <br/>
                 <button type='submit' className='btn btn-primary'
                         disable={this.props.submitting}>Search
