@@ -30,21 +30,21 @@ import adapter, {FieldWrapper, validEmail} from 'reusable/utilities/reduxFormFie
 import classes from './LookupForm.scss'
 
 const invalidKeyToMessageMap = {
-  'bad-alpha-position':           "Misplaced alpha character",
-  'bad-alpha-position-tip':       "Only first 2 characters can ba alphabetic",
-  'bad-email-format':             "Invalid format",
-  'bad-email-format-tip':         "Contains invalid characters or exceeds length limits",
-  'bad-first-two-chars':          "If alpha, first 2 chars alpha",
-  'bad-first-two-chars-tip':      "Alpha okay in first 2 characters, but both need to be alpha",
-  'email-missing-separators':     "Must have '@' and '.'",
+  'bad-alpha-position'          : "Misplaced alpha character",
+  'bad-alpha-position-tip'      : "Only first 2 characters can ba alphabetic",
+  'bad-email-format'            : "Invalid format",
+  'bad-email-format-tip'        : "Contains invalid characters or exceeds length limits",
+  'bad-first-two-chars'         : "If alpha, first 2 chars alpha",
+  'bad-first-two-chars-tip'     : "Alpha okay in first 2 characters, but both need to be alpha",
+  'email-missing-separators'    : "Must have '@' and '.'",
   'email-missing-separators-tip': "Email have the format: <i>text</i>@<i>text</i>.<i>text</i>",
-  'high-range':                   "Must < 9 characters",
-  'high-range-tip':               "Number cannot exceed 8 characters in length",
-  'less-than-data-to':            "From is less than To",
-  'less-than-data-to-tip':        "'From' date must be greater than or equal 'To' date",
-  'low-range':                    "Must > 6 characters",
-  'low-range-tip':                "Number must at least 7 characters in length",
-  'required':                     "Required"
+  'high-range'                  : "Must < 9 characters",
+  'high-range-tip'              : "Number cannot exceed 8 characters in length",
+  'less-than-data-to'           : "From is less than To",
+  'less-than-data-to-tip'       : "'From' date must be greater than or equal 'To' date",
+  'low-range'                   : "Must > 6 characters",
+  'low-range-tip'               : "Number must at least 7 characters in length",
+  'required'                    : "Required"
 }
 
 const validate = (values:LookupFormDataType):Object => {
@@ -76,7 +76,7 @@ const validate = (values:LookupFormDataType):Object => {
     const diff = compare(dateFrom, dateTo)
     if (diff > 0) {
       errors.dateFrom = 'less-than-data-to'
-      errors.dateTo = 'less-than-data-to'
+      errors.dateTo   = 'less-than-data-to'
     }
   }
   if (email) {
@@ -133,9 +133,9 @@ let LookupForm = (props:PropType):Object => {
   // Though the performance hit may be insignificant, it causes loss of focus
   // on HTML <input /> fields after entering the 1st charater into the <input />.
   return (
-    <section className='lookup-section' key='lookup-section'>
-      <form onSubmit={handleSubmit} className='lookup-form' key='lookup-form-form'>
-        <Box justify-content='center' key='lookup-form-layout'>
+    <section className='lookup-section'>
+      <form onSubmit={handleSubmit} className='lookup-form'>
+        <Box justify-content='center'>
           <Field name='referenceNum' id='referenceNum-id'
                  messageMap={invalidKeyToMessageMap}
                  normalize={upper} component={renderReferenceNum}/>
@@ -158,17 +158,16 @@ let LookupForm = (props:PropType):Object => {
                  messageMap={invalidKeyToMessageMap}
                  normalize={lower} component={FieldWrapper}/>
 
-          { /* Adapter doesn't work for some reason.
+          { /*
+           Adapter doesn't work for some reason.
            <Field name='email' label="Email Address"
            messageMap={invalidKeyToMessageMap}
            normalize={lower} component='EmailAdapter' />
-           */ }
+           */}
 
-          <div className='lookup-btns form-field' key='lookup-submit-layout'>
-            <br key='lookup-submit-spacer'/>
-            <button type='submit'
-                    className='btn btn-primary'
-                    key='lookup-submit'
+          <div className='lookup-btns form-field'>
+            <br/>
+            <button type='submit' className='btn btn-primary'
                     disable={submitting}>Search
             </button>
           </div>
@@ -179,19 +178,19 @@ let LookupForm = (props:PropType):Object => {
 }
 
 LookupForm.displayName = 'LookupForm'
-LookupForm.propTypes = {
-  anyTouched:   React.PropTypes.bool.isRequired,
-  array:        React.PropTypes.object.isRequired,
-  dirty:        React.PropTypes.bool.isRequired,
-  form:         React.PropTypes.string.isRequired,
+LookupForm.propTypes   = {
+  anyTouched  : React.PropTypes.bool.isRequired,
+  array       : React.PropTypes.object.isRequired,
+  dirty       : React.PropTypes.bool.isRequired,
+  form        : React.PropTypes.string.isRequired,
   handleSubmit: React.PropTypes.func.isRequired,
-  initialized:  React.PropTypes.bool.isRequired,
-  invalid:      React.PropTypes.bool.isRequired,
-  lookup:       React.PropTypes.object.isRequired,
-  pristine:     React.PropTypes.bool.isRequired,
+  initialized : React.PropTypes.bool.isRequired,
+  invalid     : React.PropTypes.bool.isRequired,
+  lookup      : React.PropTypes.object.isRequired,
+  pristine    : React.PropTypes.bool.isRequired,
   submitFailed: React.PropTypes.bool.isRequired,
-  submitting:   React.PropTypes.bool.isRequired,
-  valid:        React.PropTypes.bool.isRequired
+  submitting  : React.PropTypes.bool.isRequired,
+  valid       : React.PropTypes.bool.isRequired
 }
 
 LookupForm = reduxForm(

@@ -1,5 +1,6 @@
 /* @flow */
 import React from 'react'
+import {Box, Flex} from 'react-layout-components'
 import ReactTooltip from 'react-tooltip'
 import Transition from 'react-motion-ui-pack'
 
