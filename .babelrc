@@ -4,7 +4,25 @@
 // Why? The react-transform-hmr plugin depends on HMR (and throws if
 // module.hot is disabled), so keeping it and related plugins contained
 // within webpack helps prevent unexpected errors.
+//
+// Keeping the options in the build process (webpck) configuration is wise
+// simpply because it isn’t unheard of to want different configuration for
+// tests, task runners, etc.
 {
-  "presets": ["es2015", "react", "stage-0"],
-  "plugins": ["transform-runtime"]
+  "presets": [
+    "es2015",
+    "react",
+    "stage-0"
+  ],
+  "plugins": [
+    "transform-runtime",
+    [
+      "typecheck",
+      {
+        "disable": {
+          "production": true
+        }
+      }
+    ]
+  ]
 }

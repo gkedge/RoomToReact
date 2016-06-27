@@ -1,11 +1,10 @@
-import {
+import counterReducer, {
   COUNTER_INCREMENT,
   increment,
   doubleAsync,
-  default as counterReducer
 } from 'routes/Counter/modules/counter'
 
-describe('(Redux Module) Counter', () => {
+describe('(Route Module) Counter', () => {
   it('Should export a constant COUNTER_INCREMENT.', () => {
     expect(COUNTER_INCREMENT).to.equal('COUNTER_INCREMENT')
   })
@@ -50,9 +49,8 @@ describe('(Redux Module) Counter', () => {
   })
 
   describe('(Action Creator) doubleAsync', () => {
-    let _globalState
-    let _dispatchSpy
-    let _getStateSpy
+
+    let _globalState, _dispatchSpy, _getStateSpy;
 
     beforeEach(() => {
       _globalState = {

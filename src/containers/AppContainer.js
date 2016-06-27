@@ -1,16 +1,17 @@
-import React, { PropTypes } from 'react'
+/* @flow */
+
+import React from 'react'
 import { Router } from 'react-router'
 import { Provider } from 'react-redux'
 
 class AppContainer extends React.Component {
   static propTypes = {
-    history: PropTypes.object.isRequired,
-    routes: PropTypes.object.isRequired,
-    routerKey: PropTypes.number,
-    store: PropTypes.object.isRequired
+    history:   React.PropTypes.object.isRequired,
+    routerKey: React.PropTypes.number,
+    routes:    React.PropTypes.object.isRequired,
+    store:     React.PropTypes.object.isRequired
   }
-
-  render () {
+  render():Object {
     const { history, routes, routerKey, store } = this.props
 
     return (
@@ -22,5 +23,5 @@ class AppContainer extends React.Component {
     )
   }
 }
-
+AppContainer.displayName = 'AppContainer'
 export default AppContainer

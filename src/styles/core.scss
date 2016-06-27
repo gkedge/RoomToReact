@@ -8,8 +8,7 @@
     box-sizing: border-box;
   }
 
-  html,
-  body {
+  html, body, section {
     margin: 0;
     padding: 0;
     height: 100%;
@@ -19,5 +18,92 @@
   *:before,
   *:after {
     box-sizing: inherit;
+  }
+
+  .react-layout-components--box {
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+  }
+
+  .uspto-seal {
+    width: 260px;
+    margin: 1.5rem auto;
+  }
+
+  .pdf-viewer {
+    border: 1px solid #d3d3d3;
+    background-color: rgba(249, 248, 248, 1);
+    height: 815px;
+    width: 635px;
+    margin: 1rem;
+    padding: 1rem;
+  }
+
+  .pdf-viewer canvas {
+    box-shadow: 1px 1px 3px 4px #D7D2D2;
+  }
+
+  .attach-document  {
+    position: relative;
+    overflow: hidden;
+    margin: 10px;
+  }
+
+  .attach-document input.attach-btn {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 0;
+    padding: 0;
+    font-size: 20px;
+    cursor: pointer;
+    opacity: 0;
+    filter: opacity(0);
+    -webkit-filter: opacity(0)
+  }
+
+  .scan-upload-btns-outer {
+    border: 1px solid #d3d3d3;
+    height: 815px;
+    width: 635px;
+    margin: 1rem;
+    padding: 1rem;
+  }
+
+  .scan-upload-btns {
+    height: 792px;
+    width: 612px;
+    box-shadow: 1px 1px 3px 4px #D7D2D2;
+  }
+
+  div.form-field div.error {
+    color: darkred;
+  }
+
+  div.referenceNum-field {
+  }
+
+  div.dateFrom-field {
+    //width: 140px;
+  }
+
+  div.dateTo-field {
+    padding-left: 1rem;
+    //width: 140px;
+  }
+
+  div.form-field {
+    padding-right: 1rem;
+    padding-left: 1rem;
+    vertical-align: bottom;
+  }
+
+  label.questionmark {
+    //font-family: "symbols";
+    color: darkred;
+    align-items: flex-end;
   }
 }

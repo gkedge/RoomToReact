@@ -1,9 +1,10 @@
 .DS_STORE
 *.log
 
-node_modules
-
-dist
-coverage
-.idea/
 application.iml
+/.idea/
+/node_modules/
+/coverage/
+/dist/
+/*.zip
+/Home/

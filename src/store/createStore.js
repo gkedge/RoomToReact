@@ -31,6 +31,9 @@ export default (initialState = {}, history) => {
       ...enhancers
     )
   )
+
+  // Described by Dan Abramov here: http://stackoverflow.com/a/33044701
+  // to dynamically add route-specific JS/CSS/etc. See ./reducers.js
   store.asyncReducers = {}
 
   if (module.hot) {

@@ -1,15 +1,19 @@
 import React from 'react'
-import DuckImage from '../assets/Duck.jpg'
+import USPTOSeal from '../assets/USPTO_Seal.png'
+import { Center } from 'react-layout-components'
 import classes from './HomeView.scss'
 
 export const HomeView = () => (
-  <div>
-    <h4>Welcome!</h4>
-    <img
-      alt='This is a duck, because Redux!'
-      className={classes.duck}
-      src={DuckImage} />
-  </div>
+  <section>
+    <Center>
+      <div className='uspto-seal-panel {classes.usptoSealPanel}'>
+        <img
+          alt='United States Patent and Trademark Office Seal'
+          className='uspto-seal {classes.usptoSeal}'
+          src={USPTOSeal} />
+      </div>
+    </Center>
+  </section>
 )
-
+HomeView.displayName = 'HomeView'
 export default HomeView

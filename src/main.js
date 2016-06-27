@@ -1,8 +1,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import createBrowserHistory from 'history/lib/createBrowserHistory'
-import { useRouterHistory } from 'react-router'
-import { syncHistoryWithStore } from 'react-router-redux'
+import {useRouterHistory} from 'react-router'
+import {syncHistoryWithStore} from 'react-router-redux'
 import createStore from './store/createStore'
 import AppContainer from './containers/AppContainer'
 
@@ -41,13 +41,13 @@ if (__DEBUG__) {
 const MOUNT_NODE = document.getElementById('root')
 
 let render = (routerKey = null) => {
-  const routes = require('./routes/index').default(store)
+  const createRoutes = require('./routes/index').default(store)
 
   ReactDOM.render(
     <AppContainer
       store={store}
       history={history}
-      routes={routes}
+      routes={createRoutes}
       routerKey={routerKey}
     />,
     MOUNT_NODE
@@ -61,12 +61,13 @@ if (__DEV__ && module.hot) {
   const renderError = (error) => {
     const RedBox = require('redbox-react')
 
-    ReactDOM.render(<RedBox error={error} />, MOUNT_NODE)
+    ReactDOM.render(<RedBox error={error}/>, MOUNT_NODE)
   }
   render = () => {
     try {
       renderApp(Math.random())
-    } catch (error) {
+    }
+    catch (error) {
       renderError(error)
     }
   }

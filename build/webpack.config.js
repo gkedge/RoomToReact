@@ -1,7 +1,11 @@
+/*
+ http://jamesknelson.com/using-es6-in-the-browser-with-babel-6-and-webpack/
+ */
 import webpack from 'webpack'
 import cssnano from 'cssnano'
 import HtmlWebpackPlugin from 'html-webpack-plugin'
 import ExtractTextPlugin from 'extract-text-webpack-plugin'
+import NpmInstallPlugin from 'npm-install-webpack-plugin'
 import config from '../config'
 import _debug from 'debug'
 
@@ -11,11 +15,11 @@ const {__DEV__, __PROD__, __TEST__} = config.globals
 
 debug('Create configuration.')
 const webpackConfig = {
-  name: 'client',
-  target: 'web',
+  name:    'client',
+  target:  'web',
   devtool: config.compiler_devtool,
   resolve: {
-    root: paths.client(),
+    root:       paths.client(),
     extensions: ['', '.js', '.jsx', '.json']
   },
   module: {}
@@ -30,8 +34,8 @@ const APP_ENTRY_PATHS = [
 
 webpackConfig.entry = {
   app: __DEV__
-    ? APP_ENTRY_PATHS.concat(`webpack-hot-middleware/client?path=${config.compiler_public_path}__webpack_hmr`)
-    : APP_ENTRY_PATHS,
+            ? APP_ENTRY_PATHS.concat(`webpack-hot-middleware/client?path=${config.compiler_public_path}__webpack_hmr`)
+            : APP_ENTRY_PATHS,
   vendor: config.compiler_vendor
 }
 
@@ -39,23 +43,24 @@ webpackConfig.entry = {
 // Bundle Output
 // ------------------------------------
 webpackConfig.output = {
-  filename: `[name].[${config.compiler_hash_type}].js`,
-  path: paths.dist(),
+  filename:   `[name].[${config.compiler_hash_type}].js`,
+  path:       paths.dist(),
   publicPath: config.compiler_public_path
 }
 
 // ------------------------------------
 // Plugins
 // ------------------------------------
+debug('Enable plugins standard plugins.')
 webpackConfig.plugins = [
   new webpack.DefinePlugin(config.globals),
   new HtmlWebpackPlugin({
     template: paths.client('index.html'),
-    hash: false,
-    favicon: paths.client('static/favicon.ico'),
+    hash:     false,
+    favicon:  paths.client('static/favicon.ico'),
     filename: 'index.html',
-    inject: 'body',
-    minify: {
+    inject:   'body',
+    minify:   {
       collapseWhitespace: true
     }
   })
@@ -65,6 +70,19 @@ if (__DEV__) {
   debug('Enable plugins for live development (HMR, NoErrors).')
   webpackConfig.plugins.push(
     new webpack.HotModuleReplacementPlugin(),
+    // The NpmInstallPlugin plugin will assist the developer as they add
+    // 'import' dependencies for which the dependency has yet to be
+    // installed. It will detect changes made to Webpack configuration
+    // and the projects files and install the dependencies as soon as
+    // the 'import' is added to dependent source and that dependent
+    // source is save. It will modify package.json automatically as well.
+    //
+    // No luck... .babelrc 'es2015' preset causes it to fail.. Track fix
+    // here: https://github.com/ericclemmons/terse-webpack/pull/8#issuecomment-226859051
+    //
+    // new NpmInstallPlugin({
+    //  save: true // --save
+    // }),
     new webpack.NoErrorsPlugin()
   )
 } else if (__PROD__) {
@@ -74,9 +92,10 @@ if (__DEV__) {
     new webpack.optimize.DedupePlugin(),
     new webpack.optimize.UglifyJsPlugin({
       compress: {
-        unused: true,
+        unused:    true,
         dead_code: true,
-        warnings: false
+        warnings:  false,
+        screw_ie8: true
       }
     })
   )
@@ -84,6 +103,7 @@ if (__DEV__) {
 
 // Don't split bundles during testing, since we only want import one bundle
 if (!__TEST__) {
+  debug('Enable plugins for bundle chunking.')
   webpackConfig.plugins.push(
     new webpack.optimize.CommonsChunkPlugin({
       names: ['vendor']
@@ -95,24 +115,24 @@ if (!__TEST__) {
 // Pre-Loaders
 // ------------------------------------
 /*
-[ NOTE ]
-We no longer use eslint-loader due to it severely impacting build
-times for larger projects. `npm run lint` still exists to aid in
-deploy processes (such as with CI), and it's recommended that you
-use a linting plugin for your IDE in place of this loader.
+ [ NOTE ]
+ We no longer use eslint-loader due to it severely impacting build
+ times for larger projects. `npm run lint` still exists to aid in
+ deploy processes (such as with CI), and it's recommended that you
+ use a linting plugin for your IDE in place of this loader.
 
-If you do wish to continue using the loader, you can uncomment
-the code below and run `npm i --save-dev eslint-loader`. This code
-will be removed in a future release.
-
+ If you do wish to continue using the loader, you can uncomment
+ the code below and run `npm i --save-dev eslint-loader`. This code
+ will be removed in a future release.
+debug('Enable preloaders (eslint).')
 webpackConfig.module.preLoaders = [{
-  test: /\.(js|jsx)$/,
-  loader: 'eslint',
+  test:    /\.(js|jsx)$/,
+  loader:  'eslint',
   exclude: /node_modules/
 }]
 
 webpackConfig.eslint = {
-  configFile: paths.base('.eslintrc'),
+  configFile:  paths.base('.eslintrc'),
   emitWarning: __DEV__
 }
 */
@@ -122,14 +142,14 @@ webpackConfig.eslint = {
 // ------------------------------------
 // JavaScript / JSON
 webpackConfig.module.loaders = [{
-  test: /\.(js|jsx)$/,
+  test:    /\.(js|jsx)$/,
   exclude: /node_modules/,
-  loader: 'babel',
-  query: {
+  loader:  'babel',
+  query:   {
     cacheDirectory: true,
-    plugins: ['transform-runtime'],
-    presets: ['es2015', 'react', 'stage-0'],
-    env: {
+    plugins:        ['transform-runtime'],
+    presets:        ['es2015', 'react', 'stage-0'],
+    env:            {
       production: {
         presets: ['react-optimize']
       }
@@ -137,7 +157,7 @@ webpackConfig.module.loaders = [{
   }
 },
 {
-  test: /\.json$/,
+  test:   /\.json$/,
   loader: 'json'
 }]
 
@@ -173,8 +193,9 @@ if (isUsingCSSModules) {
     'localIdentName=[name]__[local]___[hash:base64:5]'
   ].join('&')
 
+  debug('Enable SASS loader.')
   webpackConfig.module.loaders.push({
-    test: /\.scss$/,
+    test:    /\.scss$/,
     include: cssModulesRegex,
     loaders: [
       'style',
@@ -184,8 +205,9 @@ if (isUsingCSSModules) {
     ]
   })
 
+  debug('Enable CSS loader.')
   webpackConfig.module.loaders.push({
-    test: /\.css$/,
+    test:    /\.css$/,
     include: cssModulesRegex,
     loaders: [
       'style',
@@ -198,7 +220,7 @@ if (isUsingCSSModules) {
 // Loaders for files that should not be treated as CSS modules.
 const excludeCSSModules = isUsingCSSModules ? cssModulesRegex : false
 webpackConfig.module.loaders.push({
-  test: /\.scss$/,
+  test:    /\.scss$/,
   exclude: excludeCSSModules,
   loaders: [
     'style',
@@ -208,7 +230,7 @@ webpackConfig.module.loaders.push({
   ]
 })
 webpackConfig.module.loaders.push({
-  test: /\.css$/,
+  test:    /\.css$/,
   exclude: excludeCSSModules,
   loaders: [
     'style',
@@ -227,31 +249,34 @@ webpackConfig.sassLoader = {
 webpackConfig.postcss = [
   cssnano({
     autoprefixer: {
-      add: true,
-      remove: true,
+      add:      true,
+      remove:   true,
       browsers: ['last 2 versions']
     },
     discardComments: {
       removeAll: true
     },
     discardUnused: false,
-    mergeIdents: false,
-    reduceIdents: false,
-    safe: true,
-    sourcemap: true
+    mergeIdents:   false,
+    reduceIdents:  false,
+    safe:          true,
+    sourcemap:     true
   })
 ]
 
 // File loaders
 /* eslint-disable */
+debug('Enable font/image loaders.')
 webpackConfig.module.loaders.push(
-  { test: /\.woff(\?.*)?$/,  loader: 'url?prefix=fonts/&name=[path][name].[ext]&limit=10000&mimetype=application/font-woff' },
-  { test: /\.woff2(\?.*)?$/, loader: 'url?prefix=fonts/&name=[path][name].[ext]&limit=10000&mimetype=application/font-woff2' },
-  { test: /\.otf(\?.*)?$/,   loader: 'file?prefix=fonts/&name=[path][name].[ext]&limit=10000&mimetype=font/opentype' },
-  { test: /\.ttf(\?.*)?$/,   loader: 'url?prefix=fonts/&name=[path][name].[ext]&limit=10000&mimetype=application/octet-stream' },
-  { test: /\.eot(\?.*)?$/,   loader: 'file?prefix=fonts/&name=[path][name].[ext]' },
-  { test: /\.svg(\?.*)?$/,   loader: 'url?prefix=fonts/&name=[path][name].[ext]&limit=10000&mimetype=image/svg+xml' },
-  { test: /\.(png|jpg)$/,    loader: 'url?limit=8192' }
+  {test:    /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+    loader: "url-loader?limit=10000&mimetype=application/font-woff&name=/[name].[ext]"
+  },
+  {test: /\.otf(\?.*)?$/, loader: 'file?prefix=/fonts/&name=[path][name].[ext]&limit=10000&mimetype=font/opentype'},
+  // { test: /\.ttf(\?.*)?$/,   loader:
+  // 'url?prefix=fonts/&name=[path][name].[ext]&limit=10000&mimetype=application/octet-stream' }, { test:
+  // /\.eot(\?.*)?$/,   loader: 'file?prefix=fonts/&name=[path][name].[ext]' },
+  {test: /\.svg(\?.*)?$/, loader: 'url?prefix=fonts/&name=[path][name].[ext]&limit=10000&mimetype=image/svg+xml'},
+  {test: /\.(png|jpg)$/, loader: 'url?limit=8192'}
 )
 /* eslint-enable */
 
