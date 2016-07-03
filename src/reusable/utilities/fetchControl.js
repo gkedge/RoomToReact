@@ -1,14 +1,21 @@
 /* @flow */
 
-import {url as urlUtils}
-,
-{
-  Url
-}
-from
-'url'
+// This package wsa significantly influenced by https://github.com/haoxins/fetch.io.
+// Differences are semantic, type safety and the addition of mock creation.
 
-export const handleFetchErrors = (response):Object => {
+import {url as urlUtils, Url} from 'url'
+
+export type OptionsType = {
+  cache: ?string,
+  credentials: ?string,
+  errorReporter: ?Function,
+  headers: ?Object,
+  httpMethod: ?string',
+  corsMode: ?string,
+  rootContext: ?Url,
+  queryParams : ?Object
+}
+export const defaultErrorReporter:Function = (response):Object => {
   if (!response.ok) {
     throw Error(response.statusText);
   }
@@ -17,27 +24,28 @@ export const handleFetchErrors = (response):Object => {
 
 const defaultRootContext:Url = url.parse('http://localhost:8080')
 
-export const defaultOpts:Object = {
-  rootContext: defaultRootContext,
-  httpMethod : 'GET',
-  cache      : 'no-cache',
-  credentials: 'include',
-  headers    : { 'content-type': 'application/json' },
-  mode       : 'cors',
-  queryParams: {}
+export const defaultOpts:OptionsType = {
+  cache        : 'no-cache',
+  credentials  : 'include',
+  errorReporter: defaultErrorReporter,
+  headers      : { 'content-type': 'application/json' },
+  httpMethod   : 'GET',
+  corsMode     : 'cors',
+  rootContext  : defaultRootContext,
+  queryParams  : {}
 }
 
 class Request {
 
-  constructor(url:Url, options:Object = {}) {
+  constructor(url:Url, options:OptionsType = {}) {
     this.opts = assign({}, defaultOpts(), options)
     _normalizeOptions(opts)
 
     this.url = urlUtils.resolve(opts.rootContext, url)
   }
 
-  setOptions(options:any, value:string = '') {
-    const currentOptions = this.opts
+  setOptions(options:any /* OptionsType | string */, value:string = '') {
+    const currentOptions:OptionsType = this.opts
 
     if (typeof options === 'object') {
       for (let oo in options) {
@@ -103,7 +111,7 @@ class Request {
     }
     else if (typeof payload === 'string') {
       if (!type) {
-        this.options.headers['content-type'] = type = 'application/x-www-form-urlencoded'
+        this.opts.headers['content-type'] = type = 'application/x-www-form-urlencoded'
       }
 
       if (type.indexOf('x-www-form-urlencoded') !== -1) {
@@ -120,27 +128,9 @@ class Request {
     return this
   }
 
-  /**
-   * Append formData
-   *
-   * Examples:
-   *
-   *   .append(name, 'hello')
-   *
-   * @param {String} key
-   * @param {String} value
-   * @return {Request}
-   */
-  append(key, value) {
+  appendFormData(key:any, value:?string) {
     if (!(this._body instanceof FormData)) {
       this._body = new FormData()
-
-      if (isNode()) {
-        const headers = this._body.getHeaders()
-        if (headers && headers['content-type']) {
-          this.options.headers['content-type'] = headers['content-type']
-        }
-      }
     }
 
     this._body.append(key, value)
@@ -295,7 +285,7 @@ export const get = (url:string, options?:Object):any /* Promise */ => {
     })
 }
 
-const _normalizeOptions = (options) => {
+const _normalizeOptions = (options:OptionsType) => {
   options.httpMethod = options.httpMethod.toUpperCase()
 
   const headers = options.headers
