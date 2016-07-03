@@ -6,6 +6,8 @@
 import {url as urlUtils, Url} from 'url'
 
 export type OptionsType = {
+  afterRequest : ?Function,
+  beforeRequest: ?Function,
   cache: ?string,
   credentials: ?string,
   errorReporter: ?Function,
@@ -25,6 +27,8 @@ export const defaultErrorReporter:Function = (response):Object => {
 const defaultRootContext:Url = url.parse('http://localhost:8080')
 
 export const defaultOpts:OptionsType = {
+  afterRequest : null,
+  beforeRequest: null,
   cache        : 'no-cache',
   credentials  : 'include',
   errorReporter: defaultErrorReporter,
@@ -138,43 +142,34 @@ class Request {
     return this
   }
 
-  promise() {
-    const { options } = this
+  execute() {
+    const {opts, beforeRequest, afterResponse} = this
     let { url } = this
 
-    const {
-            beforeRequest,
-            afterResponse,
-          } = options
-
     try {
-      if (['GET', 'HEAD', 'OPTIONS'].indexOf(options.method.toUpperCase()) === -1) {
+      if (['GET', 'HEAD', 'OPTIONS'].indexOf(opts.method.toUpperCase()) === -1) {
         if (this._body instanceof FormData) {
-          options.body = this._body
+          opts.body = this._body
         }
-        else if (isObject(this._body) && isJsonType(options.headers['content-type'])) {
-          options.body = JSON.stringify(this._body)
+        else if (isObject(this._body) && isJsonType(opts.headers['content-type'])) {
+          opts.body = JSON.stringify(this._body)
         }
         else if (isObject(this._body)) {
-          options.body = stringify(this._body)
+          opts.body = stringify(this._body)
         }
         else {
-          options.body = this._body
+          opts.body = this._body
         }
       }
 
-      if (isObject(options.queryParams)) {
-        if (url.indexOf('?') >= 0) {
-          url += '&' + stringify(options.queryParams)
-        }
-        else {
-          url += '?' + stringify(options.queryParams)
-        }
+      if (isObject(opts.queryParams)) {
+        const queryParams = stringify(opts.queryParams)
+        url += url.indexOf('?') >= 0 ? '&' + queryParams : '?' + queryParams
       }
 
       if (beforeRequest) {
-        const canceled = beforeRequest(url, options.body)
-        if (canceled === false) {
+        const isCanceled = !beforeRequest(url, opts.body)
+        if (isCanceled) {
           return Promise.reject(new Error('request canceled by beforeRequest'))
         }
       }
@@ -183,34 +178,34 @@ class Request {
     }
 
     if (afterResponse) {
-      return fetch(url, options)
+      return fetch(url, opts)
         .then(res => {
           afterResponse()
           return res
         })
     }
 
-    return fetch(url, options)
+    return fetch(url.format(), opts)
   }
 
   then(resolve, reject) {
-    return this.promise().then(resolve, reject)
+    return this.execute().then(resolve, reject)
   }
 
   catch(reject) {
-    return this.promise().catch(reject)
+    return this.execute().catch(reject)
   }
 
   json(strict = true) {
-    return this.promise()
+    return this.execute()
       .then(res => res.json())
       .then(json => {
         if (strict && !isObject(json)) {
           throw new TypeError('response is not strict json')
         }
 
-        if (this.options.afterJSON) {
-          this.options.afterJSON(json)
+        if (this.opts.afterJSON) {
+          this.opts.afterJSON(json)
         }
 
         return json
@@ -218,13 +213,9 @@ class Request {
   }
 
   text() {
-    return this.promise().then(res => res.text())
+    return this.execute().then(res => res.text())
   }
 }
-
-/**
- * Private utils
- */
 
 function isObject(obj) {
   // not null
@@ -241,20 +232,12 @@ function stringify(obj) {
   }).join('&')
 }
 
-function isNode() {
-  return typeof process === 'object' && process.title === 'node'
-}
-
-/**
- * Fetch
- */
-
 function Fetch(options) {
   if (!(this instanceof Fetch)) {
     return new Fetch(options)
   }
 
-  this.options = options || {}
+  this.opts = options || {}
 }
 
 const methods = ['DELETE', 'GET', 'HEAD', 'OPTIONS', 'POST', 'PUT']
@@ -262,8 +245,8 @@ const methods = ['DELETE', 'GET', 'HEAD', 'OPTIONS', 'POST', 'PUT']
 methods.forEach(method => {
   method                  = method.toLowerCase()
   Fetch.prototype[method] = function (url) {
-    const opts = assign({}, this.options)
-    return new Request(method, url, opts)
+    const options = assign({}, this.opts)
+    return new Request(method, url, options)
   }
 })
 
@@ -274,7 +257,7 @@ methods.forEach(method => {
 export default Fetch
 
 export const get = (url:string, options?:Object):any /* Promise */ => {
-  const getOptions = this.options = assign({}, defaultOpts(), options)
+  const getOptions = this.opts = assign({}, defaultOpts(), options)
   _normalizeHeaders(getOptions.headers)
   return fetch(url, getOptions)
     .then((data:Object):any /* Promise*/ => data.text())
