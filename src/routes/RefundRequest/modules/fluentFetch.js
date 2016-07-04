@@ -78,21 +78,26 @@ export class Request {
     this.url = urlUtil.parse(urlUtil.resolve(this.opts.rootContext, url))
   }
 
-  setOptions(options:any /* OptionsType | string */, value:string = '') {
-    const currentOptions:OptionsType = this.opts
-
-    if (typeof options === 'object') {
-      for (let oo in options) {
-        currentOptions[oo] = options[oo]
-      }
+  setOptions(options:OptionsType, value:string = ''):Request {
+    
+    if (options.rootContext) {
+      console.warn("Set rootContext in ctor options; ignored by fluent setOptions()")
+      isAttemptToSetRootContext = true;
+      delete options.rootContext
     }
-    else {
-      currentOptions[options] = value
-    }
+    this.opts = Object.assign({}, this.opts, options)
 
     return this
   }
 
+  setOption(key:string, value:string):Request {
+     if (key === 'rootContext') {
+       console.warn("Set rootContext in ctor options; ignored by fluent setOption()")
+       return
+     }
+    this.opts[key] = value
+  }
+  
   getOptions():OptionsType {
     return this.opts || {}
   }
@@ -101,7 +106,7 @@ export class Request {
     return this.url
   }
   
-  setHeaders(headers:any, value:string = '') {
+  setHeaders(headers:any, value:string = ''):Request {
     const currentHeaders = this.opts.headers
 
     if (typeof headers === 'object') {
@@ -116,7 +121,7 @@ export class Request {
     return this
   }
 
-  setMimeType(type:string) {
+  setMimeType(type:string):Request {
     switch (type) {
       case 'json':
         type = 'application/json'
@@ -132,7 +137,7 @@ export class Request {
     return this
   }
 
-  setQueryParams(queryParams) {
+  setQueryParams(queryParams):Request {
     const currentQueryParams = this.opts.queryParams
 
     for (let qq in queryParams) {
@@ -142,7 +147,7 @@ export class Request {
     return this
   }
 
-  setPayload(payload) {
+  setPayload(payload):Request {
     let type = this.opts.headers['content-type']
 
     if (_isObject(payload) && _isObject(this._body)) {
@@ -170,7 +175,7 @@ export class Request {
     return this
   }
 
-  appendFormData(key:any, value:?string) {
+  appendFormData(key:any, value:?string):Request {
     if (!(this._body instanceof FormData)) {
       this._body = new FormData()
     }
@@ -180,7 +185,7 @@ export class Request {
     return this
   }
 
-  execute() {
+  execute():any /* Promise */ {
     const { opts, beforeRequest, afterResponse } = this
 
     try {
@@ -225,15 +230,15 @@ export class Request {
     return fetch(urlUtil.format(), opts)
   }
 
-  then(resolve, reject) {
+  then(resolve, reject):any /* Promise */ {
     return this.execute().then(resolve, reject)
   }
 
-  catch(reject) {
+  catch(reject):any /* Promise */ {
     return this.execute().catch(reject)
   }
 
-  json(strict = true) {
+  json(strict = true):string {
     return this.execute()
       .then(res => res.json())
       .then(json => {
@@ -249,7 +254,7 @@ export class Request {
       })
   }
 
-  text() {
+  text():string {
     return this.execute().then(res => res.text())
   }
 }

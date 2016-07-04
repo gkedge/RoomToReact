@@ -38,7 +38,7 @@ describe('fluentFetch', () => {
   })
 
   it('Request partial Url and options with rootContext Url', () => {
-    const rootContextStr      = 'http://www.yow.io';
+    const rootContextStr    = 'http://www.yow.io';
     testOptions.rootContext = urlUtil.parse(rootContextStr)
     const request           = new Request(urlUtil.parse(testPartialUrlStr), testOptions)
     const expectedUrl       = urlUtil.parse(rootContextStr).format() + testPartialUrlStr
