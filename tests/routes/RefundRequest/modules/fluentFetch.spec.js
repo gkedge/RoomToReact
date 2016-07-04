@@ -2,21 +2,52 @@
  * Created by greg.kedge on 7/3/16.
  */
 
-import {Request, defaultOpts} from 'routes/RefundRequest/modules/fluentFetch'
+import type {OptionsType} from '../../../../src/routes/RefundRequest/modules/fluentFetch'
+import {Request, defaultOpts,} from '../../../../src/routes/RefundRequest/modules/fluentFetch'
 import urlUtil, {Url} from 'url'
+import {expect} from 'chai';
+import {cloneDeep} from 'lodash'
 
 'use strict'
 
 describe('fluentFetch', () => {
-  const jsonType   = 'application/json'
-  const testUrlStr = 'http://www.mocky.io/v2/5779b9b71300007126bc3f0e'
+  const jsonType              = 'application/json'
+  const testUrlStr            = 'http://www.mocky.io/v2/5779b9b71300007126bc3f0e'
+  const testPartialUrlStr     = 'turtles'
+  let testOptions:OptionsType = cloneDeep(defaultOpts)
 
-  it('invalid url', () => {
+  beforeEach(() => {
+    testOptions = cloneDeep(defaultOpts)
+  })
+
+  it('Request constructor', () => {
     const request = new Request(urlUtil.parse(testUrlStr))
 
     expect(request.getOptions()).to.be.eql(defaultOpts)
+    // console.log("URL: " + JSON.stringify(request.getUrl(), null, 2))
+    expect(request.getUrl().format()).to.be.eql(testUrlStr)
   })
-  
+
+  it('Request partial Url', () => {
+    const request     = new Request(urlUtil.parse(testPartialUrlStr))
+    const expectedUrl = defaultOpts.rootContext.format() + testPartialUrlStr
+
+    expect(request.getOptions()).to.be.eql(defaultOpts)
+    // console.log("URL: " + JSON.stringify(request.getUrl(), null, 2))
+    expect(request.getUrl().format()).to.be.eql(expectedUrl)
+  })
+
+  it('Request partial Url and options with rootContext Url', () => {
+    const rootContextStr      = 'http://www.yow.io';
+    testOptions.rootContext = urlUtil.parse(rootContextStr)
+    const request           = new Request(urlUtil.parse(testPartialUrlStr), testOptions)
+    const expectedUrl       = urlUtil.parse(rootContextStr).format() + testPartialUrlStr
+
+    expect(request.getOptions()).to.be.eql(testOptions)
+    // console.log("URL: " + JSON.stringify(request.getUrl(), null, 2))
+    expect(request.getUrl().format()).to.be.eql(expectedUrl)
+  })
+
   // describe('# query', () => {
   //   it('query()', () => {
   //     return request

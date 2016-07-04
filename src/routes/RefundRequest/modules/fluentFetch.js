@@ -75,7 +75,7 @@ export class Request {
     this.opts = Object.assign({}, defaultOpts, options)
     _normalizeOptions(this.opts)
 
-    this.url = urlUtil.resolve(this.opts.rootContext, url)
+    this.url = urlUtil.parse(urlUtil.resolve(this.opts.rootContext, url))
   }
 
   setOptions(options:any /* OptionsType | string */, value:string = '') {

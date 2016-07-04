@@ -53,7 +53,7 @@ export const fetchZen = ():Function => {
   return (dispatch:Function):any /* Promise */ => {
     dispatch(requestZen())
 
-    return fetch('https://api.github.com/ze')
+    return fetch('https://api.github.com/zen')
       .then((data:Object):any /* Promise*/ => data.text())
       .then((text:string):any /* Promise*/ => dispatch(receiveZen(text)))
       .catch((error:Error) => {
