@@ -3,7 +3,7 @@
 // This package wsa significantly influenced by https://github.com/haoxins/fetch.io.
 // Differences are semantic, type safety and the addition of mock creation.
 
-import {url as urlUtils, Url} from 'url'
+import urlUtil, {Url} from 'url'
 
 export type OptionsType = {
   afterRequest : ?Function,
@@ -12,19 +12,20 @@ export type OptionsType = {
   credentials: ?string,
   errorReporter: ?Function,
   headers: ?Object,
-  httpMethod: ?string',
+  httpMethod: ?string,
   corsMode: ?string,
   rootContext: ?Url,
   queryParams : ?Object
 }
+
 export const defaultErrorReporter:Function = (response):Object => {
   if (!response.ok) {
     throw Error(response.statusText);
   }
-  return response;
+  return response
 }
 
-const defaultRootContext:Url = url.parse('http://localhost:8080')
+const defaultRootContext /* :Url */ = urlUtil.parse('http://localhost:8080')
 
 export const defaultOpts:OptionsType = {
   afterRequest : null,
@@ -39,13 +40,42 @@ export const defaultOpts:OptionsType = {
   queryParams  : {}
 }
 
-class Request {
+const _normalizeOptions = (options:OptionsType) => {
+  options.httpMethod = options.httpMethod.toUpperCase()
+
+  const headers = options.headers
+  for (let h in headers) {
+    let lowerCase = h.toLowerCase();
+    if (h !== lowerCase) {
+      headers[lowerCase] = headers[h]
+      delete headers[h]
+    }
+  }
+}
+
+const methods = ['DELETE', 'GET', 'HEAD', 'OPTIONS', 'POST', 'PUT']
+
+const _isObject = (obj) => {
+  return obj && typeof obj === 'object'
+}
+
+const _isJsonType = (contentType) => {
+  return contentType && contentType.indexOf('application/json') === 0
+}
+
+const _stringify = (obj) => {
+  return Object.keys(obj).map(key => {
+    return key + '=' + obj[key]
+  }).join('&')
+}
+
+export class Request {
 
   constructor(url:Url, options:OptionsType = {}) {
-    this.opts = assign({}, defaultOpts(), options)
-    _normalizeOptions(opts)
+    this.opts = Object.assign({}, defaultOpts, options)
+    _normalizeOptions(this.opts)
 
-    this.url = urlUtils.resolve(opts.rootContext, url)
+    this.url = urlUtil.resolve(this.opts.rootContext, url)
   }
 
   setOptions(options:any /* OptionsType | string */, value:string = '') {
@@ -63,6 +93,14 @@ class Request {
     return this
   }
 
+  getOptions():OptionsType {
+    return this.opts || {}
+  }
+  
+  getUrl():Url {
+    return this.url
+  }
+  
   setHeaders(headers:any, value:string = '') {
     const currentHeaders = this.opts.headers
 
@@ -107,7 +145,7 @@ class Request {
   setPayload(payload) {
     let type = this.opts.headers['content-type']
 
-    if (isObject(payload) && isObject(this._body)) {
+    if (_isObject(payload) && _isObject(this._body)) {
       // merge body
       for (let key in payload) {
         this._body[key] = payload[key]
@@ -143,32 +181,31 @@ class Request {
   }
 
   execute() {
-    const {opts, beforeRequest, afterResponse} = this
-    let { url } = this
+    const { opts, beforeRequest, afterResponse } = this
 
     try {
       if (['GET', 'HEAD', 'OPTIONS'].indexOf(opts.method.toUpperCase()) === -1) {
         if (this._body instanceof FormData) {
           opts.body = this._body
         }
-        else if (isObject(this._body) && isJsonType(opts.headers['content-type'])) {
+        else if (_isObject(this._body) && _isJsonType(opts.headers['content-type'])) {
           opts.body = JSON.stringify(this._body)
         }
-        else if (isObject(this._body)) {
-          opts.body = stringify(this._body)
+        else if (_isObject(this._body)) {
+          opts.body = _stringify(this._body)
         }
         else {
           opts.body = this._body
         }
       }
 
-      if (isObject(opts.queryParams)) {
-        const queryParams = stringify(opts.queryParams)
-        url += url.indexOf('?') >= 0 ? '&' + queryParams : '?' + queryParams
+      if (_isObject(opts.queryParams)) {
+        const queryParams = _stringify(opts.queryParams)
+        this.url += this.url.indexOf('?') >= 0 ? '&' + queryParams : '?' + queryParams
       }
 
       if (beforeRequest) {
-        const isCanceled = !beforeRequest(url, opts.body)
+        const isCanceled = !beforeRequest(this.url, opts.body)
         if (isCanceled) {
           return Promise.reject(new Error('request canceled by beforeRequest'))
         }
@@ -178,14 +215,14 @@ class Request {
     }
 
     if (afterResponse) {
-      return fetch(url, opts)
+      return fetch(this.url, opts)
         .then(res => {
           afterResponse()
           return res
         })
     }
 
-    return fetch(url.format(), opts)
+    return fetch(urlUtil.format(), opts)
   }
 
   then(resolve, reject) {
@@ -200,7 +237,7 @@ class Request {
     return this.execute()
       .then(res => res.json())
       .then(json => {
-        if (strict && !isObject(json)) {
+        if (strict && !_isObject(json)) {
           throw new TypeError('response is not strict json')
         }
 
@@ -217,68 +254,9 @@ class Request {
   }
 }
 
-function isObject(obj) {
-  // not null
-  return obj && typeof obj === 'object'
-}
+export const get = (url:string, options:?Object):Request => {
 
-function isJsonType(contentType) {
-  return contentType && contentType.indexOf('application/json') === 0
-}
-
-function stringify(obj) {
-  return Object.keys(obj).map(key => {
-    return key + '=' + obj[key]
-  }).join('&')
-}
-
-function Fetch(options) {
-  if (!(this instanceof Fetch)) {
-    return new Fetch(options)
-  }
-
-  this.opts = options || {}
-}
-
-const methods = ['DELETE', 'GET', 'HEAD', 'OPTIONS', 'POST', 'PUT']
-
-methods.forEach(method => {
-  method                  = method.toLowerCase()
-  Fetch.prototype[method] = function (url) {
-    const options = assign({}, this.opts)
-    return new Request(method, url, options)
-  }
-})
-
-/**
- * export
- */
-
-export default Fetch
-
-export const get = (url:string, options?:Object):any /* Promise */ => {
-  const getOptions = this.opts = assign({}, defaultOpts(), options)
-  _normalizeHeaders(getOptions.headers)
-  return fetch(url, getOptions)
-    .then((data:Object):any /* Promise*/ => data.text())
-    .then((text:string):any /* Promise*/ => dispatch(receiveZen(text)))
-    .catch((error:Error) => {
-      dispatch(requestZenError())
-      throw error
-    })
-}
-
-const _normalizeOptions = (options:OptionsType) => {
-  options.httpMethod = options.httpMethod.toUpperCase()
-
-  const headers = options.headers
-  for (let h in headers) {
-    let lowerCase = h.toLowerCase();
-    if (h !== lowerCase) {
-      headers[lowerCase] = headers[h]
-      delete headers[h]
-    }
-  }
+  return new Request(url, options)
 }
 
 
