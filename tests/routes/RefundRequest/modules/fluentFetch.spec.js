@@ -12,7 +12,7 @@ import {cloneDeep} from 'lodash'
 
 describe('fluentFetch', () => {
   const jsonType              = 'application/json'
-  const testUrlStr            = 'http://www.mocky.io/v2/5779b9b71300007126bc3f0e'
+  const testUrlStr            = 'http://www.mocky.io/v2/5779b9b71300007126bc3f0e?zippy=yow&zip=yowsa'
   const testPartialUrlStr     = 'turtles'
   let testOptions:OptionsType = cloneDeep(defaultOpts)
 

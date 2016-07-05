@@ -5,39 +5,42 @@
 
 import urlUtil, {Url} from 'url'
 
+export type MapToStringType = {
+  [key: string]: string
+}
+
 export type OptionsType = {
   afterRequest : ?Function,
   beforeRequest: ?Function,
   cache: ?string,
   credentials: ?string,
   errorReporter: ?Function,
-  headers: ?Object,
+  headers: ?MapToStringType,
   httpMethod: ?string,
   corsMode: ?string,
-  rootContext: ?Url,
-  queryParams : ?Object
+  rootContext: ?Url
 }
 
-export const defaultErrorReporter:Function = (response):Object => {
+const defaultRootContext /* :Url */ = urlUtil.parse('http://localhost:8080')
+
+export const _defaultErrorReporter:Function = (response):Object => {
   if (!response.ok) {
     throw Error(response.statusText);
   }
   return response
 }
 
-const defaultRootContext /* :Url */ = urlUtil.parse('http://localhost:8080')
-
 export const defaultOpts:OptionsType = {
   afterRequest : null,
   beforeRequest: null,
   cache        : 'no-cache',
   credentials  : 'include',
-  errorReporter: defaultErrorReporter,
+  errorReporter: _defaultErrorReporter,
   headers      : { 'content-type': 'application/json' },
   httpMethod   : 'GET',
   corsMode     : 'cors',
-  rootContext  : defaultRootContext,
-  queryParams  : {}
+  queryParams  : null,
+  rootContext  : defaultRootContext
 }
 
 const _normalizeOptions = (options:OptionsType) => {
@@ -63,10 +66,11 @@ const _isJsonType = (contentType) => {
   return contentType && contentType.indexOf('application/json') === 0
 }
 
-const _stringify = (obj) => {
-  return Object.keys(obj).map(key => {
-    return key + '=' + obj[key]
-  }).join('&')
+const _stringify = (obj:?MapToStringType = {}) => {
+  return (obj || {}).length ?
+         Object.keys(obj).map(key => {
+           return key + '=' + obj[key]
+         }).join('&') : ''
 }
 
 export class Request {
@@ -76,10 +80,13 @@ export class Request {
     _normalizeOptions(this.opts)
 
     this.url = urlUtil.parse(urlUtil.resolve(this.opts.rootContext, url))
+    
+    this.setQueryParams(this.opts.queryParams)
+    console.log("URL: " + JSON.stringify(this.url, null, 2))
   }
 
-  setOptions(options:OptionsType, value:string = ''):Request {
-    
+  setOptions(options:OptionsType):Request {
+
     if (options.rootContext) {
       console.warn("Set rootContext in ctor options; ignored by fluent setOptions()")
       isAttemptToSetRootContext = true;
@@ -91,36 +98,30 @@ export class Request {
   }
 
   setOption(key:string, value:string):Request {
-     if (key === 'rootContext') {
-       console.warn("Set rootContext in ctor options; ignored by fluent setOption()")
-       return
-     }
+    if (key === 'rootContext') {
+      console.warn("Set rootContext in ctor options; ignored by fluent setOption()")
+      return
+    }
     this.opts[key] = value
   }
-  
+
   getOptions():OptionsType {
     return this.opts || {}
   }
-  
+
   getUrl():Url {
     return this.url
   }
-  
-  setHeaders(headers:any, value:string = ''):Request {
-    const currentHeaders = this.opts.headers
 
-    if (typeof headers === 'object') {
-      for (let hh in headers) {
-        currentHeaders[hh.toLowerCase()] = headers[hh]
-      }
-    }
-    else {
-      currentHeaders[headers.toLowerCase()] = value
-    }
-
+  setHeaders(headers:MapToStringType):Request {
+    this.opts.headers = Object.assign(this.opts.headers, headers)
     return this
   }
-
+  
+  setHeader(header:string, value:string) {
+    this.opts.headers[header.toLowerCase()] = value
+  }
+  
   setMimeType(type:string):Request {
     switch (type) {
       case 'json':
@@ -137,17 +138,12 @@ export class Request {
     return this
   }
 
-  setQueryParams(queryParams):Request {
-    const currentQueryParams = this.opts.queryParams
-
-    for (let qq in queryParams) {
-      currentQueryParams[qq] = queryParams[qq]
-    }
-
+  setQueryParams(queryParams:?MapToStringType):Request {
+    this.url.query = (this.url.query || '') + _stringify(queryParams)
     return this
   }
 
-  setPayload(payload):Request {
+  setPayload(payload:any):Request {
     let type = this.opts.headers['content-type']
 
     if (_isObject(payload) && _isObject(this._body)) {
@@ -204,41 +200,37 @@ export class Request {
         }
       }
 
-      if (_isObject(opts.queryParams)) {
-        const queryParams = _stringify(opts.queryParams)
-        this.url += this.url.indexOf('?') >= 0 ? '&' + queryParams : '?' + queryParams
-      }
-
       if (beforeRequest) {
         const isCanceled = !beforeRequest(this.url, opts.body)
         if (isCanceled) {
           return Promise.reject(new Error('request canceled by beforeRequest'))
         }
       }
+
+      if (afterResponse) {
+        return fetch(this.url.format(), opts)
+          .then(res => {
+            afterResponse()
+            return res
+          })
+      }
+  
+      return fetch(urlUtil.format(), opts)
     } catch (e) {
       return Promise.reject(e)
     }
 
-    if (afterResponse) {
-      return fetch(this.url, opts)
-        .then(res => {
-          afterResponse()
-          return res
-        })
-    }
-
-    return fetch(urlUtil.format(), opts)
   }
 
-  then(resolve, reject):any /* Promise */ {
+  then(resolve:Function, reject:Function):any /* Promise */ {
     return this.execute().then(resolve, reject)
   }
 
-  catch(reject):any /* Promise */ {
+  catch(reject:Function):any /* Promise */ {
     return this.execute().catch(reject)
   }
 
-  json(strict = true):string {
+  json(strict:boolean = true):string {
     return this.execute()
       .then(res => res.json())
       .then(json => {
