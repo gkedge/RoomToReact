@@ -9,6 +9,10 @@ export type MapToStringType = {
   [key: string]: string
 }
 
+export type MapToUrlType = {
+  [key: string]: Url
+}
+
 export type OptionsType = {
   afterRequest : ?Function,
   beforeRequest: ?Function,
@@ -18,12 +22,25 @@ export type OptionsType = {
   headers: ?MapToStringType,
   httpMethod: ?string,
   corsMode: ?string,
-  rootContext: ?Url
+  rootContextKey: ?string // Only provide in ctor Options; not setOptions() 
 }
 
-const defaultRootContext /* :Url */ = urlUtil.parse('http://localhost:8080')
+const defaultRootContext:Url  = urlUtil.parse('http://localhost:8080')
+const contextMap:MapToUrlType = {
+  'default': defaultRootContext
+}
 
-export const _defaultErrorReporter:Function = (response):Object => {
+export const setRootContext = (key:string, rootContext:Url):?Url => {
+  const priorContext = getRootContext(key)
+  contextMap[key] = rootContext
+  return priorContext;
+}
+
+export const getRootContext = (key:?string):Url => {
+  return key ? (contextMap[key] || contextMap['default']) : contextMap['default']
+}
+
+const _defaultErrorReporter:Function = (response):Object => {
   if (!response.ok) {
     throw Error(response.statusText);
   }
@@ -31,16 +48,16 @@ export const _defaultErrorReporter:Function = (response):Object => {
 }
 
 export const defaultOpts:OptionsType = {
-  afterRequest : null,
-  beforeRequest: null,
-  cache        : 'no-cache',
-  credentials  : 'include',
-  errorReporter: _defaultErrorReporter,
-  headers      : { 'content-type': 'application/json' },
-  httpMethod   : 'GET',
-  corsMode     : 'cors',
-  queryParams  : null,
-  rootContext  : defaultRootContext
+  afterRequest  : null,
+  beforeRequest : null,
+  cache         : 'no-cache',
+  credentials   : 'include',
+  errorReporter : _defaultErrorReporter,
+  headers       : { 'content-type': 'application/json' },
+  httpMethod    : 'GET',
+  corsMode      : 'cors',
+  queryParams   : null,
+  rootContextKey: 'default'
 }
 
 const _normalizeOptions = (options:OptionsType) => {
@@ -62,7 +79,7 @@ const _isObject = (obj) => {
   return obj && typeof obj === 'object'
 }
 
-const _isJsonType = (contentType) => {
+const _isJsonType = (contentType:?string) => {
   return contentType && contentType.indexOf('application/json') === 0
 }
 
@@ -79,18 +96,18 @@ export class Request {
     this.opts = Object.assign({}, defaultOpts, options)
     _normalizeOptions(this.opts)
 
-    this.url = urlUtil.parse(urlUtil.resolve(this.opts.rootContext, url))
-    
+    var rootContext = getRootContext(this.opts.rootContextKey);
+    this.url        = urlUtil.parse(urlUtil.resolve(rootContext, url))
+
     this.setQueryParams(this.opts.queryParams)
     console.log("URL: " + JSON.stringify(this.url, null, 2))
   }
 
   setOptions(options:OptionsType):Request {
 
-    if (options.rootContext) {
-      console.warn("Set rootContext in ctor options; ignored by fluent setOptions()")
-      isAttemptToSetRootContext = true;
-      delete options.rootContext
+    if (options.rootContextKey) {
+      console.warn("Set rootContextKey in ctor options; ignored by fluent setOptions()")
+      delete options.rootContextKey
     }
     this.opts = Object.assign({}, this.opts, options)
 
@@ -98,8 +115,8 @@ export class Request {
   }
 
   setOption(key:string, value:string):Request {
-    if (key === 'rootContext') {
-      console.warn("Set rootContext in ctor options; ignored by fluent setOption()")
+    if (key === 'rootContextKey') {
+      console.warn("Set rootContextKey in ctor options; ignored by fluent setOption()")
       return
     }
     this.opts[key] = value
@@ -114,14 +131,17 @@ export class Request {
   }
 
   setHeaders(headers:MapToStringType):Request {
-    this.opts.headers = Object.assign(this.opts.headers, headers)
+    for (const headerKey of headers.keys()) {
+      setHeader(headerKey, headers(headerKey))
+    }
     return this
   }
-  
-  setHeader(header:string, value:string) {
-    this.opts.headers[header.toLowerCase()] = value
+
+  setHeader(headerKey:string, value:string) {
+    this.opts.headers[headerKey.toLowerCase()] = value
+    return this
   }
-  
+
   setMimeType(type:string):Request {
     switch (type) {
       case 'json':
@@ -214,7 +234,7 @@ export class Request {
             return res
           })
       }
-  
+
       return fetch(urlUtil.format(), opts)
     } catch (e) {
       return Promise.reject(e)

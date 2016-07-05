@@ -3,7 +3,12 @@
  */
 
 import type {OptionsType} from '../../../../src/routes/RefundRequest/modules/fluentFetch'
-import {Request, defaultOpts,} from '../../../../src/routes/RefundRequest/modules/fluentFetch'
+import {
+  Request,
+  defaultOpts,
+  getRootContext,
+  setRootContext
+} from '../../../../src/routes/RefundRequest/modules/fluentFetch'
 import urlUtil, {Url} from 'url'
 import {expect} from 'chai';
 import {cloneDeep} from 'lodash'
@@ -12,36 +17,50 @@ import {cloneDeep} from 'lodash'
 
 describe('fluentFetch', () => {
   const jsonType              = 'application/json'
+  const testRootContext       = 'http://www.mocky.io/v2'
   const testUrlStr            = 'http://www.mocky.io/v2/5779b9b71300007126bc3f0e?zippy=yow&zip=yowsa'
   const testPartialUrlStr     = 'turtles'
+  const origDefaultContext    = getRootContext();
   let testOptions:OptionsType = cloneDeep(defaultOpts)
+
+  before(() => {
+    setRootContext('', urlUtil.parse(testRootContext))
+  })
+
+  after(() => {
+    setRootContext('', origDefaultContext)
+  })
 
   beforeEach(() => {
     testOptions = cloneDeep(defaultOpts)
   })
 
   it('Request constructor', () => {
-    const request = new Request(urlUtil.parse(testUrlStr))
-
-    expect(request.getOptions()).to.be.eql(defaultOpts)
-    // console.log("URL: " + JSON.stringify(request.getUrl(), null, 2))
-    expect(request.getUrl().format()).to.be.eql(testUrlStr)
-  })
-
-  it('Request partial Url', () => {
-    const request     = new Request(urlUtil.parse(testPartialUrlStr))
-    const expectedUrl = defaultOpts.rootContext.format() + testPartialUrlStr
+    const request     = new Request(urlUtil.parse(testUrlStr))
+    const expectedUrl = testUrlStr
 
     expect(request.getOptions()).to.be.eql(defaultOpts)
     // console.log("URL: " + JSON.stringify(request.getUrl(), null, 2))
     expect(request.getUrl().format()).to.be.eql(expectedUrl)
   })
 
-  it('Request partial Url and options with rootContext Url', () => {
-    const rootContextStr    = 'http://www.yow.io';
-    testOptions.rootContext = urlUtil.parse(rootContextStr)
-    const request           = new Request(urlUtil.parse(testPartialUrlStr), testOptions)
-    const expectedUrl       = urlUtil.parse(rootContextStr).format() + testPartialUrlStr
+  it('Request partial Url', () => {
+    const request     = new Request(urlUtil.parse(testPartialUrlStr))
+    const expectedUrl = getRootContext().format() + testPartialUrlStr
+
+    expect(request.getOptions()).to.be.eql(defaultOpts)
+    // console.log("URL: " + JSON.stringify(request.getUrl(), null, 2))
+    expect(request.getUrl().format()).to.be.eql(expectedUrl)
+  })
+
+  it('Request partial Url and options with rootContextKey Url', () => {
+    const rootContextKeyStr    = 'http://www.yow.io'
+    testOptions.rootContextKey = 'test'
+    
+    setRootContext(testOptions.rootContextKey, urlUtil.parse(rootContextKeyStr))
+    
+    const request     = new Request(urlUtil.parse(testPartialUrlStr), testOptions)
+    const expectedUrl = getRootContext(testOptions.rootContextKey).format() + testPartialUrlStr
 
     expect(request.getOptions()).to.be.eql(testOptions)
     // console.log("URL: " + JSON.stringify(request.getUrl(), null, 2))
