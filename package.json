@@ -17,6 +17,8 @@
     "dev": "better-npm-run dev",
     "dev:no-debug": "npm run dev -- --no_debug",
     "test": "better-npm-run test",
+    "test:record": "better-npm-run test --record",
+    "test:no-mock": "better-npm-run test --no_mock",
     "test:dev": "npm run test -- --watch",
     "deploy": "better-npm-run deploy",
     "deploy:dev": "better-npm-run deploy:dev",
@@ -34,6 +36,7 @@
       "command": "nodemon --exec babel-node bin/server",
       "env": {
         "NODE_ENV": "development",
+        "COMMENT_DEBUG_SETTINGS": "app:*, reusable:*, test:*",
         "DEBUG": "app:*"
       }
     },
@@ -47,6 +50,7 @@
       "command": "npm run deploy",
       "env": {
         "NODE_ENV": "development",
+        "COMMENT_DEBUG_SETTINGS": "app:*, reusable:*, test:*",
         "DEBUG": "app:*"
       }
     },
@@ -60,6 +64,7 @@
     "start": {
       "command": "babel-node bin/server",
       "env": {
+        "COMMENT_DEBUG_SETTINGS": "app:*, reusable:*, test:*",
         "DEBUG": "app:*"
       }
     },
@@ -74,6 +79,7 @@
       "command": "babel-node ./node_modules/karma/bin/karma start build/karma.conf",
       "env": {
         "NODE_ENV": "test",
+        "COMMENT_DEBUG_SETTINGS": "app:*, reusable:*, test:*",
         "DEBUG": "app:*"
       }
     }

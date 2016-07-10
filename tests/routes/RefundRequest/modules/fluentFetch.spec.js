@@ -12,15 +12,18 @@ import {
 import urlUtil, {Url} from 'url'
 import {expect} from 'chai';
 import {cloneDeep} from 'lodash'
+import _debug from 'debug'
 
 'use strict'
+
+const debug = _debug('test:fluentFetch')
 
 describe('fluentFetch', () => {
   const jsonType              = 'application/json'
   const testRootContext       = 'http://www.mocky.io/v2'
   const testUrlStr            = 'http://www.mocky.io/v2/5779b9b71300007126bc3f0e?zippy=yow&zip=yowsa'
   const testPartialUrlStr     = 'turtles'
-  const origDefaultContext    = getRootContext();
+  const origDefaultContext    = getRootContext()
   let testOptions:OptionsType = cloneDeep(defaultOpts)
 
   before(() => {
@@ -61,7 +64,9 @@ describe('fluentFetch', () => {
     
     const request     = new Request(urlUtil.parse(testPartialUrlStr), testOptions)
     const expectedUrl = getRootContext(testOptions.rootContextKey).format() + testPartialUrlStr
-
+    
+    debug("DEBUG console log setting: " + process.env.DEBUG)
+    
     expect(request.getOptions()).to.be.eql(testOptions)
     // console.log("URL: " + JSON.stringify(request.getUrl(), null, 2))
     expect(request.getUrl().format()).to.be.eql(expectedUrl)

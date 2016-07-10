@@ -33,11 +33,15 @@
     }
   },
   "globals" : {
-    "__DEV__"      : false,
-    "__PROD__"     : false,
-    "__DEBUG__"    : false,
-    "__COVERAGE__" : false,
-    "__BASENAME__" : false
+    "NODE_DEV":     false,
+    "__DEV__":      false,
+    "__DEBUG__":    false,
+    "__PROD__":     false,
+    "__TEST__":     false,
+    "__RECORD__":   false,
+    "__MOCK__":     false,
+    "__COVERAGE__": false,
+    "__BASENAME__": false
   },
   "rules": {
     "no-console": 0,

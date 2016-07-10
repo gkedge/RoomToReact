@@ -7,6 +7,7 @@ import chai from 'chai'
 import sinonChai from 'sinon-chai'
 import chaiAsPromised from 'chai-as-promised'
 import chaiEnzyme from 'chai-enzyme'
+import _debug from 'debug'
 
 chai.use(sinonChai)
 chai.use(chaiAsPromised)
@@ -16,6 +17,8 @@ global.chai = chai
 global.sinon = sinon
 global.expect = chai.expect
 global.should = chai.should()
+
+_debug.enable(process.env.DEBUG)
 
 // ---------------------------------------
 // Require Tests

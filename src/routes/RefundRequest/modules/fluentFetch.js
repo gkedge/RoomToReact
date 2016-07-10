@@ -4,6 +4,7 @@
 // Differences are semantic, type safety and the addition of mock creation.
 
 import urlUtil, {Url} from 'url'
+import _debug from 'debug'
 
 export type MapToStringType = {
   [key: string]: string
@@ -25,6 +26,7 @@ export type OptionsType = {
   rootContextKey: ?string // Only provide in ctor Options; not setOptions() 
 }
 
+const debug = _debug("reusable:fluentFetch")
 const defaultRootContext:Url  = urlUtil.parse('http://localhost:8080')
 const contextMap:MapToUrlType = {
   'default': defaultRootContext
@@ -100,7 +102,11 @@ export class Request {
     this.url        = urlUtil.parse(urlUtil.resolve(rootContext, url))
 
     this.setQueryParams(this.opts.queryParams)
-    console.log("URL: " + JSON.stringify(this.url, null, 2))
+    
+    // console.error("debug() enabled: " + !!debug.enabled)
+    if (debug.enabled) {
+      debug("URL: " + JSON.stringify(this.url, null, 2))
+    }
   }
 
   setOptions(options:OptionsType):Request {
