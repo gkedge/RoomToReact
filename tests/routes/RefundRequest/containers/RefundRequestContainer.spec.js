@@ -104,14 +104,14 @@ describe('(Route/Container) RefundRequest/RefundRequestContainer', () => {
       expect(mockedActions).to.be.eql([savedRefundRequestAction])
     })
 
-    //it('Test react-redux connect()\'ed store with fetchPaymentHistory action.', () => {
+    //it('Test react-redux connect()\'ed store with lookupReferencedData action.', () => {
     //  
     //  let pdfFilePath =  url.parse('http://localhost/foo.pdf')
     //  
     //  fetchMock.mock(pdfFilePath.format(), 'GET', 'I like turtles!')
     //
     //  // Return the promise to handle error
-    //  return store.dispatch(actions.fetchPaymentHistory(pdfFilePath))
+    //  return store.dispatch(actions.lookupReferencedData(pdfFilePath))
     //    .then(data => {
     //      const pdfBinary = actions.pdfBinary(base64ToBinary('I like turtles!'))
     //      expect(data).to.be.eql(pdfBinary)

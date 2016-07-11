@@ -1,9 +1,9 @@
 /* @flow */
+/*eslint no-useless-constructor: 0*/
 import type {
   PdfDataType,
-  RefundRequestStateObjectType,
-  LookupFormDataType,
-  SaveRefundRequestPayloadType
+  RefundRequestFormDataType,
+  LookupFormDataType
 } from '../interfaces/RefundRequestTypes'
 import React from 'react'
 import {Box, VBox, Center, Flex, Container} from 'react-layout-components'
@@ -14,22 +14,24 @@ import RefundRequestForm from './RefundRequestForm'
 
 type PropType = {
   loadingPdf: Function,
-  lookupFormData: ? LookupFormDataType,
+  lookupFormData: LookupFormDataType,
+  lookupReferencedData: Function,
   pdfBinary: Function,
-  pdfData: ? PdfDataType,
+  pdfData: PdfDataType,
   pdfLoaded: Function,
+  refundRequestFormData: RefundRequestFormDataType,
   resetState: Function,
-  saveRefundRequestData: ? SaveRefundRequestPayloadType,
+  saveRefundRequest: Function,
   validLookup: Function
 }
 
 export class RefundRequest extends React.Component {
   constructor(props:PropType) {
     super(props)
-    this.onFileOpen               = this.onFileOpen.bind(this)
-    this.onDocumentComplete       = this.onDocumentComplete.bind(this)
+    this.onFileOpen = this.onFileOpen.bind(this)
+    this.onDocumentComplete = this.onDocumentComplete.bind(this)
     this.onBinaryContentAvailable = this.onBinaryContentAvailable.bind(this)
-    this.handleSubmit             = this.handleSubmit.bind(this)
+    this.handleSubmit = this.handleSubmit.bind(this)
   }
 
   // componentWillReceiveProps(newProps:PropType) {
@@ -58,7 +60,13 @@ export class RefundRequest extends React.Component {
     this.props.resetState()
   }
 
-  render():any {
+  renderRefundRequest():Object {
+    return (
+      <RefundRequestForm {...this.props.refundRequestFormData}
+        onSubmit={this.handleSubmit} />)
+  }
+
+  render():Object {
     return (
       <section className='load-refund-request'>
         <Box>
@@ -72,30 +80,36 @@ export class RefundRequest extends React.Component {
             </Container>
           </Center>
           <VBox>
-              {/* This Box limits vertical space to the vertical size of form. */ }
-              <Box justify-content='center'>
-                <LookupForm {...this.props.lookupFormData}
-                  onSubmit={this.handleSubmit}/>
-              </Box>
-              <RefundRequestForm {...this.props}/>
+            {/* This Box limits vertical space to the vertical size of form. */ }
+            <Box justify-content='center'>
+              <LookupForm {...this.props.lookupFormData}
+                onSubmit={this.handleSubmit}/>
+            </Box>
+            {
+              this.props.lookupFormData.lookupForm.referenceNum &&
+              this.props.lookupFormData.lookupForm.dateFrom &&
+              this.props.lookupFormData.lookupForm.dateTo &&
+              this.renderRefundRequest()
+            }
           </VBox>
         </Box>
-      </section>
-    )
+      </section>)
   }
 }
 
 RefundRequest.displayName = 'RefundRequest'
-RefundRequest.propTypes   = {
-  loadingPdf           : React.PropTypes.func.isRequired,
-  lookupFormData       : React.PropTypes.object,
-  onFileOpen           : React.PropTypes.func,
-  pdfBinary            : React.PropTypes.func.isRequired,
-  pdfData              : React.PropTypes.object,
-  pdfLoaded            : React.PropTypes.func.isRequired,
-  resetState           : React.PropTypes.func.isRequired,
+RefundRequest.propTypes = {
+  loadingPdf:            React.PropTypes.func.isRequired,
+  lookupFormData:        React.PropTypes.object,
+  lookupReferencedData:  React.PropTypes.func.isRequired,
+  pdfBinary:             React.PropTypes.func.isRequired,
+  pdfData:               React.PropTypes.object,
+  pdfLoaded:             React.PropTypes.func.isRequired,
+  refundRequestFormData: React.PropTypes.object,
+  resetState:            React.PropTypes.func.isRequired,
+  saveRefundRequest:     React.PropTypes.func.isRequired,
   saveRefundRequestData: React.PropTypes.object,
-  validLookup          : React.PropTypes.func.isRequired
+  validLookup:           React.PropTypes.func.isRequired
 }
 
 export default RefundRequest

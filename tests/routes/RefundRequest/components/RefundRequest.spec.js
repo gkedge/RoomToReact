@@ -6,6 +6,7 @@ import {mount, shallow} from 'enzyme';
 const props = {
   pdfData:                {
     pdf: {
+      isError:   false,
       isLoading: false,
       file:      null,
       content:   null,
@@ -13,18 +14,54 @@ const props = {
       scale:     1.0
     }
   },
-  lookupFormData:         {
-    referenceNum: 'Yow',
-    dateFrom:     null,
-    dateTo:       null,
-    email:        null
+  lookupFormData: {
+    lookupForm: {
+      isError:      false,
+      isLookingUp:  false,
+      referenceNum: 'Yow',
+      dateFrom:     null,
+      dateTo:       null,
+      email:        null
+    }
+  },
+  refundRequestFormData: {
+    refundRequestForm: {
+      isError:           false,
+      fees:              [],
+      depositAccountNum: 0,
+      reason:            null,
+      rationale:         null,
+      name:              {
+        isError: false,
+        found:   false,
+        name:    ''
+      },
+      address:           {
+        isError: false,
+        found:   false,
+        address: {
+          role:  null,
+          addr0: null,
+          addr1: null,
+          city:  null,
+          state: null,
+          zip:   null
+        }
+      },
+      phone:             null,
+      isLoadingNames: false,
+      isLoadingPaymentHistory: false,
+      attorneyDocketNum: 0,
+      acknowledgement:   false,
+      requestDate:       null
+    }
   },
   saveRefundRequestData:  {
     isSaving: false,
     isSaved:  false
   },
-  fetchRefundRequestFile: sinon.spy(),
   loadingPdf:             sinon.spy(),
+  lookupReferencedData:   sinon.spy(),
   pdfBinary:              sinon.spy(),
   pdfLoaded:              sinon.spy(),
   resetState:             sinon.spy(),

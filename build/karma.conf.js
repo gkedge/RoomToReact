@@ -16,13 +16,22 @@ const karmaConfig = {
       included: true
     }
   ],
-  mochaReporter:     {
-    showDiff: true,
-    colors:   {
+  mochaReporter: {
+    showDiff:      true,
+    output:        'autowatch',
+    ignoreSkipped: true,
+    colors:        {
       success: 'blue',
       info:    'green',
       warning: 'cyan',
       error:   'red'
+    }
+  },
+  client: {
+    mocha: {
+      // change Karma's debug.html to the mocha web reporter
+      reporter: 'html',
+      // grep:     "RefundRequestMod"
     }
   },
   singleRun:         !argv.watch,
@@ -35,7 +44,7 @@ const karmaConfig = {
   retryLimit:        4,
   browserComment_0:  'karma does not wait long enough for Chrome chrome to start prior to retrying.',
   browserComment_1:  'https://github.com/karma-runner/karma/issues/2116',
-  browsers:          [/* 'Chrome', 'Firefox', 'SlimerJS', */ 'PhantomJS'],
+  browsers:          [/* 'Chrome', 'Firefox', 'SlimerJS',*/, 'SlimerJS', 'PhantomJS'],
   webpack:           {
     devtool:    'cheap-module-source-map',
     resolve:    {

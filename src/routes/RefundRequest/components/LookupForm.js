@@ -3,7 +3,7 @@
 import type {LookupFormDataType} from '../interfaces/RefundRequestTypes'
 
 type PropType = {
-  lookup: LookupFormDataType,
+  lookupForm: LookupFormDataType,
   form: string,
   anyTouched: boolean,
   dirty: boolean,
@@ -26,25 +26,26 @@ import compare from 'reusable/utilities/dates'
 import {upper, lower} from 'reusable/utilities/dataUtils'
 import adapter, {FieldWrapper, validEmail} from 'reusable/utilities/reduxFormFieldAdapters'
 
-// import {load as initialValues} from '../modules/RefundRequestMod'
 import classes from './LookupForm.scss'
 
+const badAlphaPositionTip = "First character limited to alphabetic/numeric;" +
+  "<br/> remaining may also contain comma, slash('/') or dash."
+
 const invalidKeyToMessageMap = {
-  'bad-alpha-position'          : "Misplaced alpha character",
-  'bad-alpha-position-tip'      : "Only first 2 characters can ba alphabetic",
-  'bad-email-format'            : "Invalid format",
-  'bad-email-format-tip'        : "Contains invalid characters or exceeds length limits",
-  'bad-first-two-chars'         : "If alpha, first 2 chars alpha",
-  'bad-first-two-chars-tip'     : "Alpha okay in first 2 characters, but both need to be alpha",
-  'email-missing-separators'    : "Must have '@' and '.'",
+  'bad-alpha-position':           "Misplaced character",
+  'bad-alpha-position-tip':       badAlphaPositionTip,
+  'bad-email-format-tip':         "Contains invalid characters or exceeds length limits",
+  'bad-first-two-chars':          "If alpha, first 2 chars alpha",
+  'bad-first-two-chars-tip':      "Alpha okay in first 2 characters, but both need to be alpha",
+  'email-missing-separators':     "Must have '@' and '.'",
   'email-missing-separators-tip': "Email have the format: <i>text</i>@<i>text</i>.<i>text</i>",
-  'high-range'                  : "Must < 9 characters",
-  'high-range-tip'              : "Number cannot exceed 8 characters in length",
-  'less-than-data-to'           : "From is less than To",
-  'less-than-data-to-tip'       : "'From' date must be greater than or equal 'To' date",
-  'low-range'                   : "Must > 6 characters",
-  'low-range-tip'               : "Number must at least 7 characters in length",
-  'required'                    : "Required"
+  'high-range':                   "Must < 9 characters",
+  'high-range-tip':               "Number cannot exceed 8 characters in length",
+  'less-than-data-to':            "From is less than To",
+  'less-than-data-to-tip':        "'From' date must be greater than or equal 'To' date",
+  'low-range':                    "Must > 6 characters",
+  'low-range-tip':                "Number must at least 7 characters in length",
+  'required':                     "Required"
 }
 
 const validate = (values:LookupFormDataType):Object => {
@@ -57,13 +58,10 @@ const validate = (values:LookupFormDataType):Object => {
   else if (referenceNum.length < 7) {
     errors.referenceNum = 'low-range'
   }
-  else if (referenceNum.length > 8) {
+  else if (referenceNum.length > 17) {
     errors.referenceNum = 'high-range'
   }
-  else if (/^(([\d][A-Za-z])|([A-Za-z][\d])).*/.test(referenceNum)) {
-    errors.referenceNum = 'bad-first-two-chars'
-  }
-  else if (!/^[A-Za-z\d][A-Za-z\d]\d*$/.test(referenceNum)) {
+  else if (!/^[A-Za-z\d][A-Za-z\d\/,-]*$/.test(referenceNum)) {
     errors.referenceNum = 'bad-alpha-position'
   }
   if (!dateFrom) {
@@ -76,7 +74,7 @@ const validate = (values:LookupFormDataType):Object => {
     const diff = compare(dateFrom, dateTo)
     if (diff > 0) {
       errors.dateFrom = 'less-than-data-to'
-      errors.dateTo   = 'less-than-data-to'
+      errors.dateTo = 'less-than-data-to'
     }
   }
   if (email) {
@@ -116,7 +114,7 @@ const renderReferenceNum = (fieldProps:Object):?Object => {
                   : fieldProps.name + '-input'}>Reference #</label>
           <label className='questionmark'
                  data-html='true'
-                 data-tip={info}>[&#x2753;]</label>
+                 data-tip={info}>[?]</label>
           <ReactTooltip />
         </Flex>
       </div>
@@ -178,19 +176,19 @@ let LookupForm = (props:PropType):Object => {
 }
 
 LookupForm.displayName = 'LookupForm'
-LookupForm.propTypes   = {
-  anyTouched  : React.PropTypes.bool.isRequired,
-  array       : React.PropTypes.object.isRequired,
-  dirty       : React.PropTypes.bool.isRequired,
-  form        : React.PropTypes.string.isRequired,
+LookupForm.propTypes = {
+  anyTouched:   React.PropTypes.bool.isRequired,
+  array:        React.PropTypes.object.isRequired,
+  dirty:        React.PropTypes.bool.isRequired,
+  form:         React.PropTypes.string.isRequired,
   handleSubmit: React.PropTypes.func.isRequired,
-  initialized : React.PropTypes.bool.isRequired,
-  invalid     : React.PropTypes.bool.isRequired,
-  lookup      : React.PropTypes.object.isRequired,
-  pristine    : React.PropTypes.bool.isRequired,
+  initialized:  React.PropTypes.bool.isRequired,
+  invalid:      React.PropTypes.bool.isRequired,
+  lookupForm:   React.PropTypes.object.isRequired,
+  pristine:     React.PropTypes.bool.isRequired,
   submitFailed: React.PropTypes.bool.isRequired,
-  submitting  : React.PropTypes.bool.isRequired,
-  valid       : React.PropTypes.bool.isRequired
+  submitting:   React.PropTypes.bool.isRequired,
+  valid:        React.PropTypes.bool.isRequired
 }
 
 LookupForm = reduxForm(
@@ -204,7 +202,7 @@ LookupForm = reduxForm(
 LookupForm = connect(
   (state:Object):Object => ({
     // pull initial values from refundRequest
-    initialValues: state.refundRequest.lookup
+    initialValues: state.refundRequest.lookupForm
   })
 )(LookupForm)
 

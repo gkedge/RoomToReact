@@ -2,45 +2,45 @@
 
 import {connect} from 'react-redux'
 import {
-  validLookup,
-  loadingPdf, pdfBinary, pdfLoaded,
-  fetchPaymentHistory,
+  lookupReferencedData,
+  loadingPdf,
+  pdfBinary,
+  pdfLoaded,
+  resetState,
   saveRefundRequest,
-  resetState
+  validLookup
 } from '../modules/RefundRequestMod'
 
 import RefundRequest from '../components/RefundRequest'
 
 const mapStateToProps = (state:Object):Object => ({
   pdfData: {
-    isLoading: Boolean(state.refundRequest.isLoading),
-    pdf:       state.refundRequest.pdf
+    pdf: state.refundRequest.pdf
   },
   lookupFormData: {
-    lookup: state.refundRequest.lookup
+    lookupForm: state.refundRequest.lookupForm
   },
-  savedRefundRequestData: {
-    isSaving: Boolean(state.refundRequest.isSaving),
-    isSaved:  Boolean(state.refundRequest.isSaved)
+  refundRequestFormData: {
+    refundRequestForm: state.refundRequest.refundRequestForm
   }
 })
 
 const mapActionCreators:{
-  validLookup: Function,
+  lookupReferencedData: Function,
   loadingPdf: Function,
   pdfBinary: Function,
   pdfLoaded: Function,
-  fetchPaymentHistory: Function,
+  resetState: Function,
   saveRefundRequest: Function,
-  resetState: Function
+  validLookup: Function
 } = {
-  validLookup,
+  lookupReferencedData,
   loadingPdf,
   pdfBinary,
   pdfLoaded,
-  fetchPaymentHistory,
+  resetState,
   saveRefundRequest,
-  resetState
+  validLookup
 }
 
 export default connect(mapStateToProps, mapActionCreators)(RefundRequest)

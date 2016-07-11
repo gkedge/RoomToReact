@@ -5,10 +5,12 @@ import {mount, shallow} from 'enzyme';
 
 const props = {
   fields:       {
+    isError:      false,
+    isLookingUp:  false,
     referenceNum: 'Yow',
     dateFrom:     null,
     dateTo:       null,
-    email:       null
+    email:        null
   },
   handleSubmit: sinon.spy(),
   resetForm:    sinon.spy()

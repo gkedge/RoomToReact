@@ -87,9 +87,7 @@ describe('(Route Module) Zen', () => {
         fetchMock.mock('https://api.github.com/zen', 'GET', 'I like turtles!')
       })
 
-      afterEach(() => {
-        fetchMock.restore()
-      })
+      afterEach(fetchMock.restore)
 
       it('Should be exported as a function.', () => {
         expect(actions.fetchZen).to.be.a('function')
