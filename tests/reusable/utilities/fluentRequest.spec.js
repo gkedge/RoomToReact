@@ -1,6 +1,7 @@
 /* @flow */
 
 import type {OptionsType} from 'reusable/utilities/fluentRequest'
+import _debug from 'debug'
 import {
   Request,
   defaultOpts,
@@ -15,6 +16,8 @@ import {cloneDeep} from 'lodash'
 import fetchMock from 'fetch-mock'
 
 'use strict'
+
+const debug = _debug('test:fluentRequest')
 
 describe('fluentFetch', () => {
   const jsonType = 'application/json; charset=utf-8'

@@ -4,6 +4,7 @@
 // Differences are semantic, type safety and the addition of mock creation.
 
 import 'whatwg-fetch'  // isomorphic-fetch contains the browser-specific whatwg-fetch
+import _debug from 'debug'
 import urlUtil, {Url} from 'url'
 import isUndefined from 'lodash/isUndefined'
 import isObject from 'lodash/isObject'
@@ -33,6 +34,7 @@ export type OptionsType = {
   rootContextKey: ? string // Only provide in ctor Options; not setOptions()
 }
 
+const debug = _debug("reusable:fluentRequest")
 const defaultRootContext:Url = urlUtil.parse('http://localhost:8080')
 const contextMap:MapToUrlType = {
   'default': defaultRootContext
@@ -181,6 +183,11 @@ export class Request {
 
     if (this.opts.queryParams) {
       this.setQueryParams(this.opts.queryParams)
+    }
+
+    // console.error("debug() enabled: " + !!debug.enabled)
+    if (debug.enabled) {
+      debug("URL: " + JSON.stringify(this.url, null, 2))
     }
   }
 

@@ -45,6 +45,7 @@ const config = {
     colors : true
   },
   compiler_vendor : [
+    'debug',
     'history',
     'react',
     'react-redux',
@@ -130,7 +131,8 @@ const overrides = environments[config.env]
 if (overrides) {
   debug('Found overrides, applying to default configuration.')
   Object.assign(config, overrides(config))
-} else {
+}
+else {
   debug('No environment overrides found, defaults will be used.')
 }
 

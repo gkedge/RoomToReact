@@ -31,6 +31,12 @@ const __karmaWebpackManifest__ = new Array() // eslint-disable-line
 const inManifest = (path) => ~__karmaWebpackManifest__.indexOf(path)
 
 // require all `tests/**/*.spec.js`
+// const testsContext = require.context('./', true, /\.spec\.js$/)
+
+// Which tests are run by mocha is an intersection of this 'testsContext' and
+// karma.config.js:karmaConfig.client.mocha.grep.  Changing
+// 'karmaConfig.client.mocha.grep' requires the TDD, continuous running tests
+// to be restarted whereas changing 'testsContext' will be reflected immediately.
 const testsContext = require.context('./', true, /(reusable|routes\/RefundRequest).*\.spec\.js$/)
 
 // only run tests that have changed after the first pass.

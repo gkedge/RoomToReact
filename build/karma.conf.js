@@ -29,13 +29,22 @@ const karmaConfig = {
   },
   client: {
     mocha: {
-      // change Karma's debug.html to the mocha web reporter
-      reporter: 'html',
+      // change Karma's debug.html to the mocha web reporter so that you
+      // can see and rerun individual tests in the Karma [DEBUG] tab in
+      // Chrome or Firefox.
+      reporter: 'html'
+
+      // Which tests are run by mocha is an intersection of this 'grep' and
+      // test-bundler.js:testsContext.  Changing 'grep' requires the TDD, continuous
+      // running tests to be restarted whereas changing test-bundler.js:testsContext
+      // will be reflected immediately.
+      //
       // grep:     "RefundRequestMod"
     }
   },
   singleRun:         !argv.watch,
   frameworks:        ['mocha'],
+  // reporters:         ['progress', 'mocha'],
   reporters:         ['mocha'],
   preprocessors:     {
     [`${config.dir_test}/test-bundler.js`]: ['webpack']
@@ -83,6 +92,8 @@ const karmaConfig = {
     reporters: config.coverage_reporters
   }
 }
+
+debug('Create coverage configuration.')
 
 if (config.globals.__COVERAGE__) {
   karmaConfig.reporters.push('coverage')

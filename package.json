@@ -80,7 +80,7 @@
       "env": {
         "NODE_ENV": "test",
         "COMMENT_DEBUG_SETTINGS": "app:*, reusable:*, test:*",
-        "DEBUG": "app:*"
+        "DEBUG": "app:*, reusable:*"
       }
     }
   },
