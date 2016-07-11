@@ -13,3 +13,5 @@ application.iml
 .eslintrc_BASE_10500
 .eslintrc_LOCAL_10500
 .eslintrc_REMOTE_10500
+/provider/
+/provision/
