@@ -1,0 +1,96 @@
+apply plugin: 'war'
+
+//version = ''
+
+war.doFirst{
+    webInf { from 'src/main/webapp/WEB-INF/jboss-deployment-structure.xml' }
+    manifest {
+        attributes("Manifest-Version": "1.0",
+                "Created-By" : vendor,
+                "Specification-Title": appName,
+                "Specification-Version": version,
+                "Specification-Vendor": vendor,
+                "Implementation-Title": appName,
+                "Implementation-Version" : version,
+                "Implementation-Vendor": vendor,
+        )
+    }
+}
+
+//uploadArchives {
+//    repositories.mavenDeployer {
+//        pom.groupId = groupId
+//        pom.artifactId = appName
+//        
+//        repository(url: "${nexusUrl}/content/repositories/releases") {
+//            authentication(userName: nexusUsername, password: nexusPassword)
+//        }
+//        
+//        snapshotRepository(url: "${nexusUrl}/content/repositories/snapshots") {
+//            authentication(userName: nexusUsername, password: nexusPassword)
+//        }
+//    }
+//}
+
+// Call script to determine successful deployment:
+//    #!/bin/sh
+//    MAX_WAIT=180
+//    DELAY=10
+//    TOTAL_WAIT=0
+//    
+//    until [ $TOTAL_WAIT -gt $MAX_WAIT ]
+//    do
+//        if $JBOSS_HOME/bin/jboss-cli.sh -c --command="deployment-info --name=mydeployment.war" | grep -q "OK"
+//        then break
+//        fi
+//        echo Application is not deployed withing $TOTAL_WAIT seconds. Waiting for another $DELAY seconds...
+//        sleep $DELAY
+//        let TOTAL_WAIT=$TOTAL_WAIT+$DELAY;
+//    done
+
+task deploy(dependsOn: war, type: Copy) {
+    
+    def destinationDirectory = "/opt/wildfly-alt/standalone/deployments";
+    def destinationWar = "${destinationDirectory}/" + war.baseName + "." + war.extension;
+    def pattern = "(.*)-" + war.version + ".(.*)";
+    
+    from war.archivePath
+    into "${destinationDirectory}"
+    rename ~/${pattern}/, '$1.$2'
+    
+    def ok = new File("${destinationWar}.deployed");
+    def nok = new File("${destinationWar}.failed");
+
+    doFirst {
+        println "deploy doFirst"
+        if (ok.exists()) {
+            ok.delete()
+        }
+        if (nok.exists()) {
+            nok.delete()
+        }
+    }
+
+    doLast {
+        logger.info("Deployment destination: ${destinationWar}");
+        println "Deployment destination: ${destinationWar}"
+
+        def deployed = false as Object
+        for (def i = 0; i < 80; i++) {
+            if (ok.exists()) {
+                deployed = true; break
+            }
+            if (nok.exists()) {
+                break
+            }
+            sleep(500);
+        }
+        if (deployed) {
+            println("deploy ok.")
+        } else {
+            throw new RuntimeException("Deployment failed, see Wildfly logs!")
+        }
+    }
+}
+
+

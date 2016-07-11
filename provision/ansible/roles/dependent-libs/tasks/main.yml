@@ -1,0 +1,6 @@
+---
+
+- name: Install dependent libs
+  yum: name='{{ item }}' state=present
+  with_items: '{{dependent_libs}}'
+

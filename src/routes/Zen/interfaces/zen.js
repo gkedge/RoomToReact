@@ -8,6 +8,7 @@ export type ZenObjectType = {
 export type ZenStateObjectType = {
   current: ?number,
   fetching: boolean,
+  fetchError: boolean,
   saved: Array<number>,
   zens: Array<ZenObjectType>
 }

@@ -10,10 +10,13 @@
 .*/src/styles/.*
 
 [include]
-./node_modules/
+# ./node_modules/
 
 [libs]
 ./node_modules/flow-interfaces/interfaces/
+./src/reusable/interfaces/
+./src/routes/RefundRequest/interfaces/
+./src/routes/Zen/interfaces/
 ./interfaces/
 
 [options]

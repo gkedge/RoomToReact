@@ -5,6 +5,9 @@ import {useRouterHistory} from 'react-router'
 import {syncHistoryWithStore} from 'react-router-redux'
 import createStore from './store/createStore'
 import AppContainer from './containers/AppContainer'
+import _debug from 'debug'
+
+_debug.enable(process.env.DEBUG)
 
 // ========================================================
 // Browser History Setup

@@ -131,7 +131,7 @@ describe('(Route Module) Zen', () => {
 
     describe('(Action Handler) REQUEST_ZEN', () => {
       it('Passing `requestZen()` to reducer should produce fetching truth', () => {
-        const expected = {fetching: true, current: null, zens: [], saved: []}
+        const expected = {fetching: true, fetchError: false, current: null, zens: [], saved: []}
         let state = zenReducer(initialState, actions.requestZen())
         expect(state).to.eql(expected)
         state = zenReducer(state, {type: '@@@@@@@'})
@@ -143,7 +143,7 @@ describe('(Route Module) Zen', () => {
       it('Passing `receiveZen()` to reducer should produce fetching falsity with `zen-like` wisdom', () => {
         let state = zenReducer(initialState, actions.receiveZen('Yow'))
 
-        expect(state).to.eql({fetching: false, current: 0, zens: [{"value": "Yow", "id": 0}], saved: []})
+        expect(state).to.eql({fetching: false, fetchError: false, current: 0, zens: [{"value": "Yow", "id": 0}], saved: []})
       })
     })
 
@@ -152,7 +152,7 @@ describe('(Route Module) Zen', () => {
         let state = zenReducer(initialState, actions.receiveZen('Yow'))
         state = zenReducer(state, actions.saveCurrentZen())
 
-        expect(state).to.eql({fetching: false, current: 0, zens: [{"value": "Yow", "id": 0}], saved: [0]})
+        expect(state).to.eql({fetching: false, fetchError: false, current: 0, zens: [{"value": "Yow", "id": 0}], saved: [0]})
       })
     })
   })

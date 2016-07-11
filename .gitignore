@@ -3,9 +3,10 @@
 
 application.iml
 /.idea/
-/node_modules/
 /coverage/
 /dist/
+/node_modules/
+/provider/vmware/.vagrant/
 /*.zip
 /Home/
 .eslintrc_BACKUP_10500

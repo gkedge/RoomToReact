@@ -8,6 +8,7 @@ import 'whatwg-fetch'
 // Constants
 // ------------------------------------
 export const REQUEST_ZEN = 'REQUEST_ZEN'
+export const REQUEST_ZEN_ERROR = 'REQUEST_ZEN_ERROR'
 export const RECEIVE_ZEN = 'RECEIVE_ZEN'
 export const SAVE_CURRENT_ZEN = 'SAVE_CURRENT_ZEN'
 
@@ -18,6 +19,12 @@ export const SAVE_CURRENT_ZEN = 'SAVE_CURRENT_ZEN'
 export function requestZen():any {
   return {
     type: REQUEST_ZEN
+  }
+}
+
+export function requestZenError():any {
+  return {
+    type: REQUEST_ZEN_ERROR
   }
 }
 
@@ -49,6 +56,10 @@ export const fetchZen = ():Function => {
     return fetch('https://api.github.com/zen')
       .then((data:Object):any /* Promise*/ => data.text())
       .then((text:string):any /* Promise*/ => dispatch(receiveZen(text)))
+      .catch((error:Error) => {
+        dispatch(requestZenError())
+        throw error
+      })
   }
 }
 
@@ -67,7 +78,16 @@ const ZEN_ACTION_HANDLERS = {
     return ({
       ...state,
       zens:     state.zens.concat(action.payload),
-      current:  action.payload.id, fetching: false
+      current:  action.payload.id, 
+      fetching: false
+    })
+  },
+  [REQUEST_ZEN_ERROR]: (state:ZenStateObjectType, action:{payload: ZenObjectType}):ZenStateObjectType => {
+    return ({
+      ...state,
+      zens      : state.zens.concat(action.payload),
+      fetching  : false,
+      fetchError: true
     })
   },
   [SAVE_CURRENT_ZEN]: (state:ZenStateObjectType):ZenStateObjectType => {
@@ -80,7 +100,7 @@ const ZEN_ACTION_HANDLERS = {
 // Reducer
 // ------------------------------------
 
-export const initialState:ZenStateObjectType = {fetching: false, current: null, zens: [], saved: []}
+export const initialState:ZenStateObjectType = {fetching: false, fetchError: false, current: null, zens: [], saved: []}
 export default function zenReducer(state:ZenStateObjectType = initialState,
                                    action:ActionPayloadType):ZenStateObjectType {
   const handler = ZEN_ACTION_HANDLERS[action.type]

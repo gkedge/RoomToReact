@@ -1,0 +1,88 @@
+---
+# file: roles/wildfly/(un)install/defaults/main.yml
+
+# NOTE: Since this file is shared by both install and uninstall,
+#       be sure to uninstall wildfly before changing these defaults!!!
+
+###
+# Installation variables
+###
+# wildfly_version: 8.2.1.Final
+wildfly_version: 9.0.1.Final
+wildfly_install_dir: /opt
+wildfly_alt_module_path: "{{ wildfly_install_dir }}/wildfly-alt/modules"
+
+###
+# wildfly.conf variables
+###
+wildfly_conf_dir: /etc/default
+                      
+###
+# User & Groups
+#
+# NOTE: This role will add jboss_user to the OS as a user during install AND
+#       remove jboss_user during uninstall. So jboss_user should be _unique_
+#       to this role.  DO NOT use this jboss_user for other ansible roles or
+#       even JBOSS related operations.
+###
+jboss_user: wildfly
+jboss_password: "{{ vaulted_jboss_password }}"
+jboss_group: wildfly
+
+jboss_groups: 
+  - wildfly
+
+###
+# standalone.xml variables
+###
+wildfly_mgmt_bind_address: "0.0.0.0" 
+wildfly_public_bind_address: "0.0.0.0" 
+
+wildfly_mgmt_native_port: 9999
+wildfly_mgmt_http_port: 9990
+wildfly_mgmt_https_port: 9993
+wildfly_ajp_port: 8009 
+wildfly_http_port: 8080
+wildfly_https_port: 8443 
+wildfly_debug_port: 59217
+
+wildfly_datasources:
+
+  - jndi_name: ExampleDS 
+    pool_name: ExampleDS 
+    url: "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE"
+    driver: h2 
+    user: sa
+    password: sa
+    # pool_enabled is required. if false; then other pool variables are ignored
+    pool_enabled: false 
+    pool_min_size: 1
+    pool_max_size: 10
+    pool_prefill: true
+    # connection_validation_enabled is required. if false; then connection_validation_sql is ignored
+    connection_validation_enabled: false 
+    connection_validation_sql: "select 1"
+
+wildfly_jdbc_drivers:
+
+  - name: "h2"
+    module_name: "com.h2database.h2" 
+    # class_name_included is required. if false; then class_name is ignored
+    class_name_included: false 
+    class_name: "org.h2.jdbcx.JdbcDataSource" 
+    # xa_class_name_included is required. if false; then class_name is ignored
+    xa_class_name_included: true
+    xa_class_name: "org.h2.jdbcx.JdbcDataSource" 
+
+###
+# standalone.conf variables
+###
+wildfly_memory_min: "512m"
+wildfly_memory_max: "1532m"
+# Is no more... wildfly_max_perm_size: "256m"
+
+wildfly_java_opts:
+  - user.timezone=EST
+  - java.library.path=/usr/java/packages/lib/amd64:/usr/lib64:/lib64:/lib:/usr/lib:/usr/local/lib
+  - "{{domainExt}}.{{domain}}.{{subDomain}}.app.report.CpuPressureReport.CpuUtilReport"=true
+  - visualvm.id=1443270428334275000
