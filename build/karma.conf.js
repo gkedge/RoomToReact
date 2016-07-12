@@ -63,7 +63,7 @@ const karmaConfig = {
   retryLimit:        4,
   browserComment_0:  'karma does not wait long enough for Chrome chrome to start prior to retrying.',
   browserComment_1:  'https://github.com/karma-runner/karma/issues/2116',
-  browsers:          [/* 'Chrome', 'Firefox', 'SlimerJS', 'Firefox', */ 'Firefox', 'PhantomJS'],
+  browsers:          [/* 'Chrome', 'Firefox', 'SlimerJS', */ 'PhantomJS'],
   webpack:           {
     devtool:    'cheap-module-source-map',
     resolve:    {
@@ -104,11 +104,16 @@ const karmaConfig = {
 }
 
 debug('Create coverage configuration.')
-
+// TODO: Checkout babel-plugin-__coverage__ or babel-plugin-istanbul
+// to replace mothballed isparta.
+// TODO: Checkout https://github.com/caitp/karma-coveralls to publish
+// 'lcov' coverage report to http://coveralls.io
 if (config.globals.__COVERAGE__) {
   karmaConfig.reporters.push('coverage')
 
   // SlimerJS doesn't work with coverage.
+  // TODO: Check this after the mothballed isparta is replaced
+  // with babel-plugin-__coverage__ or babel-plugin-istanbul
   removeAllValuesFromAry(karmaConfig.browsers, 'SlimerJS')
   if (!karmaConfig.browsers.length) {
     karmaConfig.browsers.push('PhantomJS')
