@@ -12,6 +12,8 @@ import isEmpty from 'lodash/isEmpty'
 import each from 'lodash/each'
 import transform from 'lodash/transform'
 import includes from 'lodash/includes'
+import fetcbTime from 'promise-time'
+
 // TODO: Only 'require()' this when mock() called.
 import fetchMock from 'fetch-mock'
 
@@ -34,7 +36,8 @@ export type OptionsType = {
   rootContextKey: ? string // Only provide in ctor Options; not setOptions()
 }
 
-const debug = _debug("reusable:fluentRequest")
+const debugUrl = _debug("reusable:fluentRequest:url")
+const debugRequestTime = _debug("reusable:fluentRequest:time")
 const defaultRootContext:Url = urlUtil.parse('http://localhost:8080')
 const contextMap:MapToUrlType = {
   'default': defaultRootContext
@@ -186,9 +189,6 @@ export class Request {
     }
 
     // console.error("debug() enabled: " + !!debug.enabled)
-    if (debug.enabled) {
-      debug("URL: " + JSON.stringify(this.url, null, 2))
-    }
   }
 
   setOptions(options:OptionsType):Request {
@@ -236,13 +236,13 @@ export class Request {
 
   setMimeType(type:string):Request {
     switch (type) {
-    case 'json':
-      type = 'application/json; charset=utf-8'
-      break
-    case 'form':
-    case 'urlencoded':
-      type = 'application/x-www-form-urlencoded; charset=utf-8'
-      break
+      case 'json':
+        type = 'application/json; charset=utf-8'
+        break
+      case 'form':
+      case 'urlencoded':
+        type = 'application/x-www-form-urlencoded; charset=utf-8'
+        break
     }
 
     this.opts.headers['content-type'] = type
@@ -257,13 +257,13 @@ export class Request {
   isMimeType(typeToCheck:string):boolean {
     const currentType:?string = this.getMimeType()
     switch (typeToCheck) {
-    case 'json':
-      return currentType === 'application/json; charset=utf-8'
-    case 'form':
-    case 'urlencoded':
-      return currentType === 'application/x-www-form-urlencoded; charset=utf-8'
-    default:
-      return false
+      case 'json':
+        return currentType === 'application/json; charset=utf-8'
+      case 'form':
+      case 'urlencoded':
+        return currentType === 'application/x-www-form-urlencoded; charset=utf-8'
+      default:
+        return false
     }
   }
 
@@ -354,10 +354,21 @@ export class Request {
         }
       }
 
-      if (afterResponse) {
-        return fetch(this.url.format(), opts)
+      if (debugUrl.enabled) {
+        debugUrl("URL: " + JSON.stringify(this.url, null, 2))
+      }
+
+      if (afterResponse || debugRequestTime.enabled) {
+        // fetcbTime() is a timer focused on functions that return
+        // a Promise.
+        const fetchPromise = debugRequestTime.enabled
+          ? fetcbTime(fetch)(this.url.format(), opts)
+          : fetch(this.url.format(), opts)
+
+        return fetchPromise
           .then((response:any):any => {
-            afterResponse()
+            debugRequestTime(this.url.pathname + ': +' + fetchPromise.time + 'ms')
+            afterResponse && afterResponse()
             return response
           })
       }

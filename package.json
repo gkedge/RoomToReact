@@ -29,58 +29,58 @@
     "compile": {
       "command": "babel-node bin/compile",
       "env": {
-        "DEBUG": "app:*"
+        "DEBUG": "kit:*, app:config:config"
       }
     },
     "dev": {
       "command": "nodemon --exec babel-node bin/server",
       "env": {
         "NODE_ENV": "development",
-        "COMMENT_DEBUG_SETTINGS": "app:*, reusable:*, test:*",
-        "DEBUG": "app:*"
+        "COMMENT_DEBUG_SETTINGS": "kit:*, reusable:*, test:*",
+        "DEBUG": "kit:*, app:config:config"
       }
     },
     "deploy": {
       "command": "npm run clean && npm run compile",
       "env": {
-        "DEBUG": "app:*"
+        "DEBUG": "kit:*, app:config:config"
       }
     },
     "deploy:dev": {
       "command": "npm run deploy",
       "env": {
         "NODE_ENV": "development",
-        "COMMENT_DEBUG_SETTINGS": "app:*, reusable:*, test:*",
-        "DEBUG": "app:*"
+        "COMMENT_DEBUG_SETTINGS": "kit:*, app:config, reusable:*, test:*",
+        "DEBUG": "kit:*, app:config:config"
       }
     },
     "deploy:prod": {
       "command": "npm run deploy",
       "env": {
         "NODE_ENV": "production",
-        "DEBUG": "app:*"
+        "DEBUG": "kit:*, app:config:config"
       }
     },
     "start": {
       "command": "babel-node bin/server",
       "env": {
-        "COMMENT_DEBUG_SETTINGS": "app:*, reusable:*, test:*",
-        "DEBUG": "app:*"
+        "COMMENT_DEBUG_SETTINGS": "kit:*, app:config:config, reusable:*, test:*",
+        "DEBUG": "kit:*"
       }
     },
     "start:prod": {
       "command": "babel-node bin/server",
       "env": {
         "NODE_ENV": "production",
-        "DEBUG": "app:*"
+        "DEBUG": "kit:*"
       }
     },
     "test": {
       "command": "babel-node ./node_modules/karma/bin/karma start build/karma.conf",
       "env": {
         "NODE_ENV": "test",
-        "COMMENT_DEBUG_SETTINGS": "app:*, reusable:*, test:*",
-        "DEBUG": "app:*, reusable:*"
+        "COMMENT_DEBUG_SETTINGS": "kit:*, app:config:config, reusable:fluentRequest:time, refunds:RefundRequestMod:time, test:*",
+        "DEBUG": "kit:*, app:config:config"
       }
     }
   },
@@ -129,6 +129,7 @@
     "node-sass": "^3.7.0",
     "normalize.css": "^4.1.1",
     "postcss-loader": "^0.9.0",
+    "promise-time": "^0.1.0",
     "react": "^15.0.0",
     "react-dnd": "2.1.4",
     "react-dnd-html5-backend": "2.1.2",

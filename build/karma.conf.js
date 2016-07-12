@@ -3,8 +3,18 @@ import config from '../config'
 import webpackConfig from './webpack.config'
 import _debug from 'debug'
 
-const debug = _debug('app:karma')
+const debug = _debug('kit:karma')
 debug('Create configuration.')
+
+function removeAllValuesFromAry(ary, val) {
+  let jj = 0
+  for (let element of ary) {
+    if (element !== val) {
+      ary[jj++] = element
+    }
+  }
+  ary.length = jj
+}
 
 const karmaConfig = {
   basePath:          '../', // project root in relation to bin/karma.js
@@ -53,7 +63,7 @@ const karmaConfig = {
   retryLimit:        4,
   browserComment_0:  'karma does not wait long enough for Chrome chrome to start prior to retrying.',
   browserComment_1:  'https://github.com/karma-runner/karma/issues/2116',
-  browsers:          [/* 'Chrome', 'Firefox', 'SlimerJS',*/, 'SlimerJS', 'PhantomJS'],
+  browsers:          [/* 'Chrome', 'Firefox', 'SlimerJS', 'Firefox', */ 'Firefox', 'PhantomJS'],
   webpack:           {
     devtool:    'cheap-module-source-map',
     resolve:    {
@@ -97,6 +107,12 @@ debug('Create coverage configuration.')
 
 if (config.globals.__COVERAGE__) {
   karmaConfig.reporters.push('coverage')
+
+  // SlimerJS doesn't work with coverage.
+  removeAllValuesFromAry(karmaConfig.browsers, 'SlimerJS')
+  if (!karmaConfig.browsers.length) {
+    karmaConfig.browsers.push('PhantomJS')
+  }
   karmaConfig.webpack.module.preLoaders = [{
     test:    /\.(js|jsx)$/,
     include: new RegExp(config.dir_client),

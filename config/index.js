@@ -5,7 +5,7 @@ import { argv } from 'yargs'
 import ip from 'ip'
 
 const localip = ip.address()
-const debug = _debug('app:config')
+const debug = _debug('app:config:config')
 debug('Creating default configuration.')
 
 // ========================================================
@@ -61,6 +61,7 @@ const config = {
   coverage_reporters : [
     { type : 'text-summary' },
     { type : 'lcov', dir : 'coverage' }
+    //{ type : 'html', dir : 'coverage' }
   ]
 }
 
@@ -135,5 +136,8 @@ if (overrides) {
 else {
   debug('No environment overrides found, defaults will be used.')
 }
+
+const vDebug = _debug('app:config:verbose')
+vDebug('Build configuration:\n', JSON.stringify(config, null, 2))
 
 export default config

@@ -26,12 +26,14 @@ import {
   setRootContext,
   responseFail
 } from 'reusable/utilities/fluentRequest'
+import _debug from 'debug'
 import {reset} from 'redux-form'
 import url, {Url} from 'url'
 import {upper, lower} from 'reusable/utilities/dataUtils'
-import attempt from 'lodash/attempt'
-import isError from 'lodash/isError'
-import isObject from 'lodash/isObject'
+import dispatchTime from 'promise-time'
+
+const debug = _debug('refunds:RefundRequestMod:debug')
+const debugTime = _debug('refunds:RefundRequestMod:time')
 
 // ------------------------------------
 // Constants
@@ -85,7 +87,7 @@ export const loadPaymentHistoryData = ():Function => {
   return (dispatch:Function, getState:Function):any /* Promise */ => {
     let lookupForm = getState().lookupForm
     const paymentHistoryAPI = url.parse('/paymentHistory/' + lookupForm.referenceNum)
-    console.debug('Lookup Form: ' + JSON.stringify(lookupForm))
+    debug('loadPaymentHistoryData: Lookup Form: ' + JSON.stringify(lookupForm))
     dispatch(loadPaymentHistoryDataStart())
     return get(paymentHistoryAPI)
       .setMimeType('json')
@@ -124,7 +126,7 @@ export const loadNamesData = ():Function => {
   return (dispatch:Function, getState:Function):any /* Promise */ => {
     let lookupForm = getState().lookupForm
     const loadNamesAPI = url.parse('/name/')
-    console.debug('Lookup Form: ' + JSON.stringify(lookupForm))
+    debug('loadNamesData: Lookup Form: ' + JSON.stringify(lookupForm))
     dispatch(loadNamesDataStart())
 
     return get(loadNamesAPI)
@@ -164,7 +166,7 @@ export const loadAddressesData = ():Function => {
   return (dispatch:Function, getState:Function):any /* Promise */ => {
     let lookupForm = getState().lookupForm
     const loadAddressesAPI = url.parse('/address/')
-    console.log('Lookup Form: ' + JSON.stringify(lookupForm))
+    debug('loadAddressesData: Lookup Form: ' + JSON.stringify(lookupForm))
     dispatch(loadAddressesDataStart())
 
     return get(loadAddressesAPI)
@@ -268,12 +270,23 @@ export const lookupReferencedData = ():Function => {
   return (dispatch:Function):any /* Promise */ => {
     dispatch(lookupReferencedDataStart())
 
-    return Promise.all([
+    const allDispatches = ():Promise => Promise.all([
       dispatch(loadPaymentHistoryData()),
       dispatch(loadNamesData()),
       dispatch(loadAddressesData())
     ])
-      .then(():any /* Promise*/ => dispatch(lookupReferencedDataLoaded()))
+
+    const promiseAll:Promise = debugTime.enabled
+      ? dispatchTime(allDispatches)()
+      : allDispatches()
+
+    return promiseAll
+      .then(():any /* Promise*/ => {
+        if (debugTime.enabled) {
+          debugTime('lookupReferencedData time: +' + promiseAll.time + 'ms')
+        }
+        return dispatch(lookupReferencedDataLoaded())
+      })
   }
 }
 
