@@ -112,7 +112,7 @@ if (config.globals.__COVERAGE__) {
   karmaConfig.reporters.push('coverage')
 
   // SlimerJS doesn't work with coverage.
-  // TODO: Check this after the mothballed isparta is replaced
+  // TODO: Recheck SlimerJS after the mothballed isparta is replaced
   // with babel-plugin-__coverage__ or babel-plugin-istanbul
   removeAllValuesFromAry(karmaConfig.browsers, 'SlimerJS')
   if (!karmaConfig.browsers.length) {

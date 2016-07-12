@@ -85,7 +85,7 @@ function loadPaymentHistoryDataError():ActionPayloadType {
 
 export const loadPaymentHistoryData = ():Function => {
   return (dispatch:Function, getState:Function):any /* Promise */ => {
-    let lookupForm = getState().lookupForm
+    let lookupForm = getState().refundRequest.lookupForm
     const paymentHistoryAPI = url.parse('/paymentHistory/' + lookupForm.referenceNum)
     debug('loadPaymentHistoryData: Lookup Form: ' + JSON.stringify(lookupForm))
     dispatch(loadPaymentHistoryDataStart())
@@ -124,7 +124,7 @@ function loadNamesDataError():ActionPayloadType {
 
 export const loadNamesData = ():Function => {
   return (dispatch:Function, getState:Function):any /* Promise */ => {
-    let lookupForm = getState().lookupForm
+    let lookupForm = getState().refundRequest.lookupForm
     const loadNamesAPI = url.parse('/name/')
     debug('loadNamesData: Lookup Form: ' + JSON.stringify(lookupForm))
     dispatch(loadNamesDataStart())
@@ -164,7 +164,7 @@ function loadAddressesDataError():ActionPayloadType {
 
 export const loadAddressesData = ():Function => {
   return (dispatch:Function, getState:Function):any /* Promise */ => {
-    let lookupForm = getState().lookupForm
+    let lookupForm = getState().refundRequest.lookupForm
     const loadAddressesAPI = url.parse('/address/')
     debug('loadAddressesData: Lookup Form: ' + JSON.stringify(lookupForm))
     dispatch(loadAddressesDataStart())
