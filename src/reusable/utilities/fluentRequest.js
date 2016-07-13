@@ -37,6 +37,7 @@ export type OptionsType = {
 }
 
 const debugUrl = _debug("reusable:fluentRequest:url")
+const debugMocking = _debug("reusable:fluentRequest:mocking")
 const debugRequestTime = _debug("reusable:fluentRequest:time")
 const defaultRootContext:Url = urlUtil.parse('http://localhost:8080')
 const contextMap:MapToUrlType = {
@@ -174,6 +175,7 @@ const _stringify = (obj:?MapToStringType = {}):string => {
     return result
   }, [''])[0]
 }
+
 export class Request {
 
   constructor(url:Url, options:OptionsType = {}) {
@@ -181,14 +183,13 @@ export class Request {
 
     this.opts = Object.assign({}, defaultOpts, options)
 
-    var rootContext = getRootContext(this.opts.rootContextKey)
+    const rootContext = getRootContext(this.opts.rootContextKey)
+    url.pathname = (rootContext.pathname || '') + (url.pathname || '')
     this.url = urlUtil.parse(urlUtil.resolve(rootContext, url))
 
     if (this.opts.queryParams) {
       this.setQueryParams(this.opts.queryParams)
     }
-
-    // console.error("debug() enabled: " + !!debug.enabled)
   }
 
   setOptions(options:OptionsType):Request {
@@ -199,6 +200,7 @@ export class Request {
     _normalizeOptions(options)
 
     this.opts = Object.assign({}, this.opts, options)
+    this.opts.isMocking = this.opts.isMocking || __MOCK__
 
     return this
   }
@@ -318,9 +320,9 @@ export class Request {
     return this
   }
 
-  mock(responseData:any):Request {
+  mock(mockedResponseData:any):Request {
     this.opts.isMocking = true
-    fetchMock.mock(this.url.format(), this.opts.httpMethod, responseData)
+    this.opts.mockData = mockedResponseData
     return this
   }
 
@@ -328,6 +330,7 @@ export class Request {
     const {opts} = this
     const {httpMethod, beforeRequest, afterResponse} = opts
     opts.method = httpMethod
+    opts.mode = opts.corsMode
     try {
       if (!includes(['GET', 'HEAD', 'OPTIONS'], httpMethod)) {
         if (this._payload instanceof FormData) {
@@ -358,6 +361,22 @@ export class Request {
         debugUrl("URL: " + JSON.stringify(this.url, null, 2))
       }
 
+      if (this.opts.isMocking) {
+        if (this.opts.mockData) {
+          fetchMock.mock(this.url.format(), this.opts.httpMethod, this.opts.mockData)
+        }
+        else {
+          // Read response data (json 99% of the time) from a Javascript object created
+          // by karma-json-fixtures-preprocessor. Obviously, these JS objects are ONLY
+          // available during process.env.NODE_ENV === 'test' (AKA: __TEST__ === true).
+          // FYI: karma-json-fixtures-preprocessor reads the JSON files found within
+          // ./test/resources/**/.json or possibly ./test/resources/**/.fd (Form Data).
+          const mockData = __mockData__[this.url.pathname]
+          debugMocking('Mock data path: ' + this.url.pathname)
+        }
+      }
+      debugMocking(this.url.pathname + ' data: ' +
+        JSON.stringify(__mockData__[this.url.pathname]))
       if (afterResponse || debugRequestTime.enabled) {
         // fetcbTime() is a timer focused on functions that return
         // a Promise.
@@ -401,7 +420,7 @@ export class Request {
       .then((res:any):any /* Promise */ => res.json())
       .then((json:any):any /* Promise */ => {
         if (strict && !isObject(json)) {
-          throw new TypeError('Response is not strict json: /n' + JSON.stringafy(json))
+          throw new TypeError('Response is not strict json: /n' + JSON.stringify(json))
         }
 
         if (this.opts.afterJSON) {

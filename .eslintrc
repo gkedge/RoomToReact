@@ -40,6 +40,7 @@
     "__TEST__":     false,
     "__RECORD__":   false,
     "__MOCK__":     false,
+    "__mockData__": false,
     "__COVERAGE__": false,
     "__BASENAME__": false
   },

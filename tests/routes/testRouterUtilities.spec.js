@@ -17,7 +17,7 @@ export const reducerSpy = (reducer, stateHolder) => {
       }
     }
     else {
-      stateHolder.state = reducer(stateHolder.state, action)
+      stateHolder.state.refundRequest = reducer(stateHolder.state.refundRequest, action)
     }
   })
   return {dispatchSpy: _dispatchSpy, getStateSpy: _getStateSpy}

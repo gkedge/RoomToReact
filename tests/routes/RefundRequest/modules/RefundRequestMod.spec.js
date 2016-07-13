@@ -41,7 +41,6 @@ import cloneDeep from 'lodash/cloneDeep'
 describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
   describe('Actions', () => {
     const pdfFile = {}
-
     describe('Actions Constants', () => {
       it('Should export a constant LOADING_PDF.', () => {
         expect(LOADING_PDF).to.equal('refund/RefundRequest/LOADING_PDF')
@@ -561,9 +560,6 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
     })
 
     describe('Actions Creators Thunks', () => {
-      const baseAPI = 'http://unit-test/'
-      const namesAPI = url.parse(baseAPI + 'name/')
-      const addressesAPI = url.parse(baseAPI + 'address/')
       const lookupFormData:LookupFormDataType = {
         isError:      false,
         isLookingUp:  false,
@@ -572,8 +568,11 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
         dateTo:       '2016-06-15',
         email:        'devnull@gmail.com'
       }
+      const baseAPI = 'http://unit-test'
+      const namesAPI = url.parse(baseAPI + '/name')
+      const addressesAPI = url.parse(baseAPI + '/address')
       const paymentHistoryAPI =
-              url.parse(baseAPI + 'paymentHistory/' + lookupFormData.referenceNum)
+              url.parse(baseAPI + '/paymentHistory/' + lookupFormData.referenceNum)
       const namesData = [{"firstName": "Tommy", "lastName": "Turtle"}]
       const addressesData = [{
         addr0: '1010 Turtle St.',
@@ -583,9 +582,11 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
       describe('loadPaymentHistoryData', () => {
         const paymentHistoryData = [{"like": "turtles"}]
         const stateHolder = {
-          state: cloneDeep(initialState)
+          state: {
+            refundRequest: cloneDeep(initialState)
+          }
         }
-        stateHolder.state.lookupForm = lookupFormData;
+        stateHolder.state.refundRequest.lookupForm = lookupFormData
         const {dispatchSpy, getStateSpy} = reducerSpy(refundRequestReducer, stateHolder)
         let originalRootContext = null;
 
@@ -595,9 +596,9 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
         })
 
         afterEach(() => {
-          stateHolder.state = cloneDeep(initialState)
-          stateHolder.state.lookupForm = cloneDeep(lookupFormData);
-          stateHolder.state.refundRequestForm.fees = null;
+          stateHolder.state.refundRequest = cloneDeep(initialState)
+          stateHolder.state.refundRequest.lookupForm = cloneDeep(lookupFormData);
+          stateHolder.state.refundRequest.refundRequestForm.fees = null;
           dispatchSpy.reset()
           getStateSpy.reset()
           fetchMock.restore()
@@ -638,7 +639,7 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
           expected.refundRequestForm.fees = paymentHistoryData
           return actions.loadPaymentHistoryData()(dispatchSpy, getStateSpy)
             .then(() => {
-              expect(stateHolder.state).to.eql(expected)
+              expect(stateHolder.state.refundRequest).to.eql(expected)
             })
         })
 
@@ -673,15 +674,16 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
               expect(fetchMock.called(paymentHistoryAPI.format())).to.be.true
             })
         })
-
       })
 
       describe('loadNamesData', () => {
 
         const stateHolder = {
-          state: cloneDeep(initialState)
+          state: {
+            refundRequest: cloneDeep(initialState)
+          }
         }
-        stateHolder.state.lookupForm = lookupFormData;
+        stateHolder.state.refundRequest.lookupForm = lookupFormData
         const {dispatchSpy, getStateSpy} = reducerSpy(refundRequestReducer, stateHolder)
         let originalRootContext = null;
 
@@ -691,9 +693,9 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
         })
 
         afterEach(() => {
-          stateHolder.state = cloneDeep(initialState)
-          stateHolder.state.lookupForm = cloneDeep(lookupFormData);
-          stateHolder.state.refundRequestForm.names = null;
+          stateHolder.state.refundRequest = cloneDeep(initialState)
+          stateHolder.state.refundRequest.lookupForm = cloneDeep(lookupFormData)
+          stateHolder.state.refundRequest.refundRequestForm.names = null
           dispatchSpy.reset()
           getStateSpy.reset()
           fetchMock.restore()
@@ -734,7 +736,7 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
           expected.refundRequestForm.names = namesData
           return actions.loadNamesData()(dispatchSpy, getStateSpy)
             .then(() => {
-              expect(stateHolder.state).to.eql(expected)
+              expect(stateHolder.state.refundRequest).to.eql(expected)
             })
         })
 
@@ -773,9 +775,11 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
 
       describe('loadAddressesData', () => {
         const stateHolder = {
-          state: cloneDeep(initialState)
+          state: {
+            refundRequest: cloneDeep(initialState)
+          }
         }
-        stateHolder.state.lookupForm = lookupFormData;
+        stateHolder.state.refundRequest.lookupForm = lookupFormData
         const {dispatchSpy, getStateSpy} = reducerSpy(refundRequestReducer, stateHolder)
         let originalRootContext = null;
 
@@ -785,9 +789,9 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
         })
 
         afterEach(() => {
-          stateHolder.state = cloneDeep(initialState)
-          stateHolder.state.lookupForm = cloneDeep(lookupFormData);
-          stateHolder.state.refundRequestForm.addresses = null;
+          stateHolder.state.refundRequest = cloneDeep(initialState)
+          stateHolder.state.refundRequest.lookupForm = cloneDeep(lookupFormData)
+          stateHolder.state.refundRequest.refundRequestForm.addresses = null;
           dispatchSpy.reset()
           getStateSpy.reset()
           fetchMock.restore()
@@ -828,7 +832,7 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
           expected.refundRequestForm.addresses = addressesData
           return actions.loadAddressesData()(dispatchSpy, getStateSpy)
             .then(() => {
-              expect(stateHolder.state).to.eql(expected)
+              expect(stateHolder.state.refundRequest).to.eql(expected)
             })
         })
 
@@ -867,9 +871,11 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
 
       describe('lookupReferencedData', () => {
         const stateHolder = {
-          state: cloneDeep(initialState)
+          state: {
+            refundRequest: cloneDeep(initialState)
+          }
         }
-        stateHolder.state.lookupForm = cloneDeep(lookupFormData);
+        stateHolder.state.refundRequest.lookupForm = lookupFormData
 
         const {dispatchSpy, getStateSpy} = reducerSpy(refundRequestReducer, stateHolder)
         let originalRootContext = null;
@@ -882,8 +888,8 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
         })
 
         afterEach(() => {
-          stateHolder.state = cloneDeep(initialState)
-          stateHolder.state.lookupForm = cloneDeep(lookupFormData);
+          stateHolder.state.refundRequest = cloneDeep(initialState)
+          stateHolder.state.refundRequest.lookupForm = cloneDeep(lookupFormData);
           dispatchSpy.reset()
           getStateSpy.reset()
           fetchMock.restore()
@@ -948,15 +954,18 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
           expected.refundRequestForm.addresses = addressesData
           return actions.lookupReferencedData()(dispatchSpy, getStateSpy)
             .then(() => {
-              expect(stateHolder.state).to.eql(expected)
+              expect(stateHolder.state.refundRequest).to.eql(expected)
             })
         })
       })
 
       describe('validLookup', () => {
         const stateHolder = {
-          state: cloneDeep(initialState)
+          state: {
+            refundRequest: cloneDeep(initialState)
+          }
         }
+        stateHolder.state.refundRequest.lookupForm = lookupFormData
 
         const {dispatchSpy, getStateSpy} = reducerSpy(refundRequestReducer, stateHolder)
         let originalRootContext = null;
@@ -969,7 +978,7 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
         })
 
         afterEach(() => {
-          stateHolder.state = cloneDeep(initialState)
+          stateHolder.state.refundRequest = cloneDeep(initialState)
           dispatchSpy.reset()
           getStateSpy.reset()
           fetchMock.restore()
@@ -1051,13 +1060,17 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
           expected.refundRequestForm.addresses = addressesData
           return actions.validLookup(lookupFormData)(dispatchSpy, getStateSpy)
             .then(() => {
-              expect(stateHolder.state).to.eql(expected)
+              expect(stateHolder.state.refundRequest).to.eql(expected)
             })
         })
       })
 
       describe.skip('saveRefundRequest', () => {
-        const stateHolder = {state: cloneDeep(initialState)}
+        const stateHolder = {
+          state: {
+            refundRequest: cloneDeep(initialState)
+          }
+        }
         const {dispatchSpy, getStateSpy} = reducerSpy(refundRequestReducer, stateHolder)
         beforeEach(() => {
           fetchMock.mock('/refunds', 'POST', 'I like turtles!')

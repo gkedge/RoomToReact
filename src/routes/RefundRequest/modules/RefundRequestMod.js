@@ -86,7 +86,7 @@ function loadPaymentHistoryDataError():ActionPayloadType {
 export const loadPaymentHistoryData = ():Function => {
   return (dispatch:Function, getState:Function):any /* Promise */ => {
     let lookupForm = getState().refundRequest.lookupForm
-    const paymentHistoryAPI = url.parse('/paymentHistory/' + lookupForm.referenceNum)
+    const paymentHistoryAPI = url.parse('paymentHistory/' + lookupForm.referenceNum)
     debug('loadPaymentHistoryData: Lookup Form: ' + JSON.stringify(lookupForm))
     dispatch(loadPaymentHistoryDataStart())
     return get(paymentHistoryAPI)
@@ -125,7 +125,7 @@ function loadNamesDataError():ActionPayloadType {
 export const loadNamesData = ():Function => {
   return (dispatch:Function, getState:Function):any /* Promise */ => {
     let lookupForm = getState().refundRequest.lookupForm
-    const loadNamesAPI = url.parse('/name/')
+    const loadNamesAPI = url.parse('name')
     debug('loadNamesData: Lookup Form: ' + JSON.stringify(lookupForm))
     dispatch(loadNamesDataStart())
 
@@ -165,7 +165,7 @@ function loadAddressesDataError():ActionPayloadType {
 export const loadAddressesData = ():Function => {
   return (dispatch:Function, getState:Function):any /* Promise */ => {
     let lookupForm = getState().refundRequest.lookupForm
-    const loadAddressesAPI = url.parse('/address/')
+    const loadAddressesAPI = url.parse('address')
     debug('loadAddressesData: Lookup Form: ' + JSON.stringify(lookupForm))
     dispatch(loadAddressesDataStart())
 
@@ -587,6 +587,8 @@ export default function refundRequestReducer(state:ShortType = initialState,
 }
 
 (function() {
-  setRootContext('default', url.parse('http://dev-fpng-jboss-3.etc.uspto.gov:8080/refunds-services/v1'))
+  setRootContext('default', url.parse('http://dev-fpng-jboss-3.etc.uspto.gov:8080/refunds-services/v1/'))
+
+  // setRootContext('default', url.parse('http://ud18174.uspto.gov:8080/refunds-services/v1/'))
 })()
 

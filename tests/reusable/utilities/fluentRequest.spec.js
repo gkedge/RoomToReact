@@ -19,7 +19,7 @@ import fetchMock from 'fetch-mock'
 
 const debug = _debug('test:fluentRequest')
 
-describe('fluentFetch', () => {
+describe('fluentRequest', () => {
   const jsonType = 'application/json; charset=utf-8'
   const testRootContext = 'http://www.mocky.io/v2'
   // const testUrlStr = 'https://api.github.com/zen'
@@ -30,7 +30,7 @@ describe('fluentFetch', () => {
   let testOptions:OptionsType = cloneDeep(defaultOpts)
 
   before(() => {
-    origDefaultContext = setRootContext('', urlUtil.parse('//unit-test/'))
+    origDefaultContext = setRootContext('', urlUtil.parse('//unit-test'))
   })
 
   after(() => {
