@@ -64,19 +64,19 @@ const validate = (values:LookupFormDataType):Object => {
   else if (!/^[A-Za-z\d][A-Za-z\d\/,-]*$/.test(referenceNum)) {
     errors.referenceNum = 'bad-alpha-position'
   }
-  if (!dateFrom) {
-    errors.dateFrom = 'required'
-  }
-  if (!dateTo) {
-    errors.dateTo = 'required'
-  }
-  if (dateFrom && dateTo) {
-    const diff = compare(dateFrom, dateTo)
-    if (diff > 0) {
-      errors.dateFrom = 'less-than-data-to'
-      errors.dateTo = 'less-than-data-to'
-    }
-  }
+  //if (!dateFrom) {
+  //  errors.dateFrom = 'required'
+  //}
+  //if (!dateTo) {
+  //  errors.dateTo = 'required'
+  //}
+  //if (dateFrom && dateTo) {
+  //  const diff = compare(dateFrom, dateTo)
+  //  if (diff > 0) {
+  //    errors.dateFrom = 'less-than-data-to'
+  //    errors.dateTo = 'less-than-data-to'
+  //  }
+  //}
   if (email) {
     if (!(/\S*@\S*\./).test(email)) {
       errors.email = 'email-missing-separators'

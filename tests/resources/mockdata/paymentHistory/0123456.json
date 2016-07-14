@@ -1,4 +1,25 @@
 {
-  "yow": "yowsa",
-  "like": "turtles"
+  "success": true,
+  "errorMessageText": [],
+  "infoMessageText": [],
+  "warnMessageText": [],
+  "model": [
+    {
+      "version": 0,
+      "items": [
+        {
+          "postingReferenceText": "0123456",
+          "datePosted": "2016-03-17",
+          "feeCode": "8001",
+          "feeCodeDescription": "PRINTED COPY OF PATENT W/O COLOR, REGULAR SERVICE",
+          "feeAmount": 3,
+          "quantity": 1,
+          "amount": 3,
+          "mailRoomDate": "2016-03-17",
+          "paymentMethodType": "DA500999"
+        }
+      ]
+    }
+  ],
+  "errorCode": 0
 }

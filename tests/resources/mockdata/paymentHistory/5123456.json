@@ -1,0 +1,113 @@
+{
+  "success": true,
+  "errorMessageText": [],
+  "infoMessageText": [],
+  "warnMessageText": [],
+  "model": [
+    {
+      "version": 0,
+      "items": [
+        {
+          "postingReferenceText": "5123456",
+          "datePosted": "2016-03-17",
+          "feeCode": "8001",
+          "feeCodeDescription": "PRINTED COPY OF PATENT W/O COLOR, REGULAR SERVICE",
+          "feeAmount": 3,
+          "quantity": 1,
+          "amount": 3,
+          "mailRoomDate": "2016-03-17",
+          "paymentMethodType": "DA500999"
+        },
+        {
+          "postingReferenceText": "5123456",
+          "datePosted": "2016-02-10",
+          "feeCode": "1551",
+          "feeCodeDescription": "MAINTENANCE FEE DUE AT 3.5 YEARS",
+          "feeAmount": 1600,
+          "quantity": 1,
+          "amount": 600,
+          "mailRoomDate": "2016-02-10",
+          "paymentMethodType": "CC"
+        },
+        {
+          "postingReferenceText": "5123456",
+          "datePosted": "2016-02-10",
+          "feeCode": "1551",
+          "feeCodeDescription": "MAINTENANCE FEE DUE AT 3.5 YEARS",
+          "feeAmount": 1600,
+          "quantity": 1,
+          "amount": 1000,
+          "mailRoomDate": "2016-02-10",
+          "paymentMethodType": "CC"
+        },
+        {
+          "postingReferenceText": "5123456",
+          "datePosted": "2004-11-09",
+          "feeCode": "8021",
+          "feeCodeDescription": "RECORDING EACH PATENT ASSIGNMENT, AGREEMENT OR OTHER PAPER, PER PROPERTY",
+          "feeAmount": 40,
+          "quantity": 3,
+          "amount": 120,
+          "mailRoomDate": "2004-11-24",
+          "paymentMethodType": "CC"
+        },
+        {
+          "postingReferenceText": "5123456",
+          "datePosted": "2004-11-09",
+          "feeCode": "8021",
+          "feeCodeDescription": "RECORDING EACH PATENT ASSIGNMENT, AGREEMENT OR OTHER PAPER, PER PROPERTY",
+          "feeAmount": 40,
+          "quantity": 3,
+          "amount": 120,
+          "mailRoomDate": "2004-11-24",
+          "paymentMethodType": "CC"
+        },
+        {
+          "postingReferenceText": "5123456",
+          "datePosted": "2004-11-09",
+          "feeCode": "8021",
+          "feeCodeDescription": "RECORDING EACH PATENT ASSIGNMENT, AGREEMENT OR OTHER PAPER, PER PROPERTY",
+          "feeAmount": 40,
+          "quantity": 4,
+          "amount": 160,
+          "mailRoomDate": "2004-11-29",
+          "paymentMethodType": "DA060001"
+        },
+        {
+          "postingReferenceText": "5123456",
+          "datePosted": "2003-11-19",
+          "feeCode": "1553",
+          "feeCodeDescription": "MAINTENANCE FEE DUE AT 11.5 YEARS",
+          "feeAmount": 3220,
+          "quantity": 1,
+          "amount": 3220,
+          "mailRoomDate": "2003-11-26",
+          "paymentMethodType": "CK"
+        },
+        {
+          "postingReferenceText": "5123456",
+          "datePosted": "1999-12-21",
+          "feeCode": "184",
+          "feeCodeDescription": "MAINTENANCE FEE DUE AT 7.5 YEARS",
+          "feeAmount": 1900,
+          "quantity": 1,
+          "amount": 1900,
+          "mailRoomDate": "1999-12-13",
+          "paymentMethodType": "CK"
+        },
+        {
+          "postingReferenceText": "5123456",
+          "datePosted": "1995-12-18",
+          "feeCode": "183",
+          "feeCodeDescription": "MAINTENANCE FEE DUE AT 3.5 YEARS",
+          "feeAmount": null,
+          "quantity": 0,
+          "amount": 990,
+          "mailRoomDate": "1995-12-12",
+          "paymentMethodType": "CRDA"
+        }
+      ]
+    }
+  ],
+  "errorCode": 0
+}

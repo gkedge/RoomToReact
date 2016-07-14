@@ -34,7 +34,7 @@ const karmaConfig = {
   ],
   mochaReporter: {
     showDiff:      true,
-    output:        'autowatch',
+    output:        'full', // 'autowatch'
     ignoreSkipped: true,
     colors:        {
       success: 'blue',

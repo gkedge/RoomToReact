@@ -1,6 +1,6 @@
 /* @flow */
 
-import type {ActionPayloadType} from 'reusable/interfaces/FpngTypes'
+import type {ActionPayloadType, RequestErrorReportType} from 'reusable/interfaces/FpngTypes'
 
 import type {
   LookupFormPayloadType,
@@ -31,6 +31,9 @@ import {reset} from 'redux-form'
 import url, {Url} from 'url'
 import {upper, lower} from 'reusable/utilities/dataUtils'
 import dispatchTime from 'promise-time'
+import isObject from 'lodash/isObject'
+import isString from 'lodash/isString'
+import cloneDeep from 'lodash/cloneDeep'
 
 const debug = _debug('refunds:RefundRequestMod:debug')
 const debugTime = _debug('refunds:RefundRequestMod:time')
@@ -55,6 +58,7 @@ export const LOAD_PAYMENT_HISTORY_DATA_LOADED = 'refund/RefundRequest/LOAD_PAYME
 export const LOAD_PAYMENT_HISTORY_DATA_ERROR = 'refund/RefundRequest/LOAD_PAYMENT_HISTORY_DATA_ERROR'
 export const PRE_RESET_REFUND_REQUEST_FORM = 'refund/RefundRequest/PRE_RESET_REFUND_REQUEST_FORM'
 export const POST_RESET_REFUND_REQUEST_FORM = 'refund/RefundRequest/POST_RESET_REFUND_REQUEST_FORM'
+export const CLEAR_ERROR_REPORT = 'refund/RefundRequest/CLEAR_ERROR_REPORT'
 export const RESET_STATE = 'refund/RefundRequest/RESET_STATE'
 export const SAVED_REFUND_REQUEST = 'refund/RefundRequest/SAVED_REFUND_REQUEST'
 export const VALID_LOOKUP = 'refund/RefundRequest/VALID_LOOKUP'
@@ -77,9 +81,10 @@ function loadPaymentHistoryDataLoaded(paymentHistoryData:PaymentHistoryDataType)
   }
 }
 
-function loadPaymentHistoryDataError():ActionPayloadType {
+function loadPaymentHistoryDataError(errorMessage:RequestErrorReportType):ActionPayloadType {
   return {
-    type: LOAD_PAYMENT_HISTORY_DATA_ERROR
+    type:    LOAD_PAYMENT_HISTORY_DATA_ERROR,
+    payload: errorMessage
   }
 }
 
@@ -96,9 +101,20 @@ export const loadPaymentHistoryData = ():Function => {
         // TODO: check schema during development.
         return dispatch(loadPaymentHistoryDataLoaded(jsonData))
       })
-      .catch((reason:any):any /* Promise*/ => {
-        responseFail(reason, 'Failed to load payment history')
-        return dispatch(loadPaymentHistoryDataError())
+      .catch((reason:Error):any /* Promise*/ => {
+        if (!getState().refundRequest.isNegativeTesting) {
+          responseFail(reason, 'Failed to load payment history')
+        }
+        if (!isObject(reason.message)) {
+          if (isString(reason.message) &&
+            (reason.message.includes('JSON.parse') || reason.message.includes('not strict JSON'))) {
+            reason.message = {
+              statusCode: 666,
+              statusText: 'Bad data response'
+            }
+          }
+        }
+        return dispatch(loadPaymentHistoryDataError(reason.message))
       })
   }
 }
@@ -126,6 +142,7 @@ export const loadNamesData = ():Function => {
   return (dispatch:Function, getState:Function):any /* Promise */ => {
     let lookupForm = getState().refundRequest.lookupForm
     const loadNamesAPI = url.parse('name')
+    // const loadNamesAPI = url.parse('patents/' + lookupForm.referenceNum + '/personNames')
     debug('loadNamesData: Lookup Form: ' + JSON.stringify(lookupForm))
     dispatch(loadNamesDataStart())
 
@@ -137,7 +154,9 @@ export const loadNamesData = ():Function => {
         return dispatch(loadNamesDataLoaded(jsonData))
       })
       .catch((reason:any):any => {
-        responseFail(reason, 'Failed to load names')
+        if (!getState().refundRequest.isNegativeTesting) {
+          responseFail(reason, 'Failed to load names associated with patent/trademark')
+        }
         return dispatch(loadNamesDataError())
       })
   }
@@ -166,6 +185,7 @@ export const loadAddressesData = ():Function => {
   return (dispatch:Function, getState:Function):any /* Promise */ => {
     let lookupForm = getState().refundRequest.lookupForm
     const loadAddressesAPI = url.parse('address')
+    // const loadAddressesAPI = url.parse('patents/' + lookupForm.referenceNum + '/addresses')
     debug('loadAddressesData: Lookup Form: ' + JSON.stringify(lookupForm))
     dispatch(loadAddressesDataStart())
 
@@ -177,7 +197,9 @@ export const loadAddressesData = ():Function => {
         return dispatch(loadAddressesDataLoaded(jsonData))
       })
       .catch((reason:any):any /* Promise*/ => {
-        responseFail(reason, 'Failed to load addresses')
+        if (!getState().refundRequest.isNegativeTesting) {
+          responseFail(reason, 'Failed to load addresses associated with patent/trademark')
+        }
         return dispatch(loadAddressesDataError())
       })
   }
@@ -224,6 +246,12 @@ export function savedRefundRequest():ActionPayloadType {
       isSaving: false,
       isSaved:  true
     }
+  }
+}
+
+export function clearErrorReport():ActionPayloadType {
+  return {
+    type: CLEAR_ERROR_REPORT
   }
 }
 
@@ -324,6 +352,7 @@ export const actions = {
   postRefundRequest,
   saveRefundRequest,
   savedRefundRequest,
+  clearErrorReport,
   resetState,
   resetRefundRequestForm,
   validLookup
@@ -338,9 +367,8 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
         ...state.refundRequestForm,
         isError:            false,
         isLoadingAddresses: true,
-        address: {
-          ...state.refundRequestForm.address,
-          isError: false
+        address:            {
+          ...state.refundRequestForm.address
         }
       }
     })
@@ -373,11 +401,9 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
       ...state,
       refundRequestForm: {
         ...state.refundRequestForm,
-        isError:        false,
         isLoadingNames: true,
-        name: {
-          ...state.refundRequestForm.name,
-          isError: false
+        name:           {
+          ...state.refundRequestForm.name
         }
       }
     })
@@ -410,7 +436,6 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
       ...state,
       refundRequestForm: {
         ...state.refundRequestForm,
-        isError:                 false,
         isLoadingPaymentHistory: true
       }
     })
@@ -426,12 +451,16 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
       }
     })
   },
-  [LOAD_PAYMENT_HISTORY_DATA_ERROR]:  (state:ShortType):ShortType => {
+  [LOAD_PAYMENT_HISTORY_DATA_ERROR]:  (state:ShortType,
+                                       action:{payload: RequestErrorReportType}):ShortType => {
+    const errorReport = cloneDeep(state.refundRequestForm.errorReport)
+    errorReport.push(action.payload)
     return ({
       ...state,
       refundRequestForm: {
         ...state.refundRequestForm,
-        isError: true
+        isError:     true,
+        errorReport: errorReport
       }
     })
   },
@@ -441,7 +470,6 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
       ...state,
       pdf: {
         ...state.pdf,
-        isError:   false,
         isLoading: true,
         file:      action.payload.pdfFile
       }
@@ -495,6 +523,26 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
       isSaved:  action.payload.isSaved
     })
   },
+  [CLEAR_ERROR_REPORT]:               (state:ShortType):ShortType => {
+    return ({
+      ...state,
+      refundRequestForm: {
+        ...state.refundRequestForm,
+        isError:     false,
+        errorReport: [],
+        address: {
+          ...state.refundRequestForm.address,
+          isError: false
+          // errorReport: []
+        },
+        name: {
+          ...state.refundRequestForm.name,
+          isError: false
+          // errorReport: []
+        }
+      }
+    })
+  },
   [RESET_STATE]:                      ():ShortType => {
     return ({
       ...initialState
@@ -544,6 +592,7 @@ export const initialState:ShortType = {
   },
   refundRequestForm:     {
     isError:                 false,
+    errorReport:             [],
     fees:                    null,
     depositAccountNum:       null,
     reason:                  null,
@@ -575,7 +624,8 @@ export const initialState:ShortType = {
   },
   isResettingRefundForm: false,
   isSaving:              false,
-  isSaved:               false
+  isSaved:               false,
+  isNegativeTesting:     false
 }
 
 export const unknownAction:ActionPayloadType = {type: "Unknown"}
@@ -586,7 +636,7 @@ export default function refundRequestReducer(state:ShortType = initialState,
   return handler ? handler(state, action) : state
 }
 
-(function() {
+(function () {
   setRootContext('default', url.parse('http://dev-fpng-jboss-3.etc.uspto.gov:8080/refunds-services/v1/'))
 
   // setRootContext('default', url.parse('http://ud18174.uspto.gov:8080/refunds-services/v1/'))

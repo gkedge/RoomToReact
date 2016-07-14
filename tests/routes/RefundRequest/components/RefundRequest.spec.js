@@ -27,6 +27,7 @@ const props = {
   refundRequestFormData: {
     refundRequestForm: {
       isError:           false,
+      errorReport:       [],
       fees:              [],
       depositAccountNum: 0,
       reason:            null,

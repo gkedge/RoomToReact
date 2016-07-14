@@ -1,5 +1,7 @@
 /* @flow */
 
+import type {ActionPayloadType, RequestErrorReportType} from 'reusable/interfaces/FpngTypes'
+
 export type PdfStateType = {
   isError: boolean,
   isLoading: boolean,
@@ -67,6 +69,7 @@ export type RefundRequestStateType = {
   // I don't understand why each of these entries MUST be optional
   // to get through a type check when creating a RefundRequest. Ugh!
   isError: ?boolean,
+  errorReport: ?Array<RequestErrorReportType>,
   fees: ?PaymentHistoryStateType,
   depositAccountNum: ?number,
   reason: ?string,
@@ -92,7 +95,8 @@ export type RefundRequestStateObjectType = {
   refundRequestForm: RefundRequestStateType,
   isResettingRefundForm: boolean,
   isSaving: boolean,
-  isSaved: boolean
+  isSaved: boolean,
+  isNegativeTesting: boolean
 }
 
 /* Action Payload Types */
@@ -102,13 +106,32 @@ export type PdfLoadingPayloadType = {
 
 export type LookupFormPayloadType = LookupFormDataType
 
-export type PaymentHistoryDatumType = {
+/* Payment History Types */
+export type PaymentHistoryItemType = {
+  "postingReferenceText": string,
+  "datePosted": string,
+  "feeCode": string,
+  "feeCodeDescription": string,
+  "feeAmount": ?number,
+  "quantity": ?number,
+  "amount": ?number,
+  "mailRoomDate": string,
+  "paymentMethodType": string
 }
-
-export type PaymentHistoryDataType = Array<PaymentHistoryDatumType>
-
+export type PaymentHistoryModelType = {
+  version: number,
+  items: Array<PaymentHistoryItemType>
+}
+export type PaymentHistoryDatumType = {
+  success: boolean,
+  errorCode: number,
+  errorMessageText: Array<string>,
+  infoMessageText: Array<string>,
+  warnMessageText: Array<string>,
+  model: ?Array<PaymentHistoryModelType>
+}
+export type PaymentHistoryDataType = PaymentHistoryDatumType
 export type PaymentHistoryStateType = PaymentHistoryDataType
-
 export type PaymentHistoryDataPayloadType = PaymentHistoryDataType
 
 export type PdfReadPayloadType = {

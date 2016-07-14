@@ -1,4 +1,9 @@
-{
-  "yow": "yowsa",
-  "like": "turtles"
-}
+[
+  {
+    addr0: '1010 Turtle St.',
+    addr1: null,
+    city: 'Ocean',
+    state: 'World',
+    zip: '11111'
+  }
+]

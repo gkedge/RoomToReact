@@ -1,4 +1,6 @@
-{
-  "yow": "yowsa",
-  "like": "turtles"
-}
+[
+  {
+    "firstName": "Tommy",
+    "lastName": "Turtle"
+  }
+]

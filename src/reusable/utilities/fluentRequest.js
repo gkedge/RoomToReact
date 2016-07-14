@@ -2,6 +2,8 @@
 
 // This package wsa significantly influenced by https://github.com/haoxins/fetch.io.
 // Differences are semantic, type safety and the addition of mock creation.
+import type {RequestErrorReportType} from 'reusable/interfaces/FpngTypes'
+import RequestError from 'reusable/errors/RequestError'
 
 import 'whatwg-fetch'  // isomorphic-fetch contains the browser-specific whatwg-fetch
 import _debug from 'debug'
@@ -28,7 +30,7 @@ export type OptionsType = {
   cache: ? string,
   corsMode: ? string,
   credentials: ? string,
-  errorReporter: ? Function,
+  errorLogger: ? Function,
   headers: ? MapToStringType,
   httpMethod: ? string,
   isMocking: ?boolean,
@@ -77,7 +79,12 @@ export const responseFail = (reason:any, message:?string):any => {
     return
   }
 
-  let serviceChain = reason.serviceChain === undefined ? serviceChainFailNumber++ : reason.serviceChain
+  const serviceChain = reason.serviceChain === undefined
+    ? serviceChainFailNumber++ : reason.serviceChain
+
+  if (isObject(reason.message)) {
+    message = JSON.stringify(reason.message, null, 2)
+  }
 
   if (reason instanceof Error) {
     message = Error.prototype.name + '(' + serviceChain + '): ' + message
@@ -125,9 +132,27 @@ export const responseFail = (reason:any, message:?string):any => {
   console.error(message)
 }
 
-const _defaultErrorReporter:Function = (response:Object):Object => {
+const _defaultErrorLogger:Function = (response:Object):Object => {
   if (!response.ok) {
-    throw Error(response.statusText)
+    const contentType = response.headers.get("content-type")
+    if (contentType && contentType.indexOf("application/json") !== -1) {
+      return response.json().then((json:Object):Promise => {
+        const requestErrorReport:RequestErrorReportType = {
+          statusCode:       response.status,
+          statusText:       response.statusText,
+          errorMessageText: json.errorMessageText,
+          infoMessageText:  json.infoMessageText,
+          warnMessageText:  json.warnMessageText
+        }
+        throw new RequestError(requestErrorReport)
+      })
+    }
+    else {
+      throw new RequestError({
+        statusCode: response,
+        statusText: response.statusText
+      })
+    }
   }
   return response
 }
@@ -139,7 +164,7 @@ export const defaultOpts:OptionsType = {
   cache:          'no-cache',
   corsMode:       'cors',
   credentials:    'omit',
-  errorReporter:  _defaultErrorReporter,
+  errorLogger:    _defaultErrorLogger,
   headers:        {'Accept': 'application/json'},
   httpMethod:     'GET',
   isMocking:      false,
@@ -157,6 +182,8 @@ const _normalizeOptions = (options:OptionsType) => {
       throw Error('Illegal HTTP method: `' + options.httpMethod + '`')
     }
   }
+
+  options.isMocking = options.isMocking || __MOCK__
 
   const headers = options.headers
   each(headers, (headerValue:string, headerName:string) => {
@@ -200,8 +227,6 @@ export class Request {
     _normalizeOptions(options)
 
     this.opts = Object.assign({}, this.opts, options)
-    this.opts.isMocking = this.opts.isMocking || __MOCK__
-
     return this
   }
 
@@ -365,18 +390,18 @@ export class Request {
         if (this.opts.mockData) {
           fetchMock.mock(this.url.format(), this.opts.httpMethod, this.opts.mockData)
         }
-        else {
-          // Read response data (json 99% of the time) from a Javascript object created
-          // by karma-json-fixtures-preprocessor. Obviously, these JS objects are ONLY
-          // available during process.env.NODE_ENV === 'test' (AKA: __TEST__ === true).
-          // FYI: karma-json-fixtures-preprocessor reads the JSON files found within
-          // ./test/resources/**/.json or possibly ./test/resources/**/.fd (Form Data).
+        else /* auto-mocking */ {
+          // Read JSON response data available in the __mockData__ map.  The URL's
+          // pathname acts as the key. The __mockData__ response data is loaded by karma
+          // by karma-json-fixtures-preprocessor using the ./test/resources/mockdata/**/*.json
+          // files as source. Obviously, these JS objects are ONLY intended to be
+          // available during test operations. See __MOCK__ in config/index.js.
           const mockData = __mockData__[this.url.pathname]
-          debugMocking('Mock data path: ' + this.url.pathname)
+          debugMocking(this.url.pathname + ' data: ' +
+            JSON.stringify(__mockData__[this.url.pathname]))
+          fetchMock.mock(this.url.format(), this.opts.httpMethod, mockData)
         }
       }
-      debugMocking(this.url.pathname + ' data: ' +
-        JSON.stringify(__mockData__[this.url.pathname]))
       if (afterResponse || debugRequestTime.enabled) {
         // fetcbTime() is a timer focused on functions that return
         // a Promise.
@@ -404,23 +429,23 @@ export class Request {
   // be possible to request another one of the following calls.
   then(resolve:Function, reject:?Function):any /* Promise */ {
     return this.execute()
-      .then(this.opts.errorReporter)
+      .then(this.opts.errorLogger)
       .then(resolve, reject)
   }
 
   catch(reject:Function):any /* Promise */ {
     return this.execute()
-      .then(this.opts.errorReporter)
+      .then(this.opts.errorLogger)
       .catch(reject)
   }
 
   json(strict:boolean = true):any /* Promise */ {
     return this.execute()
-      .then(this.opts.errorReporter)
+      .then(this.opts.errorLogger)
       .then((res:any):any /* Promise */ => res.json())
       .then((json:any):any /* Promise */ => {
         if (strict && !isObject(json)) {
-          throw new TypeError('Response is not strict json: /n' + JSON.stringify(json))
+          throw new TypeError('Response is not strict JSON: /n' + JSON.stringify(json))
         }
 
         if (this.opts.afterJSON) {
@@ -433,7 +458,7 @@ export class Request {
 
   text():any /* Promise */ {
     return this.execute()
-      .then(this.opts.errorReporter)
+      .then(this.opts.errorLogger)
       .then((res:Object):any /* Promise */=> res.text())
   }
 }

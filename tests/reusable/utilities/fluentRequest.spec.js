@@ -19,7 +19,9 @@ import fetchMock from 'fetch-mock'
 
 const debug = _debug('test:fluentRequest')
 
-describe('fluentRequest', () => {
+describe('fluentRequest', function () { // Can't use '() ==> here...
+  this.timeout(200); // ... because this 'this' would be wrong.
+  
   const jsonType = 'application/json; charset=utf-8'
   const testRootContext = 'http://www.mocky.io/v2'
   // const testUrlStr = 'https://api.github.com/zen'
@@ -39,6 +41,7 @@ describe('fluentRequest', () => {
 
   beforeEach(() => {
     testOptions = cloneDeep(defaultOpts)
+    testOptions.isMocking = true;
     fetchMock.restore()
   })
 
@@ -46,7 +49,7 @@ describe('fluentRequest', () => {
     const request = new Request(urlUtil.parse(testPartialUrlStr))
     const expectedUrl = getRootContext().format() + testPartialUrlStr
 
-    expect(request.getOptions()).to.be.eql(defaultOpts)
+    expect(request.getOptions()).to.be.eql(testOptions)
     // console.log("URL: " + JSON.stringify(request.getUrl(), null, 2))
     expect(request.getUrl().format()).to.be.eql(expectedUrl)
   })
