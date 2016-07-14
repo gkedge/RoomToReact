@@ -1,29 +1,19 @@
 /* @flow */
 
 // http://stackoverflow.com/a/32749533
-const hasStackTrace = (():boolean => {
-  try {
-    let stackTrace = {}
-    Error.captureStackTrace(stackTrace, "")
-    return true
-  }
-  catch (e) {
-    return false
-  }
-})()
-
 export default class BaseCustomError extends Error {
-  constructor(message:any) {
+  constructor(message:any, extra:any) {
     super(message)
     this.name = this.constructor.name
     this.message = message
-    if (hasStackTrace) {
-      let stackTrace = {}
-      Error.captureStackTrace(stackTrace, this.constructor)
-      this.stack = stackTrace
+    if (Error.captureStackTrace && typeof Error.captureStackTrace === 'function') {
+      Error.captureStackTrace(this, this.constructor)
     }
     else {
       this.stack = (new Error(message)).stack
+    }
+    if (extra) {
+      this.extra = extra
     }
   }
 }

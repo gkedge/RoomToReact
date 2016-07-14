@@ -2,6 +2,8 @@
 
 // This package wsa significantly influenced by https://github.com/haoxins/fetch.io.
 // Differences are semantic, type safety and the addition of mock creation.
+
+// A good fetch-focused blog: // https://davidwalsh.name/fetch
 import type {RequestErrorReportType} from 'reusable/interfaces/FpngTypes'
 import RequestError from 'reusable/errors/RequestError'
 
@@ -9,12 +11,14 @@ import 'whatwg-fetch'  // isomorphic-fetch contains the browser-specific whatwg-
 import _debug from 'debug'
 import urlUtil, {Url} from 'url'
 import isUndefined from 'lodash/isUndefined'
-import isObject from 'lodash/isObject'
 import isEmpty from 'lodash/isEmpty'
+import isObject from 'lodash/isObject'
+import isString from 'lodash/isString'
 import each from 'lodash/each'
 import transform from 'lodash/transform'
 import includes from 'lodash/includes'
-import fetcbTime from 'promise-time'
+// import fetchTime from 'promise-time'
+import {promiseTime as fetchTime} from 'reusable/utilities/promisePlugins'
 
 // TODO: Only 'require()' this when mock() called.
 import fetchMock from 'fetch-mock'
@@ -403,12 +407,11 @@ export class Request {
         }
       }
       if (afterResponse || debugRequestTime.enabled) {
-        // fetcbTime() is a timer focused on functions that return
+        // dispatchTime() is a timer focused on functions that return
         // a Promise.
         const fetchPromise = debugRequestTime.enabled
-          ? fetcbTime(fetch)(this.url.format(), opts)
+          ? fetchTime(fetch)(this.url.format(), opts)
           : fetch(this.url.format(), opts)
-
         return fetchPromise
           .then((response:any):any => {
             debugRequestTime(this.url.pathname + ': +' + fetchPromise.time + 'ms')
@@ -451,8 +454,20 @@ export class Request {
         if (this.opts.afterJSON) {
           this.opts.afterJSON(json)
         }
-
         return json
+      })
+      .catch((reason:Error) => {
+        if (!isObject(reason.message)) {
+          if (isString(reason.message) &&
+            (reason.message.includes('JSON.parse') ||
+            reason.message.includes('not strict JSON'))) {
+            reason.message = {
+              statusCode: 666,
+              statusText: 'Bad data response'
+            }
+            throw reason
+          }
+        }
       })
   }
 

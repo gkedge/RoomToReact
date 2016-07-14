@@ -4614,11 +4614,6 @@
       "from": "promise@>=7.1.1 <8.0.0",
       "resolved": "https://registry.npmjs.org/promise/-/promise-7.1.1.tgz"
     },
-    "promise-time": {
-      "version": "0.1.0",
-      "from": "promise-time@latest",
-      "resolved": "https://registry.npmjs.org/promise-time/-/promise-time-0.1.0.tgz"
-    },
     "proxy-agent": {
       "version": "2.0.0",
       "from": "proxy-agent@>=2.0.0",

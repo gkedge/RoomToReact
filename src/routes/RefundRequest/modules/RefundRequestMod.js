@@ -19,7 +19,6 @@ import type {
 
 type ShortType = RefundRequestStateObjectType
 
-// https://davidwalsh.name/fetch
 import {
   get, post, put,
   getRootContext,
@@ -30,10 +29,10 @@ import _debug from 'debug'
 import {reset} from 'redux-form'
 import url, {Url} from 'url'
 import {upper, lower} from 'reusable/utilities/dataUtils'
-import dispatchTime from 'promise-time'
-import isObject from 'lodash/isObject'
-import isString from 'lodash/isString'
 import cloneDeep from 'lodash/cloneDeep'
+
+// import dispatchTime from 'promise-time'
+import {promiseTime as dispatchTime} from 'reusable/utilities/promisePlugins'
 
 const debug = _debug('refunds:RefundRequestMod:debug')
 const debugTime = _debug('refunds:RefundRequestMod:time')
@@ -104,15 +103,6 @@ export const loadPaymentHistoryData = ():Function => {
       .catch((reason:Error):any /* Promise*/ => {
         if (!getState().refundRequest.isNegativeTesting) {
           responseFail(reason, 'Failed to load payment history')
-        }
-        if (!isObject(reason.message)) {
-          if (isString(reason.message) &&
-            (reason.message.includes('JSON.parse') || reason.message.includes('not strict JSON'))) {
-            reason.message = {
-              statusCode: 666,
-              statusText: 'Bad data response'
-            }
-          }
         }
         return dispatch(loadPaymentHistoryDataError(reason.message))
       })
@@ -297,24 +287,30 @@ function lookupReferencedDataLoaded():ActionPayloadType {
 export const lookupReferencedData = ():Function => {
   return (dispatch:Function):any /* Promise */ => {
     dispatch(lookupReferencedDataStart())
+    // Though not presently used, purposely showing the args for a
+    // 'resolve' tied to a Promise.spread() to help understand what
+    // it does very differently than a Promise.all() and provide a
+    // hint if they ever are needed in the future.
+    // eslint-disable-next-line no-unused-vars
+    const resolve = (paymentHistoryData:?any,
+                     namesData:?any,
+                     addressesData:?any):any /* Promise */ => {
+      if (debugTime.enabled) {
+        debugTime('lookupReferencedData time: +' + allDispatches.time + 'ms')
+      }
+      return dispatch(lookupReferencedDataLoaded())
+    }
 
-    const allDispatches = ():Promise => Promise.all([
-      dispatch(loadPaymentHistoryData()),
-      dispatch(loadNamesData()),
-      dispatch(loadAddressesData())
-    ])
+    const allDispatches = ():Promise =>
+      // Waaaait a minute... there ain't no spread() in the Promise spec!
+      // See promisePlugins.js...
+      Promise.spread([
+        dispatch(loadPaymentHistoryData()),
+        dispatch(loadNamesData()),
+        dispatch(loadAddressesData())],
+        resolve /*, reject */)
 
-    const promiseAll:Promise = debugTime.enabled
-      ? dispatchTime(allDispatches)()
-      : allDispatches()
-
-    return promiseAll
-      .then(():any /* Promise*/ => {
-        if (debugTime.enabled) {
-          debugTime('lookupReferencedData time: +' + promiseAll.time + 'ms')
-        }
-        return dispatch(lookupReferencedDataLoaded())
-      })
+    return debugTime.enabled ? dispatchTime(allDispatches)() : allDispatches()
   }
 }
 
