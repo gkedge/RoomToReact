@@ -27,7 +27,7 @@ import {
 } from 'reusable/utilities/fluentRequest'
 import _debug from 'debug'
 import {reset} from 'redux-form'
-import url, {Url} from 'url'
+import url from 'url'
 import {upper, lower} from 'reusable/utilities/dataUtils'
 import cloneDeep from 'lodash/cloneDeep'
 
@@ -632,9 +632,8 @@ export default function refundRequestReducer(state:ShortType = initialState,
   return handler ? handler(state, action) : state
 }
 
-(function () {
+(function() {
   setRootContext('default', url.parse('http://dev-fpng-jboss-3.etc.uspto.gov:8080/refunds-services/v1/'))
 
   // setRootContext('default', url.parse('http://ud18174.uspto.gov:8080/refunds-services/v1/'))
 })()
-
