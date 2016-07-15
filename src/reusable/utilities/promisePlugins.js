@@ -97,3 +97,4 @@ export const promiseTime:Function = (fn:Function):Function => {
     })
   }
 })(Promise)
+
