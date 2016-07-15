@@ -34,7 +34,7 @@ export type OptionsType = {
   cache: ? string,
   corsMode: ? string,
   credentials: ? string,
-  errorLogger: ? Function,
+  errorHandler: ? Function,
   headers: ? MapToStringType,
   httpMethod: ? string,
   isMocking: ?boolean,
@@ -49,17 +49,6 @@ const defaultRootContext:Url = urlUtil.parse('http://localhost:8080')
 const contextMap:MapToUrlType = {
   'default': defaultRootContext
 }
-
-const hasStackTrace = (():boolean => {
-  try {
-    let stackTrace = {}
-    Error.captureStackTrace(stackTrace, "")
-    return true
-  }
-  catch (e) {
-    return false
-  }
-})()
 
 export const setRootContext = (key:string, rootContext:?Url):?Url => {
   key = key || 'default'
@@ -78,37 +67,46 @@ export const getRootContext = (key:? string):? Url => {
 }
 
 let serviceChainFailNumber = 0
-export const responseFail = (reason:any, message:?string):any => {
-  if (reason.skipLogging) {
-    return
-  }
-
-  const serviceChain = reason.serviceChain === undefined
-    ? serviceChainFailNumber++ : reason.serviceChain
-
-  if (isObject(reason.message)) {
-    message = JSON.stringify(reason.message, null, 2)
-  }
-
-  if (reason instanceof Error) {
-    message = Error.prototype.name + '(' + serviceChain + '): ' + message
-    message += '\n' + reason.message
-    if (isUndefined(reason.serviceChain)) {
-      message += '\n' + reason.stack
+export const responseFail = (reason:any, message:?string) => {
+  try {
+    message = (message || '')
+    if (reason.skipLogging) {
+      return
     }
-  }
-  else if (typeof reason === 'string') {
-    message = reason
-  }
-  else {
-    message = ""
-  }
-  message += '\n'
 
-  if (hasStackTrace) {
-    let stackTrace = {}
-    Error.captureStackTrace(stackTrace, responseFail)
-    const stack = stackTrace.stack
+    const serviceChain = reason.serviceChain === undefined
+      ? serviceChainFailNumber++ : reason.serviceChain
+
+    if (isObject(reason.message)) {
+      message = JSON.stringify(reason.message, null, 2)
+    }
+
+    if (reason instanceof Error) {
+      message = Error.prototype.name + 
+                '(' + serviceChain + '): ' +
+                message
+      message += '\n' + reason.message
+      if (isUndefined(reason.serviceChain)) {
+        message += '\n' + reason.stack
+      }
+    }
+    else if (typeof reason === 'string') {
+      message = reason
+    }
+    else {
+      message = ""
+    }
+    message += '\n'
+    
+    let stack = null
+    if (Error.captureStackTrace && typeof Error.captureStackTrace === 'function') {
+      let stackTrace = {}
+      Error.captureStackTrace(stackTrace, responseFail)
+      stack = stackTrace.stack
+    }
+    else {
+      stack = (new Error(message)).stack
+    }
     let breadcrumb = stack
     // Cut off junk on front of stack string.
     each(['/internal/', 'at eval (', 'Error\n'], (startOffsetStr:string):?boolean => {
@@ -129,14 +127,20 @@ export const responseFail = (reason:any, message:?string):any => {
       }
     })
     message += 'Breadcrumb: ' + breadcrumb
+    if (reason instanceof Object) {
+      reason.serviceChain = serviceChain
+    }
   }
-  if (reason instanceof Object) {
-    reason.serviceChain = serviceChain
+  catch(e) {
+    message += "Uh-oh! Sumptin' went bad in logging an error! This is embarrassing...\n" +
+               e.message
   }
-  console.error(message)
+  finally {
+    console.error(message)     
+  }
 }
 
-const _defaultErrorLogger:Function = (response:Object):Object => {
+const _defaultErrorHandler:Function = (response:Object):Object => {
   if (!response.ok) {
     const contentType = response.headers.get("content-type")
     if (contentType && contentType.indexOf("application/json") !== -1) {
@@ -144,6 +148,7 @@ const _defaultErrorLogger:Function = (response:Object):Object => {
         const requestErrorReport:RequestErrorReportType = {
           statusCode:       response.status,
           statusText:       response.statusText,
+          errorCode:        json.errorCode,
           errorMessageText: json.errorMessageText,
           infoMessageText:  json.infoMessageText,
           warnMessageText:  json.warnMessageText
@@ -168,7 +173,7 @@ export const defaultOpts:OptionsType = {
   cache:          'no-cache',
   corsMode:       'cors',
   credentials:    'omit',
-  errorLogger:    _defaultErrorLogger,
+  errorHandler:    _defaultErrorHandler,
   headers:        {'Accept': 'application/json'},
   httpMethod:     'GET',
   isMocking:      false,
@@ -407,7 +412,7 @@ export class Request {
         }
       }
       if (afterResponse || debugRequestTime.enabled) {
-        // dispatchTime() is a timer focused on functions that return
+        // fetchTime() is a timer focused on functions that return
         // a Promise.
         const fetchPromise = debugRequestTime.enabled
           ? fetchTime(fetch)(this.url.format(), opts)
@@ -432,23 +437,24 @@ export class Request {
   // be possible to request another one of the following calls.
   then(resolve:Function, reject:?Function):any /* Promise */ {
     return this.execute()
-      .then(this.opts.errorLogger)
+      .then(this.opts.errorHandler)
       .then(resolve, reject)
   }
 
   catch(reject:Function):any /* Promise */ {
     return this.execute()
-      .then(this.opts.errorLogger)
+      .then(this.opts.errorHandler)
       .catch(reject)
   }
 
   json(strict:boolean = true):any /* Promise */ {
     return this.execute()
-      .then(this.opts.errorLogger)
+      .then(this.opts.errorHandler)
       .then((res:any):any /* Promise */ => res.json())
       .then((json:any):any /* Promise */ => {
         if (strict && !isObject(json)) {
-          throw new TypeError('Response is not strict JSON: /n' + JSON.stringify(json))
+          throw new TypeError('Data not strict JSON (not Object): /n' +
+                                JSON.stringify(json))
         }
 
         if (this.opts.afterJSON) {
@@ -457,23 +463,34 @@ export class Request {
         return json
       })
       .catch((reason:Error) => {
-        if (!isObject(reason.message)) {
-          if (isString(reason.message) &&
-            (reason.message.includes('JSON.parse') ||
-            reason.message.includes('not strict JSON'))) {
-            reason.message = {
-              statusCode: 666,
-              statusText: 'Bad data response'
-            }
-            throw reason
+        
+        if (isString(reason.message)) {
+          const badJsonData = reason.message.includes('JSON.parse') ||
+                              reason.message.includes('not strict JSON')
+          reason.message    = {
+            statusCode: badJsonData ? 700 : 701,
+            statusText: badJsonData ? 'Bad data response' : reason.message
           }
         }
+        else if (isObject(reason.message)) {
+          reason.message    = {
+            statusCode: 702,
+            statusText: JSON.stringify(reason.message)
+          }
+        }
+        else {
+          reason.message    = {
+            statusCode: 666,
+            statusText: 'Something truly confusing is going on...'
+          }
+        }
+        throw reason
       })
   }
 
   text():any /* Promise */ {
     return this.execute()
-      .then(this.opts.errorLogger)
+      .then(this.opts.errorHandler)
       .then((res:Object):any /* Promise */=> res.text())
   }
 }

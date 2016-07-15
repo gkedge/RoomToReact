@@ -474,6 +474,13 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
           fetchMock.mock(paymentHistoryAPI.format(), 'GET', "['yow!',]")
           stateHolder.state.refundRequest.isNegativeTesting = true;
           return actions.loadPaymentHistoryData()(dispatchSpy, getStateSpy)
+            // A catch below the 'then' below will catch failed expectations
+            // instead of Errors raised by loadPaymentHistoryData.
+            .catch((reason) => {
+               // Expect that any exception associated with a request is handled
+               // without spreading the contagion.
+               expect.fail()
+             })
             .then(() => {
               expect(dispatchSpy).to.have.been.calledTwice
               expect(dispatchSpy).to.have.been.calledWithExactly({
@@ -482,17 +489,12 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
               expect(dispatchSpy).to.have.been.calledWithExactly({
                 type:    LOAD_PAYMENT_HISTORY_DATA_ERROR,
                 payload: {
-                  statusCode: 666,
+                  statusCode: 700,
                   statusText: 'Bad data response'
                 }
               })
               // mocking setup using fully configured request in fluentRequest.
               expect(fetchMock.called(paymentHistoryAPI.format())).to.be.true
-            })
-            .catch((reason) => {
-              // Expect that any exception associated with a request is handled
-              // without spreading the contagion.
-              expect.fail()
             })
         })
 
@@ -501,6 +503,13 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
           fetchMock.mock(paymentHistoryAPI.format(), 'GET', JSON.stringify("yow!"))
           stateHolder.state.refundRequest.isNegativeTesting = true;
           return actions.loadPaymentHistoryData()(dispatchSpy, getStateSpy)
+            // A catch below the 'then' below will catch failed expectations
+            // instead of Errors raised by loadPaymentHistoryData.
+            .catch(() => {
+              // Expect that any exception associated with a request is handled
+              // without spreading the contagion.
+              expect.fail()
+            })
             .then(() => {
               expect(dispatchSpy).to.have.been.calledTwice
               expect(dispatchSpy).to.have.been.calledWithExactly({
@@ -509,17 +518,12 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
               expect(dispatchSpy).to.have.been.calledWithExactly({
                 type:    LOAD_PAYMENT_HISTORY_DATA_ERROR,
                 payload: {
-                  statusCode: 666,
+                  statusCode: 700,
                   statusText: 'Bad data response'
                 }
               })
               // mocking setup using fully configured request in fluentRequest.
               expect(fetchMock.called(paymentHistoryAPI.format())).to.be.true
-            })
-            .catch(() => {
-              // Expect that any exception associated with a request is handled
-              // without spreading the contagion.
-              expect.fail()
             })
         })
       })
@@ -682,6 +686,13 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
           fetchMock.mock(namesAPI.format(), 'GET', "['yow!',]")
           stateHolder.state.refundRequest.isNegativeTesting = true;
           return actions.loadNamesData()(dispatchSpy, getStateSpy)
+            // A catch below the 'then' below will catch failed expectations
+            // instead of Errors raised by loadPaymentHistoryData.
+            .catch(() => {
+              // Expect that any exception associated with a request is handled
+              // without spreading the contagion.
+              expect.fail()
+            })
             .then(() => {
               expect(dispatchSpy).to.have.been.calledTwice
               expect(dispatchSpy).to.have.been.calledWithExactly({
@@ -692,11 +703,6 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
               })
               // mocking setup using fully configured request in fluentRequest.
               expect(fetchMock.called(namesAPI.format())).to.be.true
-            })
-            .catch(() => {
-              // Expect that any exception associated with a request is handled
-              // without spreading the contagion.
-              expect.fail()
             })
         })
 
@@ -705,6 +711,13 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
           fetchMock.mock(namesAPI.format(), 'GET', JSON.stringify("yow!"))
           stateHolder.state.refundRequest.isNegativeTesting = true;
           return actions.loadNamesData()(dispatchSpy, getStateSpy)
+            // A catch below the 'then' below will catch failed expectations
+            // instead of Errors raised by loadPaymentHistoryData.
+            .catch(() => {
+              // Expect that any exception associated with a request is handled
+              // without spreading the contagion.
+              expect.fail()
+            })
             .then(() => {
               expect(dispatchSpy).to.have.been.calledTwice
               expect(dispatchSpy).to.have.been.calledWithExactly({
@@ -716,14 +729,8 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
               // mocking setup using fully configured request in fluentRequest.
               expect(fetchMock.called(namesAPI.format())).to.be.true
             })
-            .catch(() => {
-              // Expect that any exception associated with a request is handled
-              // without spreading the contagion.
-              expect.fail()
-            })
         })
       })
-
     })
 
     describe('Addresses Actions', () => {
