@@ -254,15 +254,24 @@ export function resetState():ActionPayloadType {
   }
 }
 
+function preResetRefundRequestForm():ActionPayloadType {
+  return {
+    type: PRE_RESET_REFUND_REQUEST_FORM
+  }
+}
+
+function postResetRefundRequestForm():ActionPayloadType {
+  return {
+    type: POST_RESET_REFUND_REQUEST_FORM
+  }
+}
+
 function resetRefundRequestForm():Function {
   return (dispatch:Function) => {
-    dispatch({
-      type: PRE_RESET_REFUND_REQUEST_FORM
-    })
+    dispatch(preResetRefundRequestForm())
+    // TODO: Hope this isn't async... Check.
     dispatch(reset('resetRefundRequestForm'))
-    dispatch({
-      type: POST_RESET_REFUND_REQUEST_FORM
-    })
+    dispatch(postResetRefundRequestForm())
   }
 }
 
@@ -381,6 +390,8 @@ export const actions = {
   clearErrorReport,
   resetState,
   resetRefundRequestForm,
+  preResetRefundRequestForm,
+  postResetRefundRequestForm,
   validLookup,
   validLookupStart,
   validLookupEnd,

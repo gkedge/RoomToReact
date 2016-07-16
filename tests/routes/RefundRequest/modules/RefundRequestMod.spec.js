@@ -325,33 +325,6 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
         expect(actions.validLookup).to.be.a('function')
       })
 
-      it('Mutate state through reducer expected to produce lookup form data', () => {
-         const testStartState = cloneDeep(initialState)
-         const expected = cloneDeep(testStartState)
-         expected.lookupForm = cloneDeep(lookupFormData)
-         expected.lookupForm.isLookingUp = true
-        
-         let state = refundRequestReducer(testStartState, {
-           type: VALID_LOOKUP_START,
-           payload: lookupFormData
-         })
-         expect(state).to.eql(expected)
- 
-         expected.isResettingRefundForm = true
-         state = refundRequestReducer(state, {
-           type: PRE_RESET_REFUND_REQUEST_FORM
-         })
- 
-         expect(state).to.eql(expected)
- 
-         expected.isResettingRefundForm = false
-         state = refundRequestReducer(state, {
-           type: POST_RESET_REFUND_REQUEST_FORM
-         })
- 
-         expect(state).to.eql(expected)
-       })
- 
       describe('Lookup Reference Data Actions and Subactions', () => {
 
         describe('Payment History Actions', () => {
@@ -370,7 +343,7 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
                 .to.have.property('type', LOAD_PAYMENT_HISTORY_DATA_START)
             })
     
-            it('Passing `loadPaymentHistoryDataStart()` to reducer should produce `loading` truth', () => {
+            it('Mutate state through reducer expected to produce history `loading` truth', () => {
               const testStartState = cloneDeep(initialState)
               const expected = cloneDeep(testStartState)
               expected.refundRequestForm.isLoadingPaymentHistory = true;
@@ -400,7 +373,7 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
                 .to.have.property('payload').and.eql(paymentHistoryData)
             })
     
-            it('Passing `loadPaymentHistoryDataLoaded()` to reducer should produce payment history', () => {
+            it('Mutate state through reducer expected to produce payment history', () => {
               const testStartState = cloneDeep(initialState)
               const expected = cloneDeep(testStartState)
               expected.refundRequestForm.fees = paymentHistoryData
@@ -440,7 +413,7 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
     
           })
     
-          describe('loadPaymentHistoryData', () => {
+          describe('loadPaymentHistoryData (thunk)', () => {
             const stateHolder = {
               state: {
                 refundRequest: cloneDeep(initialState)
@@ -1120,6 +1093,58 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
           })
         })
   
+      })
+
+      describe('validLookupStart', () => {
+        it('Should export a constant VALID_LOOKUP_START.', () => {
+          expect(VALID_LOOKUP_START).to.equal('refund/RefundRequest/VALID_LOOKUP_START')
+        })
+
+        it('Should be exported as a function.', () => {
+          expect(actions.validLookupStart).to.be.a('function')
+        })
+
+        it('Should return an action with type "VALID_LOOKUP_START".', () => {
+          expect(actions.validLookupStart(cloneDeep(lookupFormData)))
+            .to.have.property('type', VALID_LOOKUP_START)
+        })
+
+        it('Mutate state through reducer expected to produce lookup `loading` truth', () => {
+          const testStartState = cloneDeep(initialState)
+          const expected = cloneDeep(testStartState)
+          expected.lookupForm = cloneDeep(lookupFormData)
+          expected.lookupForm.isLookingUp = true
+          const state = refundRequestReducer(testStartState,
+            actions.validLookupStart(cloneDeep(lookupFormData)))
+
+          expect(state).to.eql(expected)
+        })
+      })
+
+      describe('validLookupEnd', () => {
+        it('Should export a constant VALID_LOOKUP_END.', () => {
+          expect(VALID_LOOKUP_END).to.equal('refund/RefundRequest/VALID_LOOKUP_END')
+        })
+
+        it('Should be exported as a function.', () => {
+          expect(actions.validLookupEnd).to.be.a('function')
+        })
+
+        it('Should return an action with type "VALID_LOOKUP_END".', () => {
+          expect(actions.validLookupEnd(cloneDeep(lookupFormData)))
+            .to.have.property('type', VALID_LOOKUP_END)
+        })
+
+        it('Mutate state through reducer expected to produce lookup `loading` truth', () => {
+          const testStartState = cloneDeep(initialState)
+          const expected = cloneDeep(testStartState)
+          expected.lookupForm = lookupFormData
+          let state = refundRequestReducer(testStartState,
+            actions.validLookupStart(cloneDeep(lookupFormData)))
+          state = refundRequestReducer(state, actions.validLookupEnd())
+
+          expect(state).to.eql(expected)
+        })
       })
 
       describe('validLookup (thunk)', () => {
