@@ -46,6 +46,7 @@ export const PDF_LOADED = 'refund/RefundRequest/PDF_LOADED'
 export const POST_REFUND_REQUEST = 'refund/RefundRequest/POST_REFUND_REQUEST'
 export const LOOKUP_REFERENCED_DATA_START = 'refund/RefundRequest/LOOKUP_REFERENCED_DATA_START'
 export const LOOKUP_REFERENCED_DATA_LOADED = 'refund/RefundRequest/LOOKUP_REFERENCED_DATA_LOADED'
+export const LOOKUP_REFERENCED_DATA_ERROR = 'refund/RefundRequest/LOOKUP_REFERENCED_DATA_ERROR'
 export const LOAD_ADDRESSES_START = 'refund/RefundRequest/LOAD_ADDRESSES_START'
 export const LOAD_ADDRESSES_LOADED = 'refund/RefundRequest/LOAD_ADDRESSES_LOADED'
 export const LOAD_ADDRESSES_ERROR = 'refund/RefundRequest/LOAD_ADDRESSES_ERROR'
@@ -60,7 +61,9 @@ export const POST_RESET_REFUND_REQUEST_FORM = 'refund/RefundRequest/POST_RESET_R
 export const CLEAR_ERROR_REPORT = 'refund/RefundRequest/CLEAR_ERROR_REPORT'
 export const RESET_STATE = 'refund/RefundRequest/RESET_STATE'
 export const SAVED_REFUND_REQUEST = 'refund/RefundRequest/SAVED_REFUND_REQUEST'
-export const VALID_LOOKUP = 'refund/RefundRequest/VALID_LOOKUP'
+export const VALID_LOOKUP_START = 'refund/RefundRequest/VALID_LOOKUP_START'
+export const VALID_LOOKUP_END = 'refund/RefundRequest/VALID_LOOKUP_END'
+export const VALID_LOOKUP_ERROR = 'refund/RefundRequest/VALID_LOOKUP_ERROR'
 
 // ------------------------------------
 // Actions
@@ -284,6 +287,12 @@ function lookupReferencedDataLoaded():ActionPayloadType {
   }
 }
 
+function lookupReferencedDataError():ActionPayloadType {
+  return {
+      type: LOOKUP_REFERENCED_DATA_ERROR
+    }
+}
+
 export const lookupReferencedData = ():Function => {
   return (dispatch:Function):any /* Promise */ => {
     dispatch(lookupReferencedDataStart())
@@ -298,9 +307,14 @@ export const lookupReferencedData = ():Function => {
       if (debugTime.enabled) {
         debugTime('lookupReferencedData time: +' + allDispatches.time + 'ms')
       }
-      return dispatch(lookupReferencedDataLoaded())
+      dispatch(lookupReferencedDataLoaded())
+      return dispatch(validLookupEnd())
     }
 
+    const reject = () => {
+      dispatch(lookupReferencedDataError())
+      dispatch(validLookupError())
+    }
     const allDispatches = ():Promise =>
       // Waaaait a minute... there ain't no spread() in the Promise spec!
       // See promisePlugins.js...
@@ -308,18 +322,34 @@ export const lookupReferencedData = ():Function => {
         dispatch(loadPaymentHistoryData()),
         dispatch(loadNamesData()),
         dispatch(loadAddressesData())],
-        resolve /*, reject */)
+        resolve, reject)
 
     return debugTime.enabled ? dispatchTime(allDispatches)() : allDispatches()
   }
 }
 
+function validLookupStart(lookupFormData:LookupFormDataType):ActionPayloadType {
+  return {
+      type:    VALID_LOOKUP_START,
+      payload: lookupFormData
+    }
+}
+
+function validLookupEnd():ActionPayloadType {
+  return {
+      type: VALID_LOOKUP_END
+    }
+}
+
+function validLookupError():ActionPayloadType {
+  return {
+      type: VALID_LOOKUP_ERROR
+    }
+}
+
 export function validLookup(lookupFormData:LookupFormDataType):Function {
   return (dispatch:Function):any /* Promise */ => {
-    dispatch({
-      type:    VALID_LOOKUP,
-      payload: lookupFormData
-    })
+    dispatch(validLookupStart(lookupFormData))
     dispatch(resetRefundRequestForm())
 
     return dispatch(lookupReferencedData())
@@ -351,7 +381,10 @@ export const actions = {
   clearErrorReport,
   resetState,
   resetRefundRequestForm,
-  validLookup
+  validLookup,
+  validLookupStart,
+  validLookupEnd,
+  validLookupError
 }
 
 /*eslint "key-spacing": 0*/
@@ -361,7 +394,6 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
       ...state,
       refundRequestForm: {
         ...state.refundRequestForm,
-        isError:            false,
         isLoadingAddresses: true,
         address:            {
           ...state.refundRequestForm.address
@@ -471,6 +503,18 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
       }
     })
   },
+  [LOOKUP_REFERENCED_DATA_START]:      (state:ShortType):ShortType => {
+    // No affect to state, ... yet.
+    return state
+  },
+  [LOOKUP_REFERENCED_DATA_LOADED]:      (state:ShortType):ShortType => {
+    // No affect to state, ... yet.
+    return state
+  },
+  [LOOKUP_REFERENCED_DATA_ERROR]:      (state:ShortType):ShortType => {
+    // No affect to state, ... yet.
+    return state
+  },
   [PDF_BINARY]:                       (state:ShortType,
                                        action:{payload: PdfReadPayloadType}):ShortType => {
     return ({
@@ -522,6 +566,10 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
   [CLEAR_ERROR_REPORT]:               (state:ShortType):ShortType => {
     return ({
       ...state,
+      lookupForm: {
+        ...state.lookupForm,
+        isError: false
+      },
       refundRequestForm: {
         ...state.refundRequestForm,
         isError:     false,
@@ -544,7 +592,7 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
       ...initialState
     })
   },
-  [VALID_LOOKUP]:                     (state:ShortType,
+  [VALID_LOOKUP_START]:               (state:ShortType,
                                        action:{payload: LookupFormPayloadType}):ShortType => {
     const payload = action.payload
     let referenceNum = payload.referenceNum
@@ -562,14 +610,34 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
       ...state,
       lookupForm: {
         ...state.lookupForm,
-        isLookingUp:  false,
+        isLookingUp:  true,
         referenceNum: payload.referenceNum,
         dateFrom:     payload.dateFrom,
         dateTo:       payload.dateTo,
         email:        lower(payload.email)
       }
     })
+  },
+  [VALID_LOOKUP_END]:               (state:ShortType):ShortType => {
+    return ({
+      ...state,
+      lookupForm: {
+        ...state.lookupForm,
+        isLookingUp:  false
+      }
+    })
+  },
+  [VALID_LOOKUP_ERROR]:             (state:ShortType):ShortType => {
+    return ({
+      ...state,
+      lookupForm: {
+        ...state.lookupForm,
+        isError    : true,
+        isLookingUp: false
+      }
+    })
   }
+  
 }
 
 // ------------------------------------

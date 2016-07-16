@@ -18,7 +18,7 @@ import refundRequestReducer, {
   PDF_BINARY, PDF_LOADED,
   PRE_RESET_REFUND_REQUEST_FORM, POST_RESET_REFUND_REQUEST_FORM,
   POST_REFUND_REQUEST, SAVED_REFUND_REQUEST,
-  VALID_LOOKUP,
+  VALID_LOOKUP_START, VALID_LOOKUP_END, VALID_LOOKUP_ERROR, 
   CLEAR_ERROR_REPORT, RESET_STATE,
   actions,
   initialState
@@ -127,11 +127,12 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
         })
 
         it('Passing `loadingPdf()` to reducer should produce `loading` truth', () => {
-          const expected = cloneDeep(initialState)
+          const testStartState = cloneDeep(initialState)
+          const expected = cloneDeep(testStartState)
 
           expected.pdf.isLoading = true;
           expected.pdf.file = {};
-          let state = refundRequestReducer(initialState, actions.loadingPdf({}))
+          const state = refundRequestReducer(testStartState, actions.loadingPdf({}))
 
           expect(state).to.eql(expected)
         })
@@ -161,12 +162,13 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
         })
 
         it('Passing `pdfBinary()` to reducer should produce PDF data', () => {
-          const expected = cloneDeep(initialState)
+          const testStartState = cloneDeep(initialState)
+          const expected = cloneDeep(testStartState)
 
           expected.pdf.isLoading = true;
           expected.pdf.file = {}
           expected.pdf.binaryContent = pdfBinaryData
-          let state = refundRequestReducer(initialState, actions.loadingPdf({}))
+          let state = refundRequestReducer(testStartState, actions.loadingPdf({}))
           state = refundRequestReducer(state, actions.pdfBinary(pdfBinaryData))
 
           expect(state).to.eql(expected)
@@ -187,12 +189,13 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
         })
 
         it('Passing `pdfLoaded()` to reducer should produce PDF data', () => {
-          const expected = cloneDeep(initialState)
+          const testStartState = cloneDeep(initialState)
+          const expected = cloneDeep(testStartState)
 
           expected.pdf.isLoading = false
           expected.pdf.file = {}
           expected.pdf.binaryContent = pdfBinaryData
-          let state = refundRequestReducer(initialState, actions.loadingPdf({}))
+          let state = refundRequestReducer(testStartState, actions.loadingPdf({}))
           state = refundRequestReducer(state, actions.pdfBinary(pdfBinaryData))
           state = refundRequestReducer(state, actions.pdfLoaded())
 
@@ -217,7 +220,7 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
       //       refundRequest: cloneDeep(initialState)
       //     }
       //   }
-      //   stateHolder.state.refundRequest.lookupForm = lookupFormData
+      //   stateHolder.state.refundRequest.lookupForm = cloneDeep(lookupFormData)
       //
       //   const {dispatchSpy, getStateSpy} = reducerSpy(refundRequestReducer, stateHolder)
       //   let originalRootContext = null;
@@ -240,20 +243,20 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
       //   })
       //
       //   it('Should return a function (is a thunk).', () => {
-      //     expect(actions.validLookup(lookupFormData)).to.be.a('function')
+      //     expect(actions.validLookup(cloneDeep(lookupFormData))).to.be.a('function')
       //   })
       //
       //   it('Running validLookup through store returns Promise.', () => {
-      //     return expect(actions.validLookup(lookupFormData)(dispatchSpy, getStateSpy))
+      //     return expect(actions.validLookup(cloneDeep(lookupFormData))(dispatchSpy, getStateSpy))
       //       .to.eventually.be.fulfilled
       //   })
       //
       //   it('Test validLookup dispatch and all the dispatches it makes', () => {
-      //     return actions.validLookup(lookupFormData)(dispatchSpy, getStateSpy)
+      //     return actions.validLookup(cloneDeep(lookupFormData))(dispatchSpy, getStateSpy)
       //       .then(() => {
       //         expect(dispatchSpy).to.have.callCount(17)
       //         expect(dispatchSpy).to.have.been.calledWithExactly({
-      //           type:    VALID_LOOKUP,
+      //           type:    VALID_LOOKUP_START,
       //           payload: lookupFormData
       //         })
       //         // Neither of these work to test if resetRefundRequestForm() has been called:
@@ -303,798 +306,831 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
       //       })
       //   })
       //
-      //   it('State after validLookup contains lookupFormData, fees, names, addresses and entity types.', () => {
-      //     const expected = cloneDeep(initialState)
-      //     expected.lookupForm = cloneDeep(lookupFormData)
-      //     expected.refundRequestForm.fees = paymentHistoryData
-      //     expected.refundRequestForm.names = namesData
-      //     expected.refundRequestForm.addresses = addressesData
-      //     return actions.validLookup(lookupFormData)(dispatchSpy, getStateSpy)
-      //       .then(() => {
-      //         expect(stateHolder.state.refundRequest).to.eql(expected)
-      //       })
-      //   })
-      // })
+      //   it('State after validLookup contains lookupFormData, fees, names, addresses and entity
+      // types.', () => { const expected = cloneDeep(initialState) expected.lookupForm =
+      // lookupFormData expected.refundRequestForm.fees = paymentHistoryData
+      // expected.refundRequestForm.names = namesData expected.refundRequestForm.addresses =
+      // addressesData return actions.validLookup(lookupFormData)(dispatchSpy, getStateSpy)
+      // .then(() => { expect(stateHolder.state.refundRequest).to.eql(expected) }) }) })
 
     })
 
-    describe('Payment History Actions', () => {
+    describe('Valid Lookup Actions And Subactions', () => {
 
-      describe('loadPaymentHistoryDataStart', () => {
-        it('Should export a constant LOAD_PAYMENT_HISTORY_DATA_START.', () => {
-          expect(LOAD_PAYMENT_HISTORY_DATA_START).to.equal('refund/RefundRequest/LOAD_PAYMENT_HISTORY_DATA_START')
-        })
-
-        it('Should be exported as a function.', () => {
-          expect(actions.loadPaymentHistoryDataStart).to.be.a('function')
-        })
-
-        it('Should return an action with type "LOAD_PAYMENT_HISTORY_DATA_STARTED".', () => {
-          expect(actions.loadPaymentHistoryDataStart())
-            .to.have.property('type', LOAD_PAYMENT_HISTORY_DATA_START)
-        })
-
-        it('Passing `loadPaymentHistoryDataStart()` to reducer should produce `loading` truth', () => {
-          const expected = cloneDeep(initialState)
-          expected.refundRequestForm.isLoadingPaymentHistory = true;
-
-          const state = refundRequestReducer(initialState, actions.loadPaymentHistoryDataStart())
-
-          expect(state).to.eql(expected)
-        })
+      it('Should export a constant VALID_LOOKUP_START.', () => {
+        expect(VALID_LOOKUP_START).to.equal('refund/RefundRequest/VALID_LOOKUP_START')
       })
 
-      describe('loadPaymentHistoryDataLoaded', () => {
-        it('Should export a constant LOAD_PAYMENT_HISTORY_DATA_LOADED.', () => {
-          expect(LOAD_PAYMENT_HISTORY_DATA_LOADED).to.equal('refund/RefundRequest/LOAD_PAYMENT_HISTORY_DATA_LOADED')
-        })
-        it('Should be exported as a function.', () => {
-          expect(actions.loadPaymentHistoryDataLoaded).to.be.a('function')
-        })
-
-        it('Should return an action with type "LOAD_PAYMENT_HISTORY_DATA_LOADED".', () => {
-          expect(actions.loadPaymentHistoryDataLoaded(paymentHistoryData))
-            .to.have.property('type', LOAD_PAYMENT_HISTORY_DATA_LOADED)
-        })
-
-        it('Should assign the first argument to `payload` property.', () => {
-          expect(actions.loadPaymentHistoryDataLoaded(paymentHistoryData))
-            .to.have.property('payload').and.eql(paymentHistoryData)
-        })
-
-        it('Passing `loadPaymentHistoryDataLoaded()` to reducer should produce payment history', () => {
-          const expected = cloneDeep(initialState)
-          expected.refundRequestForm.fees = paymentHistoryData
-          let state = refundRequestReducer(initialState, actions.loadPaymentHistoryDataStart())
-          state = refundRequestReducer(state, actions.loadPaymentHistoryDataLoaded(paymentHistoryData))
-
-          expect(state).to.eql(expected)
-        })
-
+      it('Should be exported as a function.', () => {
+        expect(actions.validLookup).to.be.a('function')
       })
 
-      describe('loadPaymentHistoryDataError', () => {
-        it('Should export a constant LOAD_PAYMENT_HISTORY_DATA_ERROR.', () => {
-          expect(LOAD_PAYMENT_HISTORY_DATA_ERROR).to.equal('refund/RefundRequest/LOAD_PAYMENT_HISTORY_DATA_ERROR')
-        })
+      it('Mutate state through reducer expected to produce lookup form data', () => {
+         const testStartState = cloneDeep(initialState)
+         const expected = cloneDeep(testStartState)
+         expected.lookupForm = cloneDeep(lookupFormData)
+         expected.lookupForm.isLookingUp = true
+        
+         let state = refundRequestReducer(testStartState, {
+           type: VALID_LOOKUP_START,
+           payload: lookupFormData
+         })
+         expect(state).to.eql(expected)
+ 
+         expected.isResettingRefundForm = true
+         state = refundRequestReducer(state, {
+           type: PRE_RESET_REFUND_REQUEST_FORM
+         })
+ 
+         expect(state).to.eql(expected)
+ 
+         expected.isResettingRefundForm = false
+         state = refundRequestReducer(state, {
+           type: POST_RESET_REFUND_REQUEST_FORM
+         })
+ 
+         expect(state).to.eql(expected)
+       })
+ 
+      describe('Lookup Reference Data Actions and Subactions', () => {
 
-        it('Should be exported as a function.', () => {
-          expect(actions.loadPaymentHistoryDataError).to.be.a('function')
-        })
-
-        it('Should return an action with type "LOAD_PAYMENT_HISTORY_DATA_ERROR".', () => {
-          expect(actions.loadPaymentHistoryDataError(errorReport))
-            .to.have.property('type', LOAD_PAYMENT_HISTORY_DATA_ERROR)
-        })
-
-        it('Passing `loadPaymentHistoryDataError()` to reducer should produce `error` truth', () => {
-          const expected = cloneDeep(initialState)
-          expected.refundRequestForm.isError = true;
-          expected.refundRequestForm.errorReport = [cloneDeep(errorReport)]
-
-          const state = refundRequestReducer(initialState,
-            actions.loadPaymentHistoryDataError(errorReport))
-
-          expect(state).to.eql(expected)
-        })
-
-      })
-
-      describe('loadPaymentHistoryData', () => {
-        const stateHolder = {
-          state: {
-            refundRequest: cloneDeep(initialState)
-          }
-        }
-        stateHolder.state.refundRequest.lookupForm = lookupFormData
-        const {dispatchSpy, getStateSpy} = reducerSpy(refundRequestReducer, stateHolder)
-        let originalRootContext = null;
-
-        beforeEach(() => {
-          originalRootContext = setRootContext('', url.parse(baseAPI))
-        })
-
-        afterEach(() => {
-          stateHolder.state.refundRequest = cloneDeep(initialState)
-          stateHolder.state.refundRequest.lookupForm = cloneDeep(lookupFormData);
-          stateHolder.state.refundRequest.refundRequestForm.fees = null;
-          dispatchSpy.reset()
-          getStateSpy.reset()
-          fetchMock.restore() // mocking setup using fully configured request in fluentRequest.
-          setRootContext('', originalRootContext)
-        })
-
-        it('Should be exported as a function.', () => {
-          expect(actions.loadPaymentHistoryData).to.be.a('function')
-        })
-
-        it('Should return a function (is a thunk).', () => {
-          expect(actions.loadPaymentHistoryData()).to.be.a('function')
-        })
-
-        it('Fetching loadPaymentHistoryData through store returns a Promise', () => {
-          return expect(actions.loadPaymentHistoryData()(dispatchSpy, getStateSpy))
-            .to.eventually.be.fulfilled
-        })
-
-        it('Test loadPaymentHistoryData dispatch and all the dispatches it makes', () => {
-          return actions.loadPaymentHistoryData()(dispatchSpy, getStateSpy)
-            .then(() => {
-              expect(dispatchSpy).to.have.been.calledTwice
-              expect(dispatchSpy).to.have.been.calledWithExactly({
-                type: LOAD_PAYMENT_HISTORY_DATA_START
-              })
-              expect(dispatchSpy).to.have.been.calledWith({
-                type: LOAD_PAYMENT_HISTORY_DATA_LOADED,
-                payload: paymentHistoryData
-              })
-              // mocking setup using fully configured request in fluentRequest.
-              expect(fetchMock.called(paymentHistoryAPI.format())).to.be.true
+        describe('Payment History Actions', () => {
+    
+          describe('loadPaymentHistoryDataStart', () => {
+            it('Should export a constant LOAD_PAYMENT_HISTORY_DATA_START.', () => {
+              expect(LOAD_PAYMENT_HISTORY_DATA_START).to.equal('refund/RefundRequest/LOAD_PAYMENT_HISTORY_DATA_START')
             })
-        })
-
-        it('State after loadPaymentHistoryData contains fees.', () => {
-          const expected = cloneDeep(initialState)
-          expected.lookupForm = cloneDeep(lookupFormData)
-          expected.refundRequestForm.fees = paymentHistoryData
-          return actions.loadPaymentHistoryData()(dispatchSpy, getStateSpy)
-            .then(() => {
-              expect(stateHolder.state.refundRequest).to.eql(expected)
+    
+            it('Should be exported as a function.', () => {
+              expect(actions.loadPaymentHistoryDataStart).to.be.a('function')
             })
-        })
-
-        it('Test loadPaymentHistoryData dispatch with bad data (#1) and all the dispatches it makes', () => {
-          fetchMock.restore()
-          const response = {
-            body:    "'yow!',",
-            headers: {
-              'Content-Type': 'application/json; charset=utf-8'
+    
+            it('Should return an action with type "LOAD_PAYMENT_HISTORY_DATA_STARTED".', () => {
+              expect(actions.loadPaymentHistoryDataStart())
+                .to.have.property('type', LOAD_PAYMENT_HISTORY_DATA_START)
+            })
+    
+            it('Passing `loadPaymentHistoryDataStart()` to reducer should produce `loading` truth', () => {
+              const testStartState = cloneDeep(initialState)
+              const expected = cloneDeep(testStartState)
+              expected.refundRequestForm.isLoadingPaymentHistory = true;
+    
+              const state = refundRequestReducer(testStartState, actions.loadPaymentHistoryDataStart())
+    
+              expect(state).to.eql(expected)
+            })
+          })
+    
+          describe('loadPaymentHistoryDataLoaded', () => {
+            it('Should export a constant LOAD_PAYMENT_HISTORY_DATA_LOADED.', () => {
+              expect(LOAD_PAYMENT_HISTORY_DATA_LOADED).to.equal('refund/RefundRequest/LOAD_PAYMENT_HISTORY_DATA_LOADED')
+            })
+            
+            it('Should be exported as a function.', () => {
+              expect(actions.loadPaymentHistoryDataLoaded).to.be.a('function')
+            })
+    
+            it('Should return an action with type "LOAD_PAYMENT_HISTORY_DATA_LOADED".', () => {
+              expect(actions.loadPaymentHistoryDataLoaded(paymentHistoryData))
+                .to.have.property('type', LOAD_PAYMENT_HISTORY_DATA_LOADED)
+            })
+    
+            it('Should assign the first argument to `payload` property.', () => {
+              expect(actions.loadPaymentHistoryDataLoaded(paymentHistoryData))
+                .to.have.property('payload').and.eql(paymentHistoryData)
+            })
+    
+            it('Passing `loadPaymentHistoryDataLoaded()` to reducer should produce payment history', () => {
+              const testStartState = cloneDeep(initialState)
+              const expected = cloneDeep(testStartState)
+              expected.refundRequestForm.fees = paymentHistoryData
+              let state = refundRequestReducer(testStartState, actions.loadPaymentHistoryDataStart())
+              state = refundRequestReducer(state, actions.loadPaymentHistoryDataLoaded(paymentHistoryData))
+    
+              expect(state).to.eql(expected)
+            })
+    
+          })
+    
+          describe('loadPaymentHistoryDataError', () => {
+            it('Should export a constant LOAD_PAYMENT_HISTORY_DATA_ERROR.', () => {
+              expect(LOAD_PAYMENT_HISTORY_DATA_ERROR).to.equal('refund/RefundRequest/LOAD_PAYMENT_HISTORY_DATA_ERROR')
+            })
+    
+            it('Should be exported as a function.', () => {
+              expect(actions.loadPaymentHistoryDataError).to.be.a('function')
+            })
+    
+            it('Should return an action with type "LOAD_PAYMENT_HISTORY_DATA_ERROR".', () => {
+              expect(actions.loadPaymentHistoryDataError(errorReport))
+                .to.have.property('type', LOAD_PAYMENT_HISTORY_DATA_ERROR)
+            })
+    
+            it('Passing `loadPaymentHistoryDataError()` to reducer should produce `error` truth', () => {
+              const testStartState = cloneDeep(initialState)
+              const expected = cloneDeep(testStartState)
+              expected.refundRequestForm.isError = true;
+              expected.refundRequestForm.errorReport = [cloneDeep(errorReport)]
+    
+              const state = refundRequestReducer(testStartState,
+                actions.loadPaymentHistoryDataError(errorReport))
+    
+              expect(state).to.eql(expected)
+            })
+    
+          })
+    
+          describe('loadPaymentHistoryData', () => {
+            const stateHolder = {
+              state: {
+                refundRequest: cloneDeep(initialState)
+              }
             }
-          }
-          fetchMock.mock(paymentHistoryAPI.format(), 'GET', response)
-          stateHolder.state.refundRequest.isNegativeTesting = true;
-          return actions.loadPaymentHistoryData()(dispatchSpy, getStateSpy)
-            .then(() => {
-              expect(dispatchSpy).to.have.been.calledTwice
-              expect(dispatchSpy).to.have.been.calledWithExactly({
-                type: LOAD_PAYMENT_HISTORY_DATA_START
-              })
-              expect(dispatchSpy).to.have.been.calledWithExactly({
-                type: LOAD_PAYMENT_HISTORY_DATA_ERROR,
-                payload: {
-                  statusCode: 700,
-                  statusText: 'Bad data response'
-                }
-              })
-              // mocking setup using fully configured request in fluentRequest.
-              expect(fetchMock.called(paymentHistoryAPI.format())).to.be.true
+            stateHolder.state.refundRequest.lookupForm = cloneDeep(lookupFormData)
+            const {dispatchSpy, getStateSpy} = reducerSpy(refundRequestReducer, stateHolder)
+            let originalRootContext = null;
+    
+            beforeEach(() => {
+              originalRootContext = setRootContext('', url.parse(baseAPI))
             })
+    
+            afterEach(() => {
+              stateHolder.state.refundRequest = cloneDeep(initialState)
+              stateHolder.state.refundRequest.lookupForm = cloneDeep(lookupFormData);
+              stateHolder.state.refundRequest.refundRequestForm.fees = null;
+              dispatchSpy.reset()
+              getStateSpy.reset()
+              fetchMock.restore() // mocking setup using fully configured request in fluentRequest.
+              setRootContext('', originalRootContext)
+            })
+    
+            it('Should be exported as a function.', () => {
+              expect(actions.loadPaymentHistoryData).to.be.a('function')
+            })
+    
+            it('Should return a function (is a thunk).', () => {
+              expect(actions.loadPaymentHistoryData()).to.be.a('function')
+            })
+    
+            it('Fetching loadPaymentHistoryData through store returns a Promise', () => {
+              return expect(actions.loadPaymentHistoryData()(dispatchSpy, getStateSpy))
+                .to.eventually.be.fulfilled
+            })
+    
+            it('Test loadPaymentHistoryData dispatch and all the dispatches it makes', () => {
+              return actions.loadPaymentHistoryData()(dispatchSpy, getStateSpy)
+                .then(() => {
+                  expect(dispatchSpy).to.have.been.calledTwice
+                  expect(dispatchSpy).to.have.been.calledWithExactly({
+                    type: LOAD_PAYMENT_HISTORY_DATA_START
+                  })
+                  expect(dispatchSpy).to.have.been.calledWith({
+                    type: LOAD_PAYMENT_HISTORY_DATA_LOADED,
+                    payload: paymentHistoryData
+                  })
+                  // mocking setup using fully configured request in fluentRequest.
+                  expect(fetchMock.called(paymentHistoryAPI.format())).to.be.true
+                })
+            })
+    
+            it('State after loadPaymentHistoryData contains fees.', () => {
+              const expected = cloneDeep(initialState)
+              expected.lookupForm = lookupFormData
+              expected.refundRequestForm.fees = paymentHistoryData
+              return actions.loadPaymentHistoryData()(dispatchSpy, getStateSpy)
+                .then(() => {
+                  expect(stateHolder.state.refundRequest).to.eql(expected)
+                })
+            })
+    
+            it('Test loadPaymentHistoryData dispatch with bad data (#1) and all the dispatches it makes', () => {
+              fetchMock.restore()
+              const response = {
+                body:    "'yow!',",
+                headers: {
+                  'Content-Type': 'application/json; charset=utf-8'
+                }
+              }
+              fetchMock.mock(paymentHistoryAPI.format(), 'GET', response)
+              stateHolder.state.refundRequest.isNegativeTesting = true;
+              return actions.loadPaymentHistoryData()(dispatchSpy, getStateSpy)
+                .then(() => {
+                  expect(dispatchSpy).to.have.been.calledTwice
+                  expect(dispatchSpy).to.have.been.calledWithExactly({
+                    type: LOAD_PAYMENT_HISTORY_DATA_START
+                  })
+                  expect(dispatchSpy).to.have.been.calledWithExactly({
+                    type: LOAD_PAYMENT_HISTORY_DATA_ERROR,
+                    payload: {
+                      statusCode: 700,
+                      statusText: 'Bad data response'
+                    }
+                  })
+                  // mocking setup using fully configured request in fluentRequest.
+                  expect(fetchMock.called(paymentHistoryAPI.format())).to.be.true
+                })
+            })
+    
+            it('Test loadPaymentHistoryData dispatch with bad data (#2) and all the dispatches it makes', () => {
+              fetchMock.restore()
+              const response = {
+                body:    JSON.stringify("yow!"),
+                headers: {
+                  'Content-Type': 'application/json; charset=utf-8'
+                }
+              }
+              fetchMock.mock(paymentHistoryAPI.format(), 'GET', response)
+              stateHolder.state.refundRequest.isNegativeTesting = true;
+              return actions.loadPaymentHistoryData()(dispatchSpy, getStateSpy)
+                .then(() => {
+                  expect(dispatchSpy).to.have.been.calledTwice
+                  expect(dispatchSpy).to.have.been.calledWithExactly({
+                    type: LOAD_PAYMENT_HISTORY_DATA_START
+                  })
+                  expect(dispatchSpy).to.have.been.calledWithExactly({
+                    type: LOAD_PAYMENT_HISTORY_DATA_ERROR,
+                    payload: {
+                      statusCode: 700,
+                      statusText: 'Bad data response'
+                    }
+                  })
+                  // mocking setup using fully configured request in fluentRequest.
+                  expect(fetchMock.called(paymentHistoryAPI.format())).to.be.true
+                })
+            })
+          })
         })
-
-        it('Test loadPaymentHistoryData dispatch with bad data (#2) and all the dispatches it makes', () => {
-          fetchMock.restore()
-          const response = {
-            body:    JSON.stringify("yow!"),
-            headers: {
-              'Content-Type': 'application/json; charset=utf-8'
+    
+        describe('Name Actions', () => {
+    
+          describe('loadNamesDataStart', () => {
+    
+            it('Should export a constant LOAD_NAMES_START.', () => {
+              expect(LOAD_NAMES_START).to.equal('refund/RefundRequest/LOAD_NAMES_START')
+            })
+    
+            it('Should be exported as a function.', () => {
+              expect(actions.loadNamesDataStart).to.be.a('function')
+            })
+    
+            it('Should return an action with type "LOAD_NAMES_START".', () => {
+              expect(actions.loadNamesDataStart())
+                .to.have.property('type', LOAD_NAMES_START)
+            })
+    
+            it('Passing `loadNamesDataStart()` to reducer should produce `loading` truth', () => {
+              const testStartState = cloneDeep(initialState)
+              const expected = cloneDeep(testStartState)
+              expected.refundRequestForm.isLoadingNames = true;
+    
+              const state = refundRequestReducer(testStartState, actions.loadNamesDataStart())
+    
+              expect(state).to.eql(expected)
+            })
+    
+          })
+    
+          describe('loadNamesDataLoaded', () => {
+            const namesData = [{"firstName": "Tommy", "lastName": "Turtle"}]
+    
+            it('Should export a constant LOAD_NAMES_ERROR.', () => {
+              expect(LOAD_NAMES_ERROR).to.equal('refund/RefundRequest/LOAD_NAMES_ERROR')
+            })
+    
+            it('Should be exported as a function.', () => {
+              expect(actions.loadNamesDataLoaded).to.be.a('function')
+            })
+    
+            it('Should return an action with type "LOAD_NAMES_LOADED".', () => {
+              expect(actions.loadNamesDataLoaded(namesData))
+                .to.have.property('type', LOAD_NAMES_LOADED)
+            })
+    
+            it('Should assign the first argument to `payload` property.', () => {
+              expect(actions.loadNamesDataLoaded(namesData))
+                .to.have.property('payload').and.eql(namesData)
+            })
+    
+            it('Passing `loadNamesDataLoaded()` to reducer should produce names', () => {
+              const namesData = [{"firstName": "Tommy", "lastName": "Turtle"}]
+              const testStartState = cloneDeep(initialState)
+              const expected = cloneDeep(testStartState)
+              expected.refundRequestForm.names = namesData
+    
+              let state = refundRequestReducer(testStartState, actions.loadNamesDataStart())
+              state = refundRequestReducer(state, actions.loadNamesDataLoaded(namesData))
+    
+              expect(state).to.eql(expected)
+            })
+    
+          })
+    
+          describe('loadNamesDataError', () => {
+    
+            it('Should export a constant LOAD_NAMES_LOADED.', () => {
+              expect(LOAD_NAMES_LOADED).to.equal('refund/RefundRequest/LOAD_NAMES_LOADED')
+            })
+    
+            it('Should be exported as a function.', () => {
+              expect(actions.loadNamesDataError).to.be.a('function')
+            })
+    
+            it('Should return an action with type "LOAD_NAMES_ERROR".', () => {
+              expect(actions.loadNamesDataError())
+                .to.have.property('type', LOAD_NAMES_ERROR)
+            })
+    
+            it('Passing `loadNamesDataError()` to reducer should produce `error` truth', () => {
+              const testStartState = cloneDeep(initialState)
+              const expected = cloneDeep(testStartState)
+              expected.refundRequestForm.name.isError = true;
+    
+              const state = refundRequestReducer(testStartState, actions.loadNamesDataError())
+    
+              expect(state).to.eql(expected)
+            })
+    
+          })
+    
+          describe('loadNamesData', () => {
+    
+            const stateHolder = {
+              state: {
+                refundRequest: cloneDeep(initialState)
+              }
             }
-          }
-          fetchMock.mock(paymentHistoryAPI.format(), 'GET', response)
-          stateHolder.state.refundRequest.isNegativeTesting = true;
-          return actions.loadPaymentHistoryData()(dispatchSpy, getStateSpy)
-            .then(() => {
-              expect(dispatchSpy).to.have.been.calledTwice
-              expect(dispatchSpy).to.have.been.calledWithExactly({
-                type: LOAD_PAYMENT_HISTORY_DATA_START
-              })
-              expect(dispatchSpy).to.have.been.calledWithExactly({
-                type: LOAD_PAYMENT_HISTORY_DATA_ERROR,
-                payload: {
-                  statusCode: 700,
-                  statusText: 'Bad data response'
-                }
-              })
-              // mocking setup using fully configured request in fluentRequest.
-              expect(fetchMock.called(paymentHistoryAPI.format())).to.be.true
+            stateHolder.state.refundRequest.lookupForm = cloneDeep(lookupFormData)
+            const {dispatchSpy, getStateSpy} = reducerSpy(refundRequestReducer, stateHolder)
+            let originalRootContext = null;
+    
+            beforeEach(() => {
+              originalRootContext = setRootContext('', url.parse(baseAPI))
             })
+    
+            afterEach(() => {
+              stateHolder.state.refundRequest = cloneDeep(initialState)
+              stateHolder.state.refundRequest.lookupForm = cloneDeep(lookupFormData)
+              stateHolder.state.refundRequest.refundRequestForm.names = null
+              dispatchSpy.reset()
+              getStateSpy.reset()
+              fetchMock.restore()  // mocking setup using fully configured request in fluentRequest.
+              setRootContext('', originalRootContext)
+            })
+    
+            it('Should be exported as a function.', () => {
+              expect(actions.loadNamesData).to.be.a('function')
+            })
+    
+            it('Should return a function (is a thunk).', () => {
+              expect(actions.loadNamesData()).to.be.a('function')
+            })
+    
+            it('Fetching loadNamesData through store returns a Promise', () => {
+              return expect(actions.loadNamesData()(dispatchSpy, getStateSpy))
+                .to.eventually.be.fulfilled
+            })
+    
+            it('Test loadNamesData dispatch and all the dispatches it makes', () => {
+              return actions.loadNamesData()(dispatchSpy, getStateSpy)
+                .then(() => {
+                  expect(dispatchSpy).to.have.been.calledTwice
+                  expect(dispatchSpy).to.have.been.calledWithExactly({
+                    type: LOAD_NAMES_START
+                  })
+                  expect(dispatchSpy).to.have.been.calledWithExactly({
+                    type: LOAD_NAMES_LOADED,
+                    payload: namesData
+                  })
+                  // mocking setup using fully configured request in fluentRequest.
+                  expect(fetchMock.called(namesAPI.format())).to.be.true
+                })
+            })
+    
+            it('State after loadNamesData contains list of names.', () => {
+              const expected = cloneDeep(initialState)
+              expected.lookupForm = lookupFormData
+              expected.refundRequestForm.names = namesData
+              return actions.loadNamesData()(dispatchSpy, getStateSpy)
+                .then(() => {
+                  expect(stateHolder.state.refundRequest).to.eql(expected)
+                })
+            })
+    
+            it('Test loadNamesData dispatch with bad data (#1) and all the dispatches it makes', () => {
+              fetchMock.restore()
+              fetchMock.mock(namesAPI.format(), 'GET', "['yow!',]")
+              stateHolder.state.refundRequest.isNegativeTesting = true;
+              return actions.loadNamesData()(dispatchSpy, getStateSpy)
+              // A catch below the 'then' below will catch failed expectations
+              // instead of Errors raised by loadPaymentHistoryData. That would be
+              // bad since an illuminating error message from the test wouldn't
+              // produced for the 'expect' failures.
+                .catch(() => {
+                  // Expect that any exception associated with a request is handled
+                  // without spreading the contagion.
+                  expect.fail()
+                })
+                .then(() => {
+                  expect(dispatchSpy).to.have.been.calledTwice
+                  expect(dispatchSpy).to.have.been.calledWithExactly({
+                    type: LOAD_NAMES_START
+                  })
+                  expect(dispatchSpy).to.have.been.calledWithExactly({
+                    type: LOAD_NAMES_ERROR
+                  })
+                  // mocking setup using fully configured request in fluentRequest.
+                  expect(fetchMock.called(namesAPI.format())).to.be.true
+                })
+            })
+    
+            it('Test loadNamesData dispatch with bad data (#2) and all the dispatches it makes', () => {
+              fetchMock.restore()
+              fetchMock.mock(namesAPI.format(), 'GET', JSON.stringify("yow!"))
+              stateHolder.state.refundRequest.isNegativeTesting = true;
+              return actions.loadNamesData()(dispatchSpy, getStateSpy)
+              // A catch below the 'then' below will catch failed expectations
+              // instead of Errors raised by loadPaymentHistoryData. That would be
+              // bad since an illuminating error message from the test wouldn't
+              // produced for the 'expect' failures.
+                .catch(() => {
+                  // Expect that any exception associated with a request is handled
+                  // without spreading the contagion.
+                  expect.fail()
+                })
+                .then(() => {
+                  expect(dispatchSpy).to.have.been.calledTwice
+                  expect(dispatchSpy).to.have.been.calledWithExactly({
+                    type: LOAD_NAMES_START
+                  })
+                  expect(dispatchSpy).to.have.been.calledWithExactly({
+                    type: LOAD_NAMES_ERROR
+                  })
+                  // mocking setup using fully configured request in fluentRequest.
+                  expect(fetchMock.called(namesAPI.format())).to.be.true
+                })
+            })
+          })
         })
+    
+        describe('Addresses Actions', () => {
+    
+          describe('loadAddressesDataStart', () => {
+            it('Should export a constant LOAD_ADDRESSES_START.', () => {
+              expect(LOAD_ADDRESSES_START).to.equal('refund/RefundRequest/LOAD_ADDRESSES_START')
+            })
+    
+            it('Should be exported as a function.', () => {
+              expect(actions.loadAddressesDataStart).to.be.a('function')
+            })
+    
+            it('Should return an action with type "LOAD_ADDRESSES_START".', () => {
+              expect(actions.loadAddressesDataStart())
+                .to.have.property('type', LOAD_ADDRESSES_START)
+            })
+    
+            it('Passing `loadAddressesDataStart()` to reducer should produce `loading` truth', () => {
+              const testStartState = cloneDeep(initialState)
+              const expected = cloneDeep(testStartState)
+              expected.refundRequestForm.isLoadingAddresses = true;
+    
+              const state = refundRequestReducer(testStartState, actions.loadAddressesDataStart())
+    
+              expect(state).to.eql(expected)
+            })
+    
+          })
+    
+          describe('loadAddressesDataLoaded', () => {
+            it('Should export a constant LOAD_ADDRESSES_LOADED.', () => {
+              expect(LOAD_ADDRESSES_LOADED).to.equal('refund/RefundRequest/LOAD_ADDRESSES_LOADED')
+            })
+    
+            it('Should be exported as a function.', () => {
+              expect(actions.loadAddressesDataLoaded).to.be.a('function')
+            })
+    
+            it('Should return an action with type "LOAD_ADDRESSES_LOADED".', () => {
+              expect(actions.loadAddressesDataLoaded(addressesData))
+                .to.have.property('type', LOAD_ADDRESSES_LOADED)
+            })
+    
+            it('Should assign the first argument to `payload` property.', () => {
+              expect(actions.loadAddressesDataLoaded(addressesData))
+                .to.have.property('payload').and.eql(addressesData)
+            })
+    
+            it('Passing `loadAddressesDataError()` to reducer should produce `error` truth', () => {
+              const testStartState = cloneDeep(initialState)
+              const expected = cloneDeep(testStartState)
+              expected.refundRequestForm.address.isError = true;
+    
+              const state = refundRequestReducer(testStartState, actions.loadAddressesDataError())
+    
+              expect(state).to.eql(expected)
+            })
+    
+          })
+    
+          describe('loadAddressesDataError', () => {
+            it('Should export a constant LOAD_ADDRESSES_ERROR.', () => {
+              expect(LOAD_ADDRESSES_ERROR).to.equal('refund/RefundRequest/LOAD_ADDRESSES_ERROR')
+            })
+    
+            it('Should be exported as a function.', () => {
+              expect(actions.loadAddressesDataError).to.be.a('function')
+            })
+    
+            it('Should return an action with type "LOAD_ADDRESSES_ERROR".', () => {
+              expect(actions.loadAddressesDataError())
+                .to.have.property('type', LOAD_ADDRESSES_ERROR)
+            })
+    
+            it('Passing `loadAddressesDataLoaded()` to reducer should produce addresses', () => {
+              const testStartState = cloneDeep(initialState)
+              const expected = cloneDeep(testStartState)
+              expected.refundRequestForm.addresses = addressesData
+    
+              let state = refundRequestReducer(testStartState, actions.loadAddressesDataStart())
+              state = refundRequestReducer(state, actions.loadAddressesDataLoaded(addressesData))
+    
+              expect(state).to.eql(expected)
+            })
+    
+          })
+    
+          describe('loadAddressesData', () => {
+            const stateHolder = {
+              state: {
+                refundRequest: cloneDeep(initialState)
+              }
+            }
+            stateHolder.state.refundRequest.lookupForm = cloneDeep(lookupFormData)
+            const {dispatchSpy, getStateSpy} = reducerSpy(refundRequestReducer, stateHolder)
+            let originalRootContext = null;
+    
+            beforeEach(() => {
+              originalRootContext = setRootContext('', url.parse(baseAPI))
+            })
+    
+            afterEach(() => {
+              stateHolder.state.refundRequest = cloneDeep(initialState)
+              stateHolder.state.refundRequest.lookupForm = cloneDeep(lookupFormData)
+              stateHolder.state.refundRequest.refundRequestForm.addresses = null;
+              dispatchSpy.reset()
+              getStateSpy.reset()
+              // mocking setup using fully configured request in fluentRequest.
+              fetchMock.restore()
+              setRootContext('', originalRootContext)
+            })
+    
+            it('Should be exported as a function.', () => {
+              expect(actions.loadAddressesData).to.be.a('function')
+            })
+    
+            it('Should return a function (is a thunk).', () => {
+              expect(actions.loadAddressesData()).to.be.a('function')
+            })
+    
+            it('Fetching loadAddressesData through store returns a Promise', () => {
+              return expect(actions.loadAddressesData()(dispatchSpy, getStateSpy))
+                .to.eventually.be.fulfilled
+            })
+    
+            it('Test loadAddressesData dispatch and all the dispatches it makes', () => {
+              return actions.loadAddressesData()(dispatchSpy, getStateSpy)
+                .then(() => {
+                  expect(dispatchSpy).to.have.been.calledTwice
+                  expect(dispatchSpy).to.have.been.calledWithExactly({
+                    type: LOAD_ADDRESSES_START
+                  })
+                  expect(dispatchSpy).to.have.been.calledWithExactly({
+                    type: LOAD_ADDRESSES_LOADED,
+                    payload: addressesData
+                  })
+                  // mocking setup using fully configured request in fluentRequest.
+                  expect(fetchMock.called(addressesAPI.format())).to.be.true
+                })
+            })
+    
+            it('State after loadAddressesData contains list of addresses.', () => {
+              const expected = cloneDeep(initialState)
+              expected.lookupForm = lookupFormData
+              expected.refundRequestForm.addresses = addressesData
+              return actions.loadAddressesData()(dispatchSpy, getStateSpy)
+                .then(() => {
+                  expect(stateHolder.state.refundRequest).to.eql(expected)
+                })
+            })
+    
+            it('Test loadAddressesData dispatch with bad data (#1) and all the dispatches it makes', () => {
+              fetchMock.restore()
+              fetchMock.mock(addressesAPI.format(), 'GET', "['yow!',]")
+              stateHolder.state.refundRequest.isNegativeTesting = true;
+              return actions.loadAddressesData()(dispatchSpy, getStateSpy)
+                .then(() => {
+                  expect(dispatchSpy).to.have.been.calledTwice
+                  expect(dispatchSpy).to.have.been.calledWithExactly({
+                    type: LOAD_ADDRESSES_START
+                  })
+                  expect(dispatchSpy).to.have.been.calledWithExactly({
+                    type: LOAD_ADDRESSES_ERROR
+                  })
+                  // mocking setup using fully configured request in fluentRequest.
+                  expect(fetchMock.called(addressesAPI.format())).to.be.true
+                })
+                .catch(() => {
+                  // Expect that any exception associated with a request is handled
+                  // without spreading the contagion.
+                  expect.fail()
+                })
+            })
+    
+            it('Test loadAddressesData dispatch with bad data (#2) and all the dispatches it makes', () => {
+              fetchMock.restore()
+              fetchMock.mock(addressesAPI.format(), 'GET', JSON.stringify("yow!"))
+              stateHolder.state.refundRequest.isNegativeTesting = true;
+              return actions.loadAddressesData()(dispatchSpy, getStateSpy)
+                .then(() => {
+                  expect(dispatchSpy).to.have.been.calledTwice
+                  expect(dispatchSpy).to.have.been.calledWithExactly({
+                    type: LOAD_ADDRESSES_START
+                  })
+                  expect(dispatchSpy).to.have.been.calledWithExactly({
+                    type: LOAD_ADDRESSES_ERROR
+                  })
+                  // mocking setup using fully configured request in fluentRequest.
+                  expect(fetchMock.called(addressesAPI.format())).to.be.true
+                })
+                .catch(() => {
+                  // Expect that any exception associated with a request is handled
+                  // without spreading the contagion.
+                  expect.fail()
+                })
+            })
+          })
+        })
+    
+        describe('Lookup Reference Data Actions', () => {
+          describe('lookupReferencedDataStart', () => {
+            it('Should export a constant LOOKUP_REFERENCED_DATA_LOADED.', () => {
+              expect(LOOKUP_REFERENCED_DATA_LOADED).to.equal('refund/RefundRequest/LOOKUP_REFERENCED_DATA_LOADED')
+            })
+
+            it('Should be exported as a function.', () => {
+              expect(actions.lookupReferencedDataStart).to.be.a('function')
+            })
+
+            it('Should return an action with type "LOOKUP_REFERENCED_DATA_START".', () => {
+              expect(actions.lookupReferencedDataStart())
+                .to.have.property('type', LOOKUP_REFERENCED_DATA_START)
+            })
+            
+            it('Passing `lookupReferencedDataStart()` to reducer should retain lookupForm `loading` truth from `validLookup()', () => {
+              const testStartState = cloneDeep(initialState)
+              const expected = cloneDeep(testStartState)
+              expected.lookupForm = cloneDeep(lookupFormData)
+              expected.lookupForm.isLookingUp = true
+    
+              let state = refundRequestReducer(testStartState, actions.validLookupStart(cloneDeep(lookupFormData)))
+              state = refundRequestReducer(state, actions.lookupReferencedDataStart())
+    
+              expect(state).to.eql(expected)
+            })
+            
+          })
+
+          describe('lookupReferencedDataLoaded', () => {
+            it('Should export a constant LOOKUP_REFERENCED_DATA_START.', () => {
+              expect(LOOKUP_REFERENCED_DATA_START).to.equal('refund/RefundRequest/LOOKUP_REFERENCED_DATA_START')
+            })
+
+            it('Should be exported as a function.', () => {
+              expect(actions.lookupReferencedDataLoaded).to.be.a('function')
+            })
+
+            it('Should return an action with type "LOOKUP_REFERENCED_DATA_LOADED".', () => {
+              expect(actions.lookupReferencedDataLoaded())
+                .to.have.property('type', LOOKUP_REFERENCED_DATA_LOADED)
+            })
+
+            it('Passing `lookupReferencedDataLoaded()` to reducer should produce `loading` truth', () => {
+              const testStartState = cloneDeep(initialState)
+              const expected = cloneDeep(testStartState)
+              expected.lookupForm = cloneDeep(lookupFormData)
+              expected.lookupForm.isLookingUp = true;
+    
+              let state = refundRequestReducer(testStartState, actions.validLookupStart(cloneDeep(lookupFormData)))
+              state = refundRequestReducer(state, actions.lookupReferencedDataLoaded())
+    
+              expect(state).to.eql(expected)
+            })
+          })
+
+          describe('lookupReferencedData (thunk)', () => {
+            const stateHolder = {
+              state: {
+                refundRequest: cloneDeep(initialState)
+              }
+            }
+            stateHolder.state.refundRequest.lookupForm = cloneDeep(lookupFormData)
+
+            const {dispatchSpy, getStateSpy} = reducerSpy(refundRequestReducer, stateHolder)
+            let originalRootContext = null;
+
+            beforeEach(() => {
+              originalRootContext = setRootContext('', url.parse(baseAPI))
+            })
+
+            afterEach(() => {
+              stateHolder.state.refundRequest = cloneDeep(initialState)
+              stateHolder.state.refundRequest.lookupForm = cloneDeep(lookupFormData);
+              dispatchSpy.reset()
+              getStateSpy.reset()
+              // mocking setup using fully configured request in fluentRequest.
+              fetchMock.restore()
+              setRootContext('', originalRootContext)
+            })
+
+            it('Should be exported as a function.', () => {
+              expect(actions.lookupReferencedData).to.be.a('function')
+            })
+
+            it('Should return a function (is a thunk).', () => {
+              expect(actions.lookupReferencedData()).to.be.a('function')
+            })
+
+            it('Fetching lookupReferencedData through store returns a Promise', () => {
+              return expect(actions.lookupReferencedData()(dispatchSpy, getStateSpy))
+                .to.eventually.be.fulfilled
+            })
+
+            it('Test lookupReferencedData dispatch and all the dispatches it makes', () => {
+              return actions.lookupReferencedData()(dispatchSpy, getStateSpy)
+                .then(() => {
+                  expect(dispatchSpy).to.have.callCount(12)
+                  expect(dispatchSpy).to.have.been.calledWithExactly({
+                    type: LOOKUP_REFERENCED_DATA_START
+                  })
+                  expect(dispatchSpy).to.have.been.calledWithExactly({
+                    type: LOAD_PAYMENT_HISTORY_DATA_START
+                  })
+                  expect(dispatchSpy).to.have.been.calledWithExactly({
+                    type: LOAD_NAMES_START
+                  })
+                  expect(dispatchSpy).to.have.been.calledWithExactly({
+                    type: LOAD_ADDRESSES_START
+                  })
+                  expect(dispatchSpy).to.have.been.calledWithExactly({
+                    type: LOAD_NAMES_LOADED,
+                    payload: namesData
+                  })
+                  expect(dispatchSpy).to.have.been.calledWithExactly({
+                    type: LOAD_ADDRESSES_LOADED,
+                    payload: addressesData
+                  })
+                  expect(dispatchSpy).to.have.been.calledWithExactly({
+                    type: LOAD_PAYMENT_HISTORY_DATA_LOADED,
+                    payload: paymentHistoryData
+                  })
+                  expect(dispatchSpy).to.have.been.calledWithExactly({
+                    type: LOOKUP_REFERENCED_DATA_LOADED
+                  })
+                  expect(dispatchSpy).to.have.been.calledWithExactly({
+                    type: VALID_LOOKUP_END
+                  })
+                  
+                  // mocking setup using fully configured request in fluentRequest.
+                  expect(fetchMock.called(paymentHistoryAPI.format())).to.be.true
+                  expect(fetchMock.called(namesAPI.format())).to.be.true
+                  expect(fetchMock.called(addressesAPI.format())).to.be.true
+                })
+            })
+
+            it('State after lookupReferencedData contains fees, names, addresses and entity types.', () => {
+              const expected = cloneDeep(initialState)
+              expected.lookupForm = lookupFormData
+              expected.refundRequestForm.fees = paymentHistoryData
+              expected.refundRequestForm.names = namesData
+              expected.refundRequestForm.addresses = addressesData
+              return actions.lookupReferencedData()(dispatchSpy, getStateSpy)
+                .then(() => {
+                  expect(stateHolder.state.refundRequest).to.eql(expected)
+                })
+            })
+          })
+        })
+  
       })
-    })
 
-    describe('Name Actions', () => {
-
-      describe('loadNamesDataStart', () => {
-
-        it('Should export a constant LOAD_NAMES_START.', () => {
-          expect(LOAD_NAMES_START).to.equal('refund/RefundRequest/LOAD_NAMES_START')
-        })
-
-        it('Should be exported as a function.', () => {
-          expect(actions.loadNamesDataStart).to.be.a('function')
-        })
-
-        it('Should return an action with type "LOAD_NAMES_START".', () => {
-          expect(actions.loadNamesDataStart())
-            .to.have.property('type', LOAD_NAMES_START)
-        })
-
-        it('Passing `loadNamesDataStart()` to reducer should produce `loading` truth', () => {
-          const expected = cloneDeep(initialState)
-          expected.refundRequestForm.isLoadingNames = true;
-
-          const state = refundRequestReducer(initialState, actions.loadNamesDataStart())
-
-          expect(state).to.eql(expected)
-        })
-
-      })
-
-      describe('loadNamesDataLoaded', () => {
-        const namesData = [{"firstName": "Tommy", "lastName": "Turtle"}]
-
-        it('Should export a constant LOAD_NAMES_ERROR.', () => {
-          expect(LOAD_NAMES_ERROR).to.equal('refund/RefundRequest/LOAD_NAMES_ERROR')
-        })
-
-        it('Should be exported as a function.', () => {
-          expect(actions.loadNamesDataLoaded).to.be.a('function')
-        })
-
-        it('Should return an action with type "LOAD_NAMES_LOADED".', () => {
-          expect(actions.loadNamesDataLoaded(namesData))
-            .to.have.property('type', LOAD_NAMES_LOADED)
-        })
-
-        it('Should assign the first argument to `payload` property.', () => {
-          expect(actions.loadNamesDataLoaded(namesData))
-            .to.have.property('payload').and.eql(namesData)
-        })
-
-        it('Passing `loadNamesDataLoaded()` to reducer should produce names', () => {
-          const namesData = [{"firstName": "Tommy", "lastName": "Turtle"}]
-          const expected = cloneDeep(initialState)
-          expected.refundRequestForm.names = namesData
-
-          let state = refundRequestReducer(initialState, actions.loadNamesDataStart())
-          state = refundRequestReducer(state, actions.loadNamesDataLoaded(namesData))
-
-          expect(state).to.eql(expected)
-        })
-
-      })
-
-      describe('loadNamesDataError', () => {
-
-        it('Should export a constant LOAD_NAMES_LOADED.', () => {
-          expect(LOAD_NAMES_LOADED).to.equal('refund/RefundRequest/LOAD_NAMES_LOADED')
-        })
-
-        it('Should be exported as a function.', () => {
-          expect(actions.loadNamesDataError).to.be.a('function')
-        })
-
-        it('Should return an action with type "LOAD_NAMES_ERROR".', () => {
-          expect(actions.loadNamesDataError())
-            .to.have.property('type', LOAD_NAMES_ERROR)
-        })
-
-        it('Passing `loadNamesDataError()` to reducer should produce `error` truth', () => {
-          const expected = cloneDeep(initialState)
-          expected.refundRequestForm.name.isError = true;
-
-          const state = refundRequestReducer(initialState, actions.loadNamesDataError())
-
-          expect(state).to.eql(expected)
-        })
-
-      })
-
-      describe('loadNamesData', () => {
-
-        const stateHolder = {
+      describe('validLookup (thunk)', () => {
+        const stateHolder                          = {
           state: {
             refundRequest: cloneDeep(initialState)
           }
         }
-        stateHolder.state.refundRequest.lookupForm = lookupFormData
-        const {dispatchSpy, getStateSpy} = reducerSpy(refundRequestReducer, stateHolder)
-        let originalRootContext = null;
+        stateHolder.state.refundRequest.lookupForm = cloneDeep(lookupFormData)
 
-        beforeEach(() => {
-          originalRootContext = setRootContext('', url.parse(baseAPI))
-        })
-
-        afterEach(() => {
-          stateHolder.state.refundRequest = cloneDeep(initialState)
-          stateHolder.state.refundRequest.lookupForm = cloneDeep(lookupFormData)
-          stateHolder.state.refundRequest.refundRequestForm.names = null
-          dispatchSpy.reset()
-          getStateSpy.reset()
-          fetchMock.restore()  // mocking setup using fully configured request in fluentRequest.
-          setRootContext('', originalRootContext)
-        })
-
-        it('Should be exported as a function.', () => {
-          expect(actions.loadNamesData).to.be.a('function')
-        })
-
-        it('Should return a function (is a thunk).', () => {
-          expect(actions.loadNamesData()).to.be.a('function')
-        })
-
-        it('Fetching loadNamesData through store returns a Promise', () => {
-          return expect(actions.loadNamesData()(dispatchSpy, getStateSpy))
-            .to.eventually.be.fulfilled
-        })
-
-        it('Test loadNamesData dispatch and all the dispatches it makes', () => {
-          return actions.loadNamesData()(dispatchSpy, getStateSpy)
-            .then(() => {
-              expect(dispatchSpy).to.have.been.calledTwice
-              expect(dispatchSpy).to.have.been.calledWithExactly({
-                type: LOAD_NAMES_START
-              })
-              expect(dispatchSpy).to.have.been.calledWithExactly({
-                type: LOAD_NAMES_LOADED,
-                payload: namesData
-              })
-              // mocking setup using fully configured request in fluentRequest.
-              expect(fetchMock.called(namesAPI.format())).to.be.true
-            })
-        })
-
-        it('State after loadNamesData contains list of names.', () => {
-          const expected = cloneDeep(initialState)
-          expected.lookupForm = cloneDeep(lookupFormData)
-          expected.refundRequestForm.names = namesData
-          return actions.loadNamesData()(dispatchSpy, getStateSpy)
-            .then(() => {
-              expect(stateHolder.state.refundRequest).to.eql(expected)
-            })
-        })
-
-        it('Test loadNamesData dispatch with bad data (#1) and all the dispatches it makes', () => {
-          fetchMock.restore()
-          fetchMock.mock(namesAPI.format(), 'GET', "['yow!',]")
-          stateHolder.state.refundRequest.isNegativeTesting = true;
-          return actions.loadNamesData()(dispatchSpy, getStateSpy)
-          // A catch below the 'then' below will catch failed expectations
-          // instead of Errors raised by loadPaymentHistoryData. That would be
-          // bad since an illuminating error message from the test wouldn't
-          // produced for the 'expect' failures.
-            .catch(() => {
-              // Expect that any exception associated with a request is handled
-              // without spreading the contagion.
-              expect.fail()
-            })
-            .then(() => {
-              expect(dispatchSpy).to.have.been.calledTwice
-              expect(dispatchSpy).to.have.been.calledWithExactly({
-                type: LOAD_NAMES_START
-              })
-              expect(dispatchSpy).to.have.been.calledWithExactly({
-                type: LOAD_NAMES_ERROR
-              })
-              // mocking setup using fully configured request in fluentRequest.
-              expect(fetchMock.called(namesAPI.format())).to.be.true
-            })
-        })
-
-        it('Test loadNamesData dispatch with bad data (#2) and all the dispatches it makes', () => {
-          fetchMock.restore()
-          fetchMock.mock(namesAPI.format(), 'GET', JSON.stringify("yow!"))
-          stateHolder.state.refundRequest.isNegativeTesting = true;
-          return actions.loadNamesData()(dispatchSpy, getStateSpy)
-          // A catch below the 'then' below will catch failed expectations
-          // instead of Errors raised by loadPaymentHistoryData. That would be
-          // bad since an illuminating error message from the test wouldn't
-          // produced for the 'expect' failures.
-            .catch(() => {
-              // Expect that any exception associated with a request is handled
-              // without spreading the contagion.
-              expect.fail()
-            })
-            .then(() => {
-              expect(dispatchSpy).to.have.been.calledTwice
-              expect(dispatchSpy).to.have.been.calledWithExactly({
-                type: LOAD_NAMES_START
-              })
-              expect(dispatchSpy).to.have.been.calledWithExactly({
-                type: LOAD_NAMES_ERROR
-              })
-              // mocking setup using fully configured request in fluentRequest.
-              expect(fetchMock.called(namesAPI.format())).to.be.true
-            })
-        })
-      })
-    })
-
-    describe('Addresses Actions', () => {
-
-      describe('loadAddressesDataStart', () => {
-        it('Should export a constant LOAD_ADDRESSES_START.', () => {
-          expect(LOAD_ADDRESSES_START).to.equal('refund/RefundRequest/LOAD_ADDRESSES_START')
-        })
-
-        it('Should be exported as a function.', () => {
-          expect(actions.loadAddressesDataStart).to.be.a('function')
-        })
-
-        it('Should return an action with type "LOAD_ADDRESSES_START".', () => {
-          expect(actions.loadAddressesDataStart())
-            .to.have.property('type', LOAD_ADDRESSES_START)
-        })
-
-        it('Passing `loadAddressesDataStart()` to reducer should produce `loading` truth', () => {
-          const expected = cloneDeep(initialState)
-          expected.refundRequestForm.isLoadingAddresses = true;
-
-          const state = refundRequestReducer(initialState, actions.loadAddressesDataStart())
-
-          expect(state).to.eql(expected)
-        })
-
-      })
-
-      describe('loadAddressesDataLoaded', () => {
-        it('Should export a constant LOAD_ADDRESSES_LOADED.', () => {
-          expect(LOAD_ADDRESSES_LOADED).to.equal('refund/RefundRequest/LOAD_ADDRESSES_LOADED')
-        })
-
-        it('Should be exported as a function.', () => {
-          expect(actions.loadAddressesDataLoaded).to.be.a('function')
-        })
-
-        it('Should return an action with type "LOAD_ADDRESSES_LOADED".', () => {
-          expect(actions.loadAddressesDataLoaded(addressesData))
-            .to.have.property('type', LOAD_ADDRESSES_LOADED)
-        })
-
-        it('Should assign the first argument to `payload` property.', () => {
-          expect(actions.loadAddressesDataLoaded(addressesData))
-            .to.have.property('payload').and.eql(addressesData)
-        })
-
-        it('Passing `loadAddressesDataError()` to reducer should produce `error` truth', () => {
-          const expected = cloneDeep(initialState)
-          expected.refundRequestForm.address.isError = true;
-
-          const state = refundRequestReducer(initialState, actions.loadAddressesDataError())
-
-          expect(state).to.eql(expected)
-        })
-
-      })
-
-      describe('loadAddressesDataError', () => {
-        it('Should export a constant LOAD_ADDRESSES_ERROR.', () => {
-          expect(LOAD_ADDRESSES_ERROR).to.equal('refund/RefundRequest/LOAD_ADDRESSES_ERROR')
-        })
-
-        it('Should be exported as a function.', () => {
-          expect(actions.loadAddressesDataError).to.be.a('function')
-        })
-
-        it('Should return an action with type "LOAD_ADDRESSES_ERROR".', () => {
-          expect(actions.loadAddressesDataError())
-            .to.have.property('type', LOAD_ADDRESSES_ERROR)
-        })
-
-        it('Passing `loadAddressesDataLoaded()` to reducer should produce addresses', () => {
-          const expected = cloneDeep(initialState)
-          expected.refundRequestForm.addresses = addressesData
-
-          let state = refundRequestReducer(initialState, actions.loadAddressesDataStart())
-          state = refundRequestReducer(state, actions.loadAddressesDataLoaded(addressesData))
-
-          expect(state).to.eql(expected)
-        })
-
-      })
-
-      describe('loadAddressesData', () => {
-        const stateHolder = {
-          state: {
-            refundRequest: cloneDeep(initialState)
-          }
-        }
-        stateHolder.state.refundRequest.lookupForm = lookupFormData
-        const {dispatchSpy, getStateSpy} = reducerSpy(refundRequestReducer, stateHolder)
-        let originalRootContext = null;
-
-        beforeEach(() => {
-          originalRootContext = setRootContext('', url.parse(baseAPI))
-        })
-
-        afterEach(() => {
-          stateHolder.state.refundRequest = cloneDeep(initialState)
-          stateHolder.state.refundRequest.lookupForm = cloneDeep(lookupFormData)
-          stateHolder.state.refundRequest.refundRequestForm.addresses = null;
-          dispatchSpy.reset()
-          getStateSpy.reset()
-          // mocking setup using fully configured request in fluentRequest.
-          fetchMock.restore()
-          setRootContext('', originalRootContext)
-        })
-
-        it('Should be exported as a function.', () => {
-          expect(actions.loadAddressesData).to.be.a('function')
-        })
-
-        it('Should return a function (is a thunk).', () => {
-          expect(actions.loadAddressesData()).to.be.a('function')
-        })
-
-        it('Fetching loadAddressesData through store returns a Promise', () => {
-          return expect(actions.loadAddressesData()(dispatchSpy, getStateSpy))
-            .to.eventually.be.fulfilled
-        })
-
-        it('Test loadAddressesData dispatch and all the dispatches it makes', () => {
-          return actions.loadAddressesData()(dispatchSpy, getStateSpy)
-            .then(() => {
-              expect(dispatchSpy).to.have.been.calledTwice
-              expect(dispatchSpy).to.have.been.calledWithExactly({
-                type: LOAD_ADDRESSES_START
-              })
-              expect(dispatchSpy).to.have.been.calledWithExactly({
-                type: LOAD_ADDRESSES_LOADED,
-                payload: addressesData
-              })
-              // mocking setup using fully configured request in fluentRequest.
-              expect(fetchMock.called(addressesAPI.format())).to.be.true
-            })
-        })
-
-        it('State after loadAddressesData contains list of addresses.', () => {
-          const expected = cloneDeep(initialState)
-          expected.lookupForm = cloneDeep(lookupFormData)
-          expected.refundRequestForm.addresses = addressesData
-          return actions.loadAddressesData()(dispatchSpy, getStateSpy)
-            .then(() => {
-              expect(stateHolder.state.refundRequest).to.eql(expected)
-            })
-        })
-
-        it('Test loadAddressesData dispatch with bad data (#1) and all the dispatches it makes', () => {
-          fetchMock.restore()
-          fetchMock.mock(addressesAPI.format(), 'GET', "['yow!',]")
-          stateHolder.state.refundRequest.isNegativeTesting = true;
-          return actions.loadAddressesData()(dispatchSpy, getStateSpy)
-            .then(() => {
-              expect(dispatchSpy).to.have.been.calledTwice
-              expect(dispatchSpy).to.have.been.calledWithExactly({
-                type: LOAD_ADDRESSES_START
-              })
-              expect(dispatchSpy).to.have.been.calledWithExactly({
-                type: LOAD_ADDRESSES_ERROR
-              })
-              // mocking setup using fully configured request in fluentRequest.
-              expect(fetchMock.called(addressesAPI.format())).to.be.true
-            })
-            .catch(() => {
-              // Expect that any exception associated with a request is handled
-              // without spreading the contagion.
-              expect.fail()
-            })
-        })
-
-        it('Test loadAddressesData dispatch with bad data (#2) and all the dispatches it makes', () => {
-          fetchMock.restore()
-          fetchMock.mock(addressesAPI.format(), 'GET', JSON.stringify("yow!"))
-          stateHolder.state.refundRequest.isNegativeTesting = true;
-          return actions.loadAddressesData()(dispatchSpy, getStateSpy)
-            .then(() => {
-              expect(dispatchSpy).to.have.been.calledTwice
-              expect(dispatchSpy).to.have.been.calledWithExactly({
-                type: LOAD_ADDRESSES_START
-              })
-              expect(dispatchSpy).to.have.been.calledWithExactly({
-                type: LOAD_ADDRESSES_ERROR
-              })
-              // mocking setup using fully configured request in fluentRequest.
-              expect(fetchMock.called(addressesAPI.format())).to.be.true
-            })
-            .catch(() => {
-              // Expect that any exception associated with a request is handled
-              // without spreading the contagion.
-              expect.fail()
-            })
-        })
-      })
-    })
-
-    describe('Lookup Reference Data Actions', () => {
-
-      describe('lookupReferencedDataLoaded', () => {
-        it('Should export a constant LOOKUP_REFERENCED_DATA_START.', () => {
-          expect(LOOKUP_REFERENCED_DATA_START).to.equal('refund/RefundRequest/LOOKUP_REFERENCED_DATA_START')
-        })
-
-        it('Should be exported as a function.', () => {
-          expect(actions.lookupReferencedDataLoaded).to.be.a('function')
-        })
-
-        it('Should return an action with type "LOOKUP_REFERENCED_DATA_LOADED".', () => {
-          expect(actions.lookupReferencedDataLoaded())
-            .to.have.property('type', LOOKUP_REFERENCED_DATA_LOADED)
-        })
-      })
-
-      describe('lookupReferencedDataStart', () => {
-        it('Should export a constant LOOKUP_REFERENCED_DATA_LOADED.', () => {
-          expect(LOOKUP_REFERENCED_DATA_LOADED).to.equal('refund/RefundRequest/LOOKUP_REFERENCED_DATA_LOADED')
-        })
-
-        it('Should be exported as a function.', () => {
-          expect(actions.lookupReferencedDataStart).to.be.a('function')
-        })
-
-        it('Should return an action with type "PDF_LOADED".', () => {
-          expect(actions.lookupReferencedDataStart())
-            .to.have.property('type', LOOKUP_REFERENCED_DATA_START)
-        })
-      })
-
-      describe('lookupReferencedData', () => {
-        const stateHolder = {
-          state: {
-            refundRequest: cloneDeep(initialState)
-          }
-        }
-        stateHolder.state.refundRequest.lookupForm = lookupFormData
-
-        const {dispatchSpy, getStateSpy} = reducerSpy(refundRequestReducer, stateHolder)
-        let originalRootContext = null;
-
-        beforeEach(() => {
-          originalRootContext = setRootContext('', url.parse(baseAPI))
-        })
-
-        afterEach(() => {
-          stateHolder.state.refundRequest = cloneDeep(initialState)
-          stateHolder.state.refundRequest.lookupForm = cloneDeep(lookupFormData);
-          dispatchSpy.reset()
-          getStateSpy.reset()
-          // mocking setup using fully configured request in fluentRequest.
-          fetchMock.restore()
-          setRootContext('', originalRootContext)
-        })
-
-        it('Should be exported as a function.', () => {
-          expect(actions.lookupReferencedData).to.be.a('function')
-        })
-
-        it('Should return a function (is a thunk).', () => {
-          expect(actions.lookupReferencedData()).to.be.a('function')
-        })
-
-        it('Fetching lookupReferencedData through store returns a Promise', () => {
-          return expect(actions.lookupReferencedData()(dispatchSpy, getStateSpy))
-            .to.eventually.be.fulfilled
-        })
-
-        it('Test lookupReferencedData dispatch and all the dispatches it makes', () => {
-          return actions.lookupReferencedData()(dispatchSpy, getStateSpy)
-            .then(() => {
-              expect(dispatchSpy).to.have.callCount(11)
-              expect(dispatchSpy).to.have.been.calledWithExactly({
-                type: LOOKUP_REFERENCED_DATA_START
-              })
-              expect(dispatchSpy).to.have.been.calledWithExactly({
-                type: LOAD_PAYMENT_HISTORY_DATA_START
-              })
-              expect(dispatchSpy).to.have.been.calledWithExactly({
-                type: LOAD_PAYMENT_HISTORY_DATA_LOADED,
-                payload: paymentHistoryData
-              })
-              expect(dispatchSpy).to.have.been.calledWithExactly({
-                type: LOAD_NAMES_START
-              })
-              expect(dispatchSpy).to.have.been.calledWithExactly({
-                type: LOAD_NAMES_LOADED,
-                payload: namesData
-              })
-              expect(dispatchSpy).to.have.been.calledWithExactly({
-                type: LOAD_ADDRESSES_START
-              })
-              expect(dispatchSpy).to.have.been.calledWithExactly({
-                type: LOAD_ADDRESSES_LOADED,
-                payload: addressesData
-              })
-              expect(dispatchSpy).to.have.been.calledWithExactly({
-                type: LOOKUP_REFERENCED_DATA_LOADED
-              })
-              // mocking setup using fully configured request in fluentRequest.
-              expect(fetchMock.called(paymentHistoryAPI.format())).to.be.true
-              expect(fetchMock.called(namesAPI.format())).to.be.true
-              expect(fetchMock.called(addressesAPI.format())).to.be.true
-            })
-        })
-
-        it('State after lookupReferencedData contains fees, names, addresses and entity types.', () => {
-          const expected = cloneDeep(initialState)
-          expected.lookupForm = cloneDeep(lookupFormData)
-          expected.refundRequestForm.fees = paymentHistoryData
-          expected.refundRequestForm.names = namesData
-          expected.refundRequestForm.addresses = addressesData
-          return actions.lookupReferencedData()(dispatchSpy, getStateSpy)
-            .then(() => {
-              expect(stateHolder.state.refundRequest).to.eql(expected)
-            })
-        })
-      })
-
-    })
-
-    describe('Valid Lookup Actions', () => {
-      it('Should export a constant VALID_LOOKUP.', () => {
-        expect(VALID_LOOKUP).to.equal('refund/RefundRequest/VALID_LOOKUP')
-      })
-
-      it('Passing `validLookup()` to reducer should produce lookup form data', () => {
-        const testStartState = cloneDeep(initialState)
-
-        testStartState.refundRequestForm.name.found = true
-        testStartState.refundRequestForm.address.found = true
-        testStartState.refundRequestForm.acknowledgement = true
-
-        const expected = cloneDeep(testStartState)
-
-        expected.lookupForm = lookupFormData
-        let state = refundRequestReducer(testStartState, {
-          type: VALID_LOOKUP,
-          payload: lookupFormData
-        })
-        expect(state).to.eql(expected)
-
-        expected.isResettingRefundForm = true;
-        expected.refundRequestForm.name.found = false
-        expected.refundRequestForm.address.found = false
-        expected.refundRequestForm.acknowledgement = false
-        state = refundRequestReducer(state, {
-          type: PRE_RESET_REFUND_REQUEST_FORM
-        })
-
-        expect(state).to.eql(expected)
-
-        expected.isResettingRefundForm = false;
-        state = refundRequestReducer(state, {
-          type: POST_RESET_REFUND_REQUEST_FORM
-        })
-
-        expect(state).to.eql(expected)
-      })
-
-      describe('validLookup thunk', () => {
-        const stateHolder = {
-          state: {
-            refundRequest: cloneDeep(initialState)
-          }
-        }
-        stateHolder.state.refundRequest.lookupForm = lookupFormData
-
-        const {dispatchSpy, getStateSpy} = reducerSpy(refundRequestReducer, stateHolder)
+        const { dispatchSpy, getStateSpy } = reducerSpy(refundRequestReducer, stateHolder)
         let originalRootContext = null;
 
         beforeEach(() => {
@@ -1110,25 +1146,21 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
           setRootContext('', originalRootContext)
         })
 
-        it('Should be exported as a function.', () => {
-          expect(actions.validLookup).to.be.a('function')
-        })
-
         it('Should return a function (is a thunk).', () => {
-          expect(actions.validLookup(lookupFormData)).to.be.a('function')
+          expect(actions.validLookup(cloneDeep(lookupFormData))).to.be.a('function')
         })
 
-        it('Running validLookup through store returns Promise.', () => {
-          return expect(actions.validLookup(lookupFormData)(dispatchSpy, getStateSpy))
+        it('`validLookup()` expected to returns Promise.', () => {
+          return expect(actions.validLookup(cloneDeep(lookupFormData))(dispatchSpy, getStateSpy))
             .to.eventually.be.fulfilled
         })
 
         it('Test validLookup dispatch and all the dispatches it makes', () => {
-          return actions.validLookup(lookupFormData)(dispatchSpy, getStateSpy)
+          return actions.validLookup(cloneDeep(lookupFormData))(dispatchSpy, getStateSpy)
             .then(() => {
-              expect(dispatchSpy).to.have.callCount(17)
+              expect(dispatchSpy).to.have.callCount(18)
               expect(dispatchSpy).to.have.been.calledWithExactly({
-                type: VALID_LOOKUP,
+                type   : VALID_LOOKUP_START,
                 payload: lookupFormData
               })
               // Neither of these work to test if resetRefundRequestForm() has been called:
@@ -1138,7 +1170,7 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
                 type: PRE_RESET_REFUND_REQUEST_FORM
               })
               expect(dispatchSpy).to.have.been.calledWithExactly({
-                meta: {form: "resetRefundRequestForm"},
+                meta: { form: "resetRefundRequestForm" },
                 type: "redux-form/RESET"
               })
               expect(dispatchSpy).to.have.been.calledWithExactly({
@@ -1151,26 +1183,30 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
                 type: LOAD_PAYMENT_HISTORY_DATA_START
               })
               expect(dispatchSpy).to.have.been.calledWithExactly({
-                type: LOAD_PAYMENT_HISTORY_DATA_LOADED,
-                payload: paymentHistoryData
+                type: LOAD_NAMES_START
               })
               expect(dispatchSpy).to.have.been.calledWithExactly({
-                type: LOAD_NAMES_START
+                type: LOAD_ADDRESSES_START
               })
               expect(dispatchSpy).to.have.been.calledWithExactly({
                 type: LOAD_NAMES_LOADED,
                 payload: namesData
               })
               expect(dispatchSpy).to.have.been.calledWithExactly({
-                type: LOAD_ADDRESSES_START
-              })
-              expect(dispatchSpy).to.have.been.calledWithExactly({
                 type: LOAD_ADDRESSES_LOADED,
                 payload: addressesData
               })
               expect(dispatchSpy).to.have.been.calledWithExactly({
+                type: LOAD_PAYMENT_HISTORY_DATA_LOADED,
+                payload: paymentHistoryData
+              })
+              expect(dispatchSpy).to.have.been.calledWithExactly({
                 type: LOOKUP_REFERENCED_DATA_LOADED
               })
+              expect(dispatchSpy).to.have.been.calledWithExactly({
+                type: VALID_LOOKUP_END
+              })
+              
               // mocking setup using fully configured request in fluentRequest.
               expect(fetchMock.called(paymentHistoryAPI.format())).to.be.true
               expect(fetchMock.called(namesAPI.format())).to.be.true
@@ -1178,19 +1214,21 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
             })
         })
 
-        it('State after validLookup contains lookupFormData, fees, names, addresses and entity types.', () => {
-          const expected = cloneDeep(initialState)
-          expected.lookupForm = cloneDeep(lookupFormData)
-          expected.refundRequestForm.fees = paymentHistoryData
-          expected.refundRequestForm.names = namesData
-          expected.refundRequestForm.addresses = addressesData
-          return actions.validLookup(lookupFormData)(dispatchSpy, getStateSpy)
-            .then(() => {
-              expect(stateHolder.state.refundRequest).to.eql(expected)
-            })
-        })
+        it(
+          'State after validLookup contains lookupFormData, fees, names, addresses and entity types.',
+          () => {
+            const expected                       = cloneDeep(initialState)
+            expected.lookupForm                  = lookupFormData
+            expected.refundRequestForm.fees      = paymentHistoryData
+            expected.refundRequestForm.names     = namesData
+            expected.refundRequestForm.addresses = addressesData
+            return actions.validLookup(cloneDeep(lookupFormData))(dispatchSpy, getStateSpy)
+              .then(() => {
+                expect(stateHolder.state.refundRequest).to.eql(expected)
+              })
+          })
       })
-
+  
     })
 
     describe('Refund Request Actions', () => {
@@ -1209,12 +1247,13 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
         })
 
         it('Passing `postRefundRequest()` to reducer should produce...', () => {
-          const expected = cloneDeep(initialState)
+          const testStartState = cloneDeep(initialState)
+          const expected = cloneDeep(testStartState)
 
           expected.pdf.file = {}
           expected.pdf.binaryContent = pdfBinaryData
           expected.isSaving = true;
-          let state = refundRequestReducer(initialState, actions.loadingPdf({}))
+          let state = refundRequestReducer(testStartState, actions.loadingPdf({}))
           state = refundRequestReducer(state, actions.pdfBinary(pdfBinaryData))
           state = refundRequestReducer(state, actions.pdfLoaded())
           state = refundRequestReducer(state, actions.postRefundRequest())
@@ -1243,10 +1282,11 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
         })
 
         it('Passing `savedRefundRequest()` to reducer should produce...', () => {
-          const expected = cloneDeep(initialState)
+          const testStartState = cloneDeep(initialState)
+          const expected = cloneDeep(testStartState)
 
           expected.isSaved = true;
-          let state = refundRequestReducer(initialState, actions.loadingPdf({}))
+          let state = refundRequestReducer(testStartState, actions.loadingPdf({}))
           state = refundRequestReducer(state, actions.pdfBinary(pdfBinaryData))
           state = refundRequestReducer(state, actions.pdfLoaded())
           state = refundRequestReducer(state, actions.postRefundRequest())
@@ -1331,9 +1371,10 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
         })
 
         it('Passing `clearErrorReport()` to reducer should produce addresses', () => {
-          const expected = cloneDeep(initialState)
+          const testStartState = cloneDeep(initialState)
+          const expected = cloneDeep(testStartState)
 
-          let state = refundRequestReducer(initialState, actions.loadNamesDataError())
+          let state = refundRequestReducer(testStartState, actions.loadNamesDataError())
           state = refundRequestReducer(state, actions.loadAddressesDataError())
           state = refundRequestReducer(state,
             actions.loadPaymentHistoryDataError(errorReport))

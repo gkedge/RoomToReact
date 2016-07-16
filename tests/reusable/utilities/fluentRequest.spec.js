@@ -23,16 +23,14 @@ describe('fluentRequest', function () { // Can't use '() ==> here...
   this.timeout(200); // ... because this 'this' would be wrong.
 
   const jsonType = 'application/json; charset=utf-8'
-  const testRootContext = 'http://www.mocky.io/v2'
-  // const testUrlStr = 'https://api.github.com/zen'
-  const testUrlStr = 'http://www.mocky.io/v2/577c84c2100000ab254c2333'
-  // const testUrlStr = 'http://www.mocky.io/v2/5779b9b71300007126bc3f0e?zippy=yow&zip=yowsa'
+  const defaultRootContext = '//unit-test'
+  const testUrlStr = '//unit-test-full-url/is/there/anybody/out/there'
   const testPartialUrlStr = 'turtles'
   let origDefaultContext = null;
   let testOptions:OptionsType = cloneDeep(defaultOpts)
 
   before(() => {
-    origDefaultContext = setRootContext('', urlUtil.parse('//unit-test'))
+    origDefaultContext = setRootContext('', urlUtil.parse(defaultRootContext))
   })
 
   after(() => {
@@ -137,6 +135,22 @@ describe('fluentRequest', function () { // Can't use '() ==> here...
 
       expect(request.getUrl().format()).to.be.equal(expectedUrl)
     })
+    
+    it('setQueryParams()', () => {
+      const expectedUrl = getRootContext().format() +
+                          testPartialUrlStr + 
+                          '?pet=turtle&name=Yertle'
+
+      const request = new Request(urlUtil.parse(testPartialUrlStr), testOptions)
+        .setQueryParam('pet', 'turtle')
+        .setQueryParam('name', 'Yertle')
+
+      expect(request.getUrl().format()).to.be.equal(expectedUrl)
+    })
+
+  })
+
+  describe('queryParam', () => {
   })
 
   describe('# get', () => {
@@ -148,7 +162,7 @@ describe('fluentRequest', function () { // Can't use '() ==> here...
               "fluent-request": "rocks!"
             },
             headers: {
-              'Content-Type': 'application/json; charset=utf-8'
+              'Content-Type': jsonType
             }
           })
         return request
@@ -174,7 +188,7 @@ describe('fluentRequest', function () { // Can't use '() ==> here...
           .mock({
             body: JSON.stringify({ "fluent-request": "rocks!" }),
             headers: {
-              'Content-Type': 'application/json; charset=utf-8'
+              'Content-Type': jsonType
             }
           })
         return request
@@ -205,7 +219,7 @@ describe('fluentRequest', function () { // Can't use '() ==> here...
               "fluent-request": "rocks!"
             },
             headers: {
-              'Content-Type': 'application/json; charset=utf-8'
+              'Content-Type': jsonType
             }
           })
         return request
@@ -229,7 +243,7 @@ describe('fluentRequest', function () { // Can't use '() ==> here...
               "fluent-request": "rocks!"
             },
             headers: {
-              'Content-Type': 'application/json; charset=utf-8'
+              'Content-Type': jsonType
             }
           })
         return request
@@ -254,7 +268,7 @@ describe('fluentRequest', function () { // Can't use '() ==> here...
               "fluent-request": "rocks!"
             },
             headers: {
-              'Content-Type': 'application/json; charset=utf-8'
+              'Content-Type': jsonType
             }
           })
         return request
@@ -288,7 +302,7 @@ describe('fluentRequest', function () { // Can't use '() ==> here...
             "fluent-request": "rocks!"
           },
           headers: {
-            'Content-Type': 'application/json; charset=utf-8'
+            'Content-Type': jsonType
           }
         })
       return request
@@ -320,7 +334,7 @@ describe('fluentRequest', function () { // Can't use '() ==> here...
             "fluent-request": "rocks!"
           },
           headers: {
-            'Content-Type': 'application/json; charset=utf-8'
+            'Content-Type': jsonType
           }
         })
 
@@ -352,7 +366,7 @@ describe('fluentRequest', function () { // Can't use '() ==> here...
             "fluent-request": "rocks!"
           },
           headers: {
-            'Content-Type': 'application/json; charset=utf-8'
+            'Content-Type': jsonType
           }
         })
       return request
@@ -388,7 +402,7 @@ describe('fluentRequest', function () { // Can't use '() ==> here...
             "fluent-request": "rocks!"
           },
           headers: {
-            'Content-Type': 'application/json; charset=utf-8'
+            'Content-Type': jsonType
           }
         })
       return request
@@ -424,7 +438,7 @@ describe('fluentRequest', function () { // Can't use '() ==> here...
             "fluent-request": "rocks!"
           },
           headers: {
-            'Content-Type': 'application/json; charset=utf-8'
+            'Content-Type': jsonType
           }
         })
       return request

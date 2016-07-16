@@ -349,7 +349,8 @@ export class Request {
   }
 
   setQueryParam(queryKey:string, queryValue:string):Request {
-    const newQueryParams = (this.url.query ? '&' : '?') + queryKey + '=' + queryValue
+    const newQueryParams = (this.url.query ? '&' : '?') +
+                           queryKey + '=' + queryValue
     this.url = urlUtil.parse(this.url.format() + newQueryParams)
     return this
   }
