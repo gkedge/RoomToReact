@@ -35,12 +35,10 @@ const invalidKeyToMessageMap = {
   'bad-alpha-position':           "Misplaced character",
   'bad-alpha-position-tip':       badAlphaPositionTip,
   'bad-email-format-tip':         "Contains invalid characters or exceeds length limits",
-  'bad-first-two-chars':          "If alpha, first 2 chars alpha",
-  'bad-first-two-chars-tip':      "Alpha okay in first 2 characters, but both need to be alpha",
   'email-missing-separators':     "Must have '@' and '.'",
   'email-missing-separators-tip': "Email have the format: <i>text</i>@<i>text</i>.<i>text</i>",
-  'high-range':                   "Must < 9 characters",
-  'high-range-tip':               "Number cannot exceed 8 characters in length",
+  'high-range':                   "Must < 20 characters",
+  'high-range-tip':               "Number cannot exceed 20 characters in length",
   'less-than-data-to':            "From is less than To",
   'less-than-data-to-tip':        "'From' date must be greater than or equal 'To' date",
   'low-range':                    "Must > 6 characters",
@@ -58,25 +56,25 @@ const validate = (values:LookupFormDataType):Object => {
   else if (referenceNum.length < 7) {
     errors.referenceNum = 'low-range'
   }
-  else if (referenceNum.length > 17) {
+  else if (referenceNum.length > 20) {
     errors.referenceNum = 'high-range'
   }
   else if (!/^[A-Za-z\d][A-Za-z\d\/,-]*$/.test(referenceNum)) {
     errors.referenceNum = 'bad-alpha-position'
   }
-  //if (!dateFrom) {
+  // if (!dateFrom) {
   //  errors.dateFrom = 'required'
-  //}
-  //if (!dateTo) {
+  // }
+  // if (!dateTo) {
   //  errors.dateTo = 'required'
-  //}
-  //if (dateFrom && dateTo) {
+  // }
+  // if (dateFrom && dateTo) {
   //  const diff = compare(dateFrom, dateTo)
   //  if (diff > 0) {
   //    errors.dateFrom = 'less-than-data-to'
   //    errors.dateTo = 'less-than-data-to'
   //  }
-  //}
+  // }
   if (email) {
     if (!(/\S*@\S*\./).test(email)) {
       errors.email = 'email-missing-separators'
@@ -91,17 +89,18 @@ const validate = (values:LookupFormDataType):Object => {
 const renderReferenceNum = (fieldProps:Object):?Object => {
   // <img href='circle-questionmark.jpg' />
   const info = '<ul style="list-style: none; margin: 0; padding: 0">' +
-    '<li>Number must be 7 or 8 characters in length</li>' +
+    '<li>Number must be 7 or 20 characters in length</li>' +
     '<li><label>Format:</label></li>' +
     '<ul>' +
     '<li>Numbers (0-9)</li>' +
-    '<li>First two characters may be alphabetic</li>' +
-    '<li>If any alphabetic, there must be two</li>' +
+    '<li>First character limited to alphabetic/numeric;<br/>' +
+    'remaining may also contain comma, slash('/') or dash.</li>' +
     '</ul>' +
     '<li><label style="padding-top: 1rem">E.g.:</label></li>' +
     '<ul style="padding-bottom: 0">' +
     '<li style="font-family: monospace;">06152000</li>' +
     '<li style="font-family: monospace;">BD032403</li>' +
+    '<li style="font-family: monospace;">BD/032403</li>' +
     '<li style="font-family: monospace;">0123456</li>' +
     '</ul>' +
     '</ul>'

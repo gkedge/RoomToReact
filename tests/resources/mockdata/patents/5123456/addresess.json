@@ -1,0 +1,668 @@
+{
+  "success": true,
+  "errorMessageText": [],
+  "infoMessageText": [],
+  "warnMessageText": [],
+  "model": [
+    {
+      "version": 0,
+      "streetLineOne": "1560 BROADWAY STEET, SUITE 1200",
+      "streetLineTwo": " ",
+      "cityName": "DENVER",
+      "geographicRegionModel": {
+        "geographicRegionCategory": null,
+        "geographicRegionText": "CO ",
+        "geographicRegionName": "COLORADO"
+      },
+      "countryCode": "US",
+      "countryName": "UNITED STATES",
+      "postalCode": "80202",
+      "type": "Attorney Address"
+    },
+    {
+      "version": 0,
+      "streetLineOne": "1560 BROADWAY",
+      "streetLineTwo": "SUITE 1200",
+      "cityName": "DENVER",
+      "geographicRegionModel": {
+        "geographicRegionCategory": null,
+        "geographicRegionText": "CO ",
+        "geographicRegionName": "COLORADO"
+      },
+      "countryCode": "US",
+      "countryName": "UNITED STATES",
+      "postalCode": "80202",
+      "type": "Attorney Address"
+    },
+    {
+      "version": 0,
+      "streetLineOne": "1063 HAWK CT",
+      "streetLineTwo": " ",
+      "cityName": "LOUISVILLE",
+      "geographicRegionModel": {
+        "geographicRegionCategory": null,
+        "geographicRegionText": "CO ",
+        "geographicRegionName": "COLORADO"
+      },
+      "countryCode": "US",
+      "countryName": "UNITED STATES",
+      "postalCode": "80027",
+      "type": "Attorney Address"
+    },
+    {
+      "version": 0,
+      "streetLineOne": "1560 BRODAWAY STE 1200",
+      "streetLineTwo": " ",
+      "cityName": "DENVER",
+      "geographicRegionModel": {
+        "geographicRegionCategory": null,
+        "geographicRegionText": "CO ",
+        "geographicRegionName": "COLORADO"
+      },
+      "countryCode": "US",
+      "countryName": "UNITED STATES",
+      "postalCode": "80202",
+      "type": "Attorney Address"
+    },
+    {
+      "version": 0,
+      "streetLineOne": "1560 BROADWAY STE. 1200",
+      "streetLineTwo": " ",
+      "cityName": "DENVER",
+      "geographicRegionModel": {
+        "geographicRegionCategory": null,
+        "geographicRegionText": "CO ",
+        "geographicRegionName": "COLORADO"
+      },
+      "countryCode": "US",
+      "countryName": "UNITED STATES",
+      "postalCode": "80202",
+      "type": "Attorney Address"
+    },
+    {
+      "version": 0,
+      "streetLineOne": "1560 BROADWAY, SUITE 1200",
+      "streetLineTwo": " ",
+      "cityName": "DENVER",
+      "geographicRegionModel": {
+        "geographicRegionCategory": null,
+        "geographicRegionText": "CO ",
+        "geographicRegionName": "COLORADO"
+      },
+      "countryCode": "US",
+      "countryName": "UNITED STATES",
+      "postalCode": "80202",
+      "type": "Attorney Address"
+    },
+    {
+      "version": 0,
+      "streetLineOne": "1560 BROADWAY",
+      "streetLineTwo": "SUITE 1200",
+      "cityName": "DENVER",
+      "geographicRegionModel": {
+        "geographicRegionCategory": null,
+        "geographicRegionText": "CO ",
+        "geographicRegionName": "COLORADO"
+      },
+      "countryCode": "US",
+      "countryName": "UNITED STATES",
+      "postalCode": "80202",
+      "type": "Attorney Address"
+    },
+    {
+      "version": 0,
+      "streetLineOne": "1560 BROADWAY, SUITE 1200",
+      "streetLineTwo": " ",
+      "cityName": "DENVER",
+      "geographicRegionModel": {
+        "geographicRegionCategory": null,
+        "geographicRegionText": "CO ",
+        "geographicRegionName": "COLORADO"
+      },
+      "countryCode": "US",
+      "countryName": "UNITED STATES",
+      "postalCode": "80204",
+      "type": "Attorney Address"
+    },
+    {
+      "version": 0,
+      "streetLineOne": "1560 BROADWAY, SUITE 1200",
+      "streetLineTwo": " ",
+      "cityName": "DENVER",
+      "geographicRegionModel": {
+        "geographicRegionCategory": null,
+        "geographicRegionText": "CO ",
+        "geographicRegionName": "COLORADO"
+      },
+      "countryCode": "US",
+      "countryName": "UNITED STATES",
+      "postalCode": "80202",
+      "type": "Attorney Address"
+    },
+    {
+      "version": 0,
+      "streetLineOne": "1560 BROADWAY",
+      "streetLineTwo": "SUITE 1200",
+      "cityName": "DENVER",
+      "geographicRegionModel": {
+        "geographicRegionCategory": null,
+        "geographicRegionText": "CO ",
+        "geographicRegionName": "COLORADO"
+      },
+      "countryCode": "US",
+      "countryName": "UNITED STATES",
+      "postalCode": "80102",
+      "type": "Attorney Address"
+    },
+    {
+      "version": 0,
+      "streetLineOne": "1560 BROADWAY, SUITE 1200",
+      "streetLineTwo": " ",
+      "cityName": "DENVER",
+      "geographicRegionModel": {
+        "geographicRegionCategory": null,
+        "geographicRegionText": "CO ",
+        "geographicRegionName": "COLORADO"
+      },
+      "countryCode": "US",
+      "countryName": "UNITED STATES",
+      "postalCode": "80202",
+      "type": "Attorney Address"
+    },
+    {
+      "version": 0,
+      "streetLineOne": " ",
+      "streetLineTwo": " ",
+      "cityName": "DENVER,",
+      "geographicRegionModel": {
+        "geographicRegionCategory": null,
+        "geographicRegionText": "CO ",
+        "geographicRegionName": "COLORADO"
+      },
+      "countryCode": "US",
+      "countryName": "UNITED STATES",
+      "postalCode": "802020000",
+      "type": "Attorney Address"
+    },
+    {
+      "version": 0,
+      "streetLineOne": "24 S, WEBER ST.,",
+      "streetLineTwo": "SUITE 205",
+      "cityName": "COLORADO SPRINGS",
+      "geographicRegionModel": {
+        "geographicRegionCategory": null,
+        "geographicRegionText": "CO ",
+        "geographicRegionName": "COLORADO"
+      },
+      "countryCode": "US",
+      "countryName": "UNITED STATES",
+      "postalCode": "80903",
+      "type": "Attorney Address"
+    },
+    {
+      "version": 0,
+      "streetLineOne": "1560 BROADWAY, SUITE 1200",
+      "streetLineTwo": " ",
+      "cityName": "DENVER",
+      "geographicRegionModel": {
+        "geographicRegionCategory": null,
+        "geographicRegionText": "CO ",
+        "geographicRegionName": "COLORADO"
+      },
+      "countryCode": "US",
+      "countryName": "UNITED STATES",
+      "postalCode": "80202",
+      "type": "Attorney Address"
+    },
+    {
+      "version": 0,
+      "streetLineOne": "1560 BROADWAY",
+      "streetLineTwo": "SUITE 1200",
+      "cityName": "DENVER",
+      "geographicRegionModel": {
+        "geographicRegionCategory": null,
+        "geographicRegionText": "CO ",
+        "geographicRegionName": "COLORADO"
+      },
+      "countryCode": "US",
+      "countryName": "UNITED STATES",
+      "postalCode": "80202",
+      "type": "Attorney Address"
+    },
+    {
+      "version": 0,
+      "streetLineOne": "1560 BROADWAY",
+      "streetLineTwo": "SUITE 1200",
+      "cityName": "DENVER",
+      "geographicRegionModel": {
+        "geographicRegionCategory": null,
+        "geographicRegionText": "CO ",
+        "geographicRegionName": "COLORADO"
+      },
+      "countryCode": "US",
+      "countryName": "UNITED STATES",
+      "postalCode": "80202",
+      "type": "Attorney Address"
+    },
+    {
+      "version": 0,
+      "streetLineOne": "1560 BROADWAY STE 1200",
+      "streetLineTwo": " ",
+      "cityName": "DENVER",
+      "geographicRegionModel": {
+        "geographicRegionCategory": null,
+        "geographicRegionText": "CO ",
+        "geographicRegionName": "COLORADO"
+      },
+      "countryCode": "US",
+      "countryName": "UNITED STATES",
+      "postalCode": "80202",
+      "type": "Attorney Address"
+    },
+    {
+      "version": 0,
+      "streetLineOne": "1560 BROADWAY",
+      "streetLineTwo": "SUITE 1200",
+      "cityName": "DENVER",
+      "geographicRegionModel": {
+        "geographicRegionCategory": null,
+        "geographicRegionText": "CO ",
+        "geographicRegionName": "COLORADO"
+      },
+      "countryCode": "US",
+      "countryName": "UNITED STATES",
+      "postalCode": "80202-514",
+      "type": "Attorney Address"
+    },
+    {
+      "version": 0,
+      "streetLineOne": "1560 BROADWAY, SUITE 1200",
+      "streetLineTwo": " ",
+      "cityName": "DENVER",
+      "geographicRegionModel": {
+        "geographicRegionCategory": null,
+        "geographicRegionText": "CO ",
+        "geographicRegionName": "COLORADO"
+      },
+      "countryCode": "US",
+      "countryName": "UNITED STATES",
+      "postalCode": "80202-514",
+      "type": "Attorney Address"
+    },
+    {
+      "version": 0,
+      "streetLineOne": "1560 BROADWAY",
+      "streetLineTwo": "SUITE 1200",
+      "cityName": "DENVER",
+      "geographicRegionModel": {
+        "geographicRegionCategory": null,
+        "geographicRegionText": "CO ",
+        "geographicRegionName": "COLORADO"
+      },
+      "countryCode": "US",
+      "countryName": "UNITED STATES",
+      "postalCode": "80202",
+      "type": "Attorney Address"
+    },
+    {
+      "version": 0,
+      "streetLineOne": "4455 EAST CHEROKEE HEIGHTS CIRCLE",
+      "streetLineTwo": " ",
+      "cityName": "IDAHO FALLS",
+      "geographicRegionModel": {
+        "geographicRegionCategory": null,
+        "geographicRegionText": "ID ",
+        "geographicRegionName": "IDAHO"
+      },
+      "countryCode": "US",
+      "countryName": "UNITED STATES",
+      "postalCode": "83406",
+      "type": "Attorney Address"
+    },
+    {
+      "version": 0,
+      "streetLineOne": "1560 BROADWAY",
+      "streetLineTwo": "SUITE 1200",
+      "cityName": "DENVER",
+      "geographicRegionModel": {
+        "geographicRegionCategory": null,
+        "geographicRegionText": "CO ",
+        "geographicRegionName": "COLORADO"
+      },
+      "countryCode": "US",
+      "countryName": "UNITED STATES",
+      "postalCode": "80202",
+      "type": "Attorney Address"
+    },
+    {
+      "version": 0,
+      "streetLineOne": "1560 BROADWAY",
+      "streetLineTwo": "SUITE 1200",
+      "cityName": "DENVER",
+      "geographicRegionModel": {
+        "geographicRegionCategory": null,
+        "geographicRegionText": "CO ",
+        "geographicRegionName": "COLORADO"
+      },
+      "countryCode": "US",
+      "countryName": "UNITED STATES",
+      "postalCode": "80202-514",
+      "type": "Attorney Address"
+    },
+    {
+      "version": 0,
+      "streetLineOne": "1560 BROADWAY, SUITE 1200",
+      "streetLineTwo": " ",
+      "cityName": "DENVER",
+      "geographicRegionModel": {
+        "geographicRegionCategory": null,
+        "geographicRegionText": "CO ",
+        "geographicRegionName": "COLORADO"
+      },
+      "countryCode": "US",
+      "countryName": "UNITED STATES",
+      "postalCode": "80202",
+      "type": "Attorney Address"
+    },
+    {
+      "version": 0,
+      "streetLineOne": "1560 BROADWAY, SUITE 1200",
+      "streetLineTwo": " ",
+      "cityName": "DENVER",
+      "geographicRegionModel": {
+        "geographicRegionCategory": null,
+        "geographicRegionText": "CO ",
+        "geographicRegionName": "COLORADO"
+      },
+      "countryCode": "US",
+      "countryName": "UNITED STATES",
+      "postalCode": "80202",
+      "type": "Attorney Address"
+    },
+    {
+      "version": 0,
+      "streetLineOne": "1560 BROADWAY, SUITE 1200",
+      "streetLineTwo": " ",
+      "cityName": "DENVER",
+      "geographicRegionModel": {
+        "geographicRegionCategory": null,
+        "geographicRegionText": "CO ",
+        "geographicRegionName": "COLORADO"
+      },
+      "countryCode": "US",
+      "countryName": "UNITED STATES",
+      "postalCode": "80202-600",
+      "type": "Attorney Address"
+    },
+    {
+      "version": 0,
+      "streetLineOne": "1560 BROADWAY",
+      "streetLineTwo": "SUITE 1200",
+      "cityName": "DENVER",
+      "geographicRegionModel": {
+        "geographicRegionCategory": null,
+        "geographicRegionText": "CO ",
+        "geographicRegionName": "COLORADO"
+      },
+      "countryCode": "US",
+      "countryName": "UNITED STATES",
+      "postalCode": "80202",
+      "type": "Attorney Address"
+    },
+    {
+      "version": 0,
+      "streetLineOne": "1560 BOADWAY",
+      "streetLineTwo": "SUITE  1200",
+      "cityName": "DENVER",
+      "geographicRegionModel": {
+        "geographicRegionCategory": null,
+        "geographicRegionText": "CO ",
+        "geographicRegionName": "COLORADO"
+      },
+      "countryCode": "US",
+      "countryName": "UNITED STATES",
+      "postalCode": "80202",
+      "type": "Attorney Address"
+    },
+    {
+      "version": 0,
+      "streetLineOne": "1560 BROADWAY, SUITE 1200",
+      "streetLineTwo": " ",
+      "cityName": "DENVER",
+      "geographicRegionModel": {
+        "geographicRegionCategory": null,
+        "geographicRegionText": "CO ",
+        "geographicRegionName": "COLORADO"
+      },
+      "countryCode": "US",
+      "countryName": "UNITED STATES",
+      "postalCode": "80202",
+      "type": "Attorney Address"
+    },
+    {
+      "version": 0,
+      "streetLineOne": "1560 BROADWAY",
+      "streetLineTwo": "SUITE 1200",
+      "cityName": "DENVER",
+      "geographicRegionModel": {
+        "geographicRegionCategory": null,
+        "geographicRegionText": "CO ",
+        "geographicRegionName": "COLORADO"
+      },
+      "countryCode": "US",
+      "countryName": "UNITED STATES",
+      "postalCode": "80202",
+      "type": "Attorney Address"
+    },
+    {
+      "version": 0,
+      "streetLineOne": "1560 BROADWAY",
+      "streetLineTwo": "SUITE 1200",
+      "cityName": "DENVER",
+      "geographicRegionModel": {
+        "geographicRegionCategory": null,
+        "geographicRegionText": "CO ",
+        "geographicRegionName": "COLORADO"
+      },
+      "countryCode": "US",
+      "countryName": "UNITED STATES",
+      "postalCode": "80202",
+      "type": "Attorney Address"
+    },
+    {
+      "version": 0,
+      "streetLineOne": "1560 BROADWAY, SUITE 1200",
+      "streetLineTwo": " ",
+      "cityName": "DENVER",
+      "geographicRegionModel": {
+        "geographicRegionCategory": null,
+        "geographicRegionText": "CO ",
+        "geographicRegionName": "COLORADO"
+      },
+      "countryCode": "US",
+      "countryName": "UNITED STATES",
+      "postalCode": "80202",
+      "type": "Attorney Address"
+    },
+    {
+      "version": 0,
+      "streetLineOne": "1560 BROADWAY # 1200",
+      "streetLineTwo": " ",
+      "cityName": "DENVER",
+      "geographicRegionModel": {
+        "geographicRegionCategory": null,
+        "geographicRegionText": "CO ",
+        "geographicRegionName": "COLORADO"
+      },
+      "countryCode": "US",
+      "countryName": "UNITED STATES",
+      "postalCode": "80202",
+      "type": "Attorney Address"
+    },
+    {
+      "version": 0,
+      "streetLineOne": "1560 BROADWAY",
+      "streetLineTwo": "SUITE 1200",
+      "cityName": "DENVER",
+      "geographicRegionModel": {
+        "geographicRegionCategory": null,
+        "geographicRegionText": "CO ",
+        "geographicRegionName": "COLORADO"
+      },
+      "countryCode": "US",
+      "countryName": "UNITED STATES",
+      "postalCode": "80202",
+      "type": "Attorney Address"
+    },
+    {
+      "version": 0,
+      "streetLineOne": "1560 BROADWAY",
+      "streetLineTwo": "SUITE 1200",
+      "cityName": "DENVER",
+      "geographicRegionModel": {
+        "geographicRegionCategory": null,
+        "geographicRegionText": "CO ",
+        "geographicRegionName": "COLORADO"
+      },
+      "countryCode": "US",
+      "countryName": "UNITED STATES",
+      "postalCode": "80202",
+      "type": "Attorney Address"
+    },
+    {
+      "version": 0,
+      "streetLineOne": "1560 BROADWAY",
+      "streetLineTwo": "SUITE 1200",
+      "cityName": "DENVER",
+      "geographicRegionModel": {
+        "geographicRegionCategory": null,
+        "geographicRegionText": "CO ",
+        "geographicRegionName": "COLORADO"
+      },
+      "countryCode": "US",
+      "countryName": "UNITED STATES",
+      "postalCode": "80202",
+      "type": "Attorney Address"
+    },
+    {
+      "version": 0,
+      "streetLineOne": "1560 BROADWAY",
+      "streetLineTwo": "SUITE 1200",
+      "cityName": "DENVER",
+      "geographicRegionModel": {
+        "geographicRegionCategory": null,
+        "geographicRegionText": "CO ",
+        "geographicRegionName": "COLORADO"
+      },
+      "countryCode": "US",
+      "countryName": "UNITED STATES",
+      "postalCode": "80202",
+      "type": "Attorney Address"
+    },
+    {
+      "version": 0,
+      "streetLineOne": "1560 BROADWAY",
+      "streetLineTwo": "SUITE 1200",
+      "cityName": "DENVER",
+      "geographicRegionModel": {
+        "geographicRegionCategory": null,
+        "geographicRegionText": "CO ",
+        "geographicRegionName": "COLORADO"
+      },
+      "countryCode": "US",
+      "countryName": "UNITED STATES",
+      "postalCode": "80202",
+      "type": "Attorney Address"
+    },
+    {
+      "version": 0,
+      "streetLineOne": "1560 BROADWAY, SUITE 1200",
+      "streetLineTwo": " ",
+      "cityName": "DENVER",
+      "geographicRegionModel": {
+        "geographicRegionCategory": null,
+        "geographicRegionText": "CO ",
+        "geographicRegionName": "COLORADO"
+      },
+      "countryCode": "US",
+      "countryName": "UNITED STATES",
+      "postalCode": "80202",
+      "type": "Attorney Address"
+    },
+    {
+      "version": 0,
+      "streetLineOne": "1560 BROADWAY",
+      "streetLineTwo": "SUITE 1200",
+      "cityName": "DENVER",
+      "geographicRegionModel": {
+        "geographicRegionCategory": null,
+        "geographicRegionText": "CO ",
+        "geographicRegionName": "COLORADO"
+      },
+      "countryCode": "US",
+      "countryName": "UNITED STATES",
+      "postalCode": "80202",
+      "type": "Attorney Address"
+    },
+    {
+      "version": 0,
+      "streetLineOne": "1560 BROADWAY, #1200",
+      "streetLineTwo": " ",
+      "cityName": "DENVER",
+      "geographicRegionModel": {
+        "geographicRegionCategory": null,
+        "geographicRegionText": "CO ",
+        "geographicRegionName": "COLORADO"
+      },
+      "countryCode": "US",
+      "countryName": "UNITED STATES",
+      "postalCode": "80202",
+      "type": "Attorney Address"
+    },
+    {
+      "version": 0,
+      "streetLineOne": "1560 Broadway",
+      "streetLineTwo": "Suite 1200",
+      "cityName": "Denver",
+      "geographicRegionModel": {
+        "geographicRegionCategory": null,
+        "geographicRegionText": "CO ",
+        "geographicRegionName": "COLORADO"
+      },
+      "countryCode": "US",
+      "countryName": "UNITED STATES",
+      "postalCode": "80202",
+      "type": "Application Address"
+    },
+    {
+      "version": 0,
+      "streetLineOne": "414 HUNGERFORD DRIVE",
+      "streetLineTwo": " ",
+      "cityName": "ROCKVILLE",
+      "geographicRegionModel": {
+        "geographicRegionCategory": null,
+        "geographicRegionText": "MD ",
+        "geographicRegionName": "MARYLAND"
+      },
+      "countryCode": "US",
+      "countryName": "UNITED STATES",
+      "postalCode": "20850",
+      "type": "Application Payor Address"
+    },
+    {
+      "version": 0,
+      "streetLineOne": "1560 Broadway",
+      "streetLineTwo": "Suite 1200",
+      "cityName": "Denver",
+      "geographicRegionModel": {
+        "geographicRegionCategory": null,
+        "geographicRegionText": "CO ",
+        "geographicRegionName": "COLORADO"
+      },
+      "countryCode": "US",
+      "countryName": "UNITED STATES",
+      "postalCode": "80202",
+      "type": "Application Correspondence Address"
+    }
+  ]
+}

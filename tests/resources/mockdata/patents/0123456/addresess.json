@@ -1,0 +1,23 @@
+{
+  "success": true,
+  "errorMessageText": [],
+  "infoMessageText": [],
+  "warnMessageText": [],
+  "model": [
+    {
+      "version": 0,
+      "streetLineOne": "1560 BROADWAY STEET, SUITE 1200",
+      "streetLineTwo": " ",
+      "cityName": "DENVER",
+      "geographicRegionModel": {
+        "geographicRegionCategory": null,
+        "geographicRegionText": "CO ",
+        "geographicRegionName": "COLORADO"
+      },
+      "countryCode": "US",
+      "countryName": "UNITED STATES",
+      "postalCode": "80202",
+      "type": "Attorney Address"
+    }
+  ]
+}
