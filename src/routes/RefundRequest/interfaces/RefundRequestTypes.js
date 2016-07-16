@@ -123,11 +123,6 @@ export type PaymentHistoryModelType = {
   items: Array<PaymentHistoryItemType>
 }
 export type PaymentHistoryDatumType = {
-  success: boolean,
-  errorCode: number,
-  errorMessageText: Array<string>,
-  infoMessageText: Array<string>,
-  warnMessageText: Array<string>,
   model: ?Array<PaymentHistoryModelType>
 }
 export type PaymentHistoryDataType = PaymentHistoryDatumType

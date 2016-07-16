@@ -21,7 +21,7 @@ const debug = _debug('test:fluentRequest')
 
 describe('fluentRequest', function () { // Can't use '() ==> here...
   this.timeout(200); // ... because this 'this' would be wrong.
-  
+
   const jsonType = 'application/json; charset=utf-8'
   const testRootContext = 'http://www.mocky.io/v2'
   // const testUrlStr = 'https://api.github.com/zen'
@@ -153,6 +153,10 @@ describe('fluentRequest', function () { // Can't use '() ==> here...
           })
         return request
           .execute()
+          .catch(reason => {
+            responseFail(reason, "Failed mock() test")
+            expect.fail()
+          })
           .then(response => {
             expect(response).to.isObject
             expect(response.status).to.equal(200)
@@ -161,10 +165,6 @@ describe('fluentRequest', function () { // Can't use '() ==> here...
             expect(fetchMock.lastOptions().method).to.equal('GET')
             expect(response.headers.get("content-type")).to.equal(jsonType)
           })
-          .catch(reason => {
-            responseFail(reason, "Failed mock() test")
-            expect.fail()
-          })
       })
     })
 
@@ -172,9 +172,7 @@ describe('fluentRequest', function () { // Can't use '() ==> here...
       it('execute()', () => {
         const request = new Request(urlUtil.parse(testUrlStr), testOptions)
           .mock({
-            body:    {
-              "fluent-request": "rocks!"
-            },
+            body: JSON.stringify({ "fluent-request": "rocks!" }),
             headers: {
               'Content-Type': 'application/json; charset=utf-8'
             }
@@ -195,10 +193,6 @@ describe('fluentRequest', function () { // Can't use '() ==> here...
               .to.have.property('fluent-request')
               .that.is.an('string')
               .that.equals('rocks!')
-          })
-          .catch(reason => {
-            responseFail(reason, "Failed execute() test")
-            expect.fail()
           })
       })
     })
@@ -223,10 +217,6 @@ describe('fluentRequest', function () { // Can't use '() ==> here...
             expect(text).to.be.a('string')
               .and.include('fluent-request')
               .and.include('rocks!')
-          })
-          .catch(reason => {
-            responseFail(reason, "Failed text() test")
-            expect.fail()
           })
       })
     })
@@ -253,10 +243,6 @@ describe('fluentRequest', function () { // Can't use '() ==> here...
               .that.is.an('string')
               .that.equals('rocks!')
           })
-          .catch(reason => {
-            responseFail(reason, "Failed json() test")
-            expect.fail()
-          })
       })
     })
 
@@ -281,10 +267,6 @@ describe('fluentRequest', function () { // Can't use '() ==> here...
               .to.have.property('fluent-request')
               .that.is.an('string')
               .that.equals('rocks!')
-          })
-          .catch(reason => {
-            responseFail(reason, "Failed json() test")
-            expect.fail()
           })
       })
     })
@@ -627,11 +609,11 @@ describe('fluentRequest', function () { // Can't use '() ==> here...
 //     return req
 //     .get(host + '/get')
 //     .json()
-//     .then(() => {
-//       throw new Error('this should not be called')
-//     })
 //     .catch(err => {
 //       equal(err.message, 'request canceled by beforeRequest')
+//     })
+//     .then(() => {
+//       throw new Error('this should not be called')
 //     })
 //   })
 //
@@ -644,11 +626,11 @@ describe('fluentRequest', function () { // Can't use '() ==> here...
 //
 //     return req
 //     .get(host + '/get?emoji=😄')
-//     .then(() => {
-//       throw new Error('this should not be called')
-//     })
 //     .catch(err => {
 //       equal(err.message, 'request canceled by beforeRequest')
+//     })
+//     .then(() => {
+//       throw new Error('this should not be called')
 //     })
 //   })
 //
@@ -662,11 +644,11 @@ describe('fluentRequest', function () { // Can't use '() ==> here...
 //     return req
 //     .post(host + '/post')
 //     .send({emoji: '😄'})
-//     .then(() => {
-//       throw new Error('this should not be called')
-//     })
 //     .catch(err => {
 //       equal(err.message, 'request canceled by beforeRequest')
+//     })
+//     .then(() => {
+//       throw new Error('this should not be called')
 //     })
 //   })
 // })

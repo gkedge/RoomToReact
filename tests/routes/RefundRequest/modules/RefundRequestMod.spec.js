@@ -40,47 +40,41 @@ import url from 'url'
 import cloneDeep from 'lodash/cloneDeep'
 
 describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
-  describe('Actions', function() { // Can't use '() ==> here...
+  describe('Actions', function () { // Can't use '() ==> here...
     this.timeout(200); // ... because this 'this' would be wrong.
 
-    const paymentHistoryData = {
-      "success":          true,
-      "errorCode":        0,
-      "errorMessageText": [],
-      "infoMessageText":  [],
-      "warnMessageText":  [],
-      "model":            [
-        {
-          "version": 0,
-          "items":   [
-            {
-              "postingReferenceText": "0123456",
-              "datePosted":           "2016-03-17",
-              "feeCode":              "8001",
-              "feeCodeDescription":   "PRINTED COPY OF PATENT W/O COLOR, REGULAR SERVICE",
-              "feeAmount":            3,
-              "quantity":             1,
-              "amount":               3,
-              "mailRoomDate":         "2016-03-17",
-              "paymentMethodType":    "DA500999"
-            }
-          ]
-        }
-      ]
-    }
+    const paymentHistoryData = [
+      {
+        "version": 0,
+        "items": [
+          {
+            "postingReferenceText": "0123456",
+            "datePosted": "2016-03-17",
+            "feeCode": "8001",
+            "feeCodeDescription": "PRINTED COPY OF PATENT W/O COLOR, REGULAR SERVICE",
+            "feeAmount": 3,
+            "quantity": 1,
+            "amount": 3,
+            "mailRoomDate": "2016-03-17",
+            "paymentMethodType": "DA500999"
+          }
+        ]
+      }
+    ]
+
     const namesData = [{"firstName": "Tommy", "lastName": "Turtle"}]
     const addressesData = [{
       addr0: '1010 Turtle St.',
       addr1: null,
-      city:  'Ocean', state: 'World', zip: '11111'
+      city: 'Ocean', state: 'World', zip: '11111'
     }]
     const lookupFormData:LookupFormDataType = {
-      isError:      false,
-      isLookingUp:  false,
+      isError: false,
+      isLookingUp: false,
       referenceNum: '0123456',
-      dateFrom:     '2016-03-24',
-      dateTo:       '2016-06-15',
-      email:        'devnull@gmail.com'
+      dateFrom: '2016-03-24',
+      dateTo: '2016-06-15',
+      email: 'devnull@gmail.com'
     }
     const errorReport = {
       statusCode: 666,
@@ -451,7 +445,7 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
                 type: LOAD_PAYMENT_HISTORY_DATA_START
               })
               expect(dispatchSpy).to.have.been.calledWith({
-                type:    LOAD_PAYMENT_HISTORY_DATA_LOADED,
+                type: LOAD_PAYMENT_HISTORY_DATA_LOADED,
                 payload: paymentHistoryData
               })
               // mocking setup using fully configured request in fluentRequest.
@@ -471,23 +465,22 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
 
         it('Test loadPaymentHistoryData dispatch with bad data (#1) and all the dispatches it makes', () => {
           fetchMock.restore()
-          fetchMock.mock(paymentHistoryAPI.format(), 'GET', "['yow!',]")
+          const response = {
+            body:    "'yow!',",
+            headers: {
+              'Content-Type': 'application/json; charset=utf-8'
+            }
+          }
+          fetchMock.mock(paymentHistoryAPI.format(), 'GET', response)
           stateHolder.state.refundRequest.isNegativeTesting = true;
           return actions.loadPaymentHistoryData()(dispatchSpy, getStateSpy)
-            // A catch below the 'then' below will catch failed expectations
-            // instead of Errors raised by loadPaymentHistoryData.
-            .catch((reason) => {
-               // Expect that any exception associated with a request is handled
-               // without spreading the contagion.
-               expect.fail()
-             })
             .then(() => {
               expect(dispatchSpy).to.have.been.calledTwice
               expect(dispatchSpy).to.have.been.calledWithExactly({
                 type: LOAD_PAYMENT_HISTORY_DATA_START
               })
               expect(dispatchSpy).to.have.been.calledWithExactly({
-                type:    LOAD_PAYMENT_HISTORY_DATA_ERROR,
+                type: LOAD_PAYMENT_HISTORY_DATA_ERROR,
                 payload: {
                   statusCode: 700,
                   statusText: 'Bad data response'
@@ -500,23 +493,22 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
 
         it('Test loadPaymentHistoryData dispatch with bad data (#2) and all the dispatches it makes', () => {
           fetchMock.restore()
-          fetchMock.mock(paymentHistoryAPI.format(), 'GET', JSON.stringify("yow!"))
+          const response = {
+            body:    JSON.stringify("yow!"),
+            headers: {
+              'Content-Type': 'application/json; charset=utf-8'
+            }
+          }
+          fetchMock.mock(paymentHistoryAPI.format(), 'GET', response)
           stateHolder.state.refundRequest.isNegativeTesting = true;
           return actions.loadPaymentHistoryData()(dispatchSpy, getStateSpy)
-            // A catch below the 'then' below will catch failed expectations
-            // instead of Errors raised by loadPaymentHistoryData.
-            .catch(() => {
-              // Expect that any exception associated with a request is handled
-              // without spreading the contagion.
-              expect.fail()
-            })
             .then(() => {
               expect(dispatchSpy).to.have.been.calledTwice
               expect(dispatchSpy).to.have.been.calledWithExactly({
                 type: LOAD_PAYMENT_HISTORY_DATA_START
               })
               expect(dispatchSpy).to.have.been.calledWithExactly({
-                type:    LOAD_PAYMENT_HISTORY_DATA_ERROR,
+                type: LOAD_PAYMENT_HISTORY_DATA_ERROR,
                 payload: {
                   statusCode: 700,
                   statusText: 'Bad data response'
@@ -663,7 +655,7 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
                 type: LOAD_NAMES_START
               })
               expect(dispatchSpy).to.have.been.calledWithExactly({
-                type:    LOAD_NAMES_LOADED,
+                type: LOAD_NAMES_LOADED,
                 payload: namesData
               })
               // mocking setup using fully configured request in fluentRequest.
@@ -686,8 +678,10 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
           fetchMock.mock(namesAPI.format(), 'GET', "['yow!',]")
           stateHolder.state.refundRequest.isNegativeTesting = true;
           return actions.loadNamesData()(dispatchSpy, getStateSpy)
-            // A catch below the 'then' below will catch failed expectations
-            // instead of Errors raised by loadPaymentHistoryData.
+          // A catch below the 'then' below will catch failed expectations
+          // instead of Errors raised by loadPaymentHistoryData. That would be
+          // bad since an illuminating error message from the test wouldn't
+          // produced for the 'expect' failures.
             .catch(() => {
               // Expect that any exception associated with a request is handled
               // without spreading the contagion.
@@ -711,8 +705,10 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
           fetchMock.mock(namesAPI.format(), 'GET', JSON.stringify("yow!"))
           stateHolder.state.refundRequest.isNegativeTesting = true;
           return actions.loadNamesData()(dispatchSpy, getStateSpy)
-            // A catch below the 'then' below will catch failed expectations
-            // instead of Errors raised by loadPaymentHistoryData.
+          // A catch below the 'then' below will catch failed expectations
+          // instead of Errors raised by loadPaymentHistoryData. That would be
+          // bad since an illuminating error message from the test wouldn't
+          // produced for the 'expect' failures.
             .catch(() => {
               // Expect that any exception associated with a request is handled
               // without spreading the contagion.
@@ -862,7 +858,7 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
                 type: LOAD_ADDRESSES_START
               })
               expect(dispatchSpy).to.have.been.calledWithExactly({
-                type:    LOAD_ADDRESSES_LOADED,
+                type: LOAD_ADDRESSES_LOADED,
                 payload: addressesData
               })
               // mocking setup using fully configured request in fluentRequest.
@@ -1009,21 +1005,21 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
                 type: LOAD_PAYMENT_HISTORY_DATA_START
               })
               expect(dispatchSpy).to.have.been.calledWithExactly({
-                type:    LOAD_PAYMENT_HISTORY_DATA_LOADED,
+                type: LOAD_PAYMENT_HISTORY_DATA_LOADED,
                 payload: paymentHistoryData
               })
               expect(dispatchSpy).to.have.been.calledWithExactly({
                 type: LOAD_NAMES_START
               })
               expect(dispatchSpy).to.have.been.calledWithExactly({
-                type:    LOAD_NAMES_LOADED,
+                type: LOAD_NAMES_LOADED,
                 payload: namesData
               })
               expect(dispatchSpy).to.have.been.calledWithExactly({
                 type: LOAD_ADDRESSES_START
               })
               expect(dispatchSpy).to.have.been.calledWithExactly({
-                type:    LOAD_ADDRESSES_LOADED,
+                type: LOAD_ADDRESSES_LOADED,
                 payload: addressesData
               })
               expect(dispatchSpy).to.have.been.calledWithExactly({
@@ -1067,7 +1063,7 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
 
         expected.lookupForm = lookupFormData
         let state = refundRequestReducer(testStartState, {
-          type:    VALID_LOOKUP,
+          type: VALID_LOOKUP,
           payload: lookupFormData
         })
         expect(state).to.eql(expected)
@@ -1132,7 +1128,7 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
             .then(() => {
               expect(dispatchSpy).to.have.callCount(17)
               expect(dispatchSpy).to.have.been.calledWithExactly({
-                type:    VALID_LOOKUP,
+                type: VALID_LOOKUP,
                 payload: lookupFormData
               })
               // Neither of these work to test if resetRefundRequestForm() has been called:
@@ -1155,21 +1151,21 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
                 type: LOAD_PAYMENT_HISTORY_DATA_START
               })
               expect(dispatchSpy).to.have.been.calledWithExactly({
-                type:    LOAD_PAYMENT_HISTORY_DATA_LOADED,
+                type: LOAD_PAYMENT_HISTORY_DATA_LOADED,
                 payload: paymentHistoryData
               })
               expect(dispatchSpy).to.have.been.calledWithExactly({
                 type: LOAD_NAMES_START
               })
               expect(dispatchSpy).to.have.been.calledWithExactly({
-                type:    LOAD_NAMES_LOADED,
+                type: LOAD_NAMES_LOADED,
                 payload: namesData
               })
               expect(dispatchSpy).to.have.been.calledWithExactly({
                 type: LOAD_ADDRESSES_START
               })
               expect(dispatchSpy).to.have.been.calledWithExactly({
-                type:    LOAD_ADDRESSES_LOADED,
+                type: LOAD_ADDRESSES_LOADED,
                 payload: addressesData
               })
               expect(dispatchSpy).to.have.been.calledWithExactly({

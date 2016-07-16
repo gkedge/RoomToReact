@@ -546,6 +546,14 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
   },
   [VALID_LOOKUP]:                     (state:ShortType,
                                        action:{payload: LookupFormPayloadType}):ShortType => {
+    const payload = action.payload
+    let referenceNum = payload.referenceNum
+    // Stripe any slashes or commas
+    referenceNum = referenceNum.replace(/,/g, '')
+    referenceNum.length < 18
+      ? referenceNum.replace(/\//g, '')
+      : referenceNum
+    payload.referenceNum = upper(referenceNum)
     // TODO: normalize API not published yet in redux-form@6.0.0-alpha-15 so
     // Notice 'case' normalizing here!  Once normalize API is published
     // I am hoping that the lower()/upper() can be removed here.
@@ -555,10 +563,10 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
       lookupForm: {
         ...state.lookupForm,
         isLookingUp:  false,
-        referenceNum: upper(action.payload.referenceNum),
-        dateFrom:     action.payload.dateFrom,
-        dateTo:       action.payload.dateTo,
-        email:        lower(action.payload.email)
+        referenceNum: payload.referenceNum,
+        dateFrom:     payload.dateFrom,
+        dateTo:       payload.dateTo,
+        email:        lower(payload.email)
       }
     })
   }

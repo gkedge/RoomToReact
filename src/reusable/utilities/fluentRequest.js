@@ -34,7 +34,8 @@ export type OptionsType = {
   cache: ? string,
   corsMode: ? string,
   credentials: ? string,
-  errorHandler: ? Function,
+  jsonErrorHandler: ? Function,
+  httpErrorHandler: ? Function,
   headers: ? MapToStringType,
   httpMethod: ? string,
   isMocking: ?boolean,
@@ -82,9 +83,9 @@ export const responseFail = (reason:any, message:?string) => {
     }
 
     if (reason instanceof Error) {
-      message = Error.prototype.name + 
-                '(' + serviceChain + '): ' +
-                message
+      message = Error.prototype.name +
+        '(' + serviceChain + '): ' +
+        message
       message += '\n' + reason.message
       if (isUndefined(reason.serviceChain)) {
         message += '\n' + reason.stack
@@ -97,7 +98,7 @@ export const responseFail = (reason:any, message:?string) => {
       message = ""
     }
     message += '\n'
-    
+
     let stack = null
     if (Error.captureStackTrace && typeof Error.captureStackTrace === 'function') {
       let stackTrace = {}
@@ -131,53 +132,86 @@ export const responseFail = (reason:any, message:?string) => {
       reason.serviceChain = serviceChain
     }
   }
-  catch(e) {
+  catch (e) {
     message += "Uh-oh! Sumptin' went bad in logging an error! This is embarrassing...\n" +
-               e.message
+      e.message
   }
   finally {
-    console.error(message)     
+    console.error(message)
   }
 }
 
-const _defaultErrorHandler:Function = (response:Object):Object => {
-  if (!response.ok) {
+const _defaultJsonErrorHandler:Function = (response:Object):Promise => {
+  return new Promise((resolve:Function, reject:Function):any /* Promise */  => {
     const contentType = response.headers.get("content-type")
     if (contentType && contentType.indexOf("application/json") !== -1) {
-      return response.json().then((json:Object):Promise => {
-        const requestErrorReport:RequestErrorReportType = {
-          statusCode:       response.status,
-          statusText:       response.statusText,
-          errorCode:        json.errorCode,
-          errorMessageText: json.errorMessageText,
-          infoMessageText:  json.infoMessageText,
-          warnMessageText:  json.warnMessageText
-        }
-        throw new RequestError(requestErrorReport)
-      })
+      return response.json()
+        .then((json:any):Promise => {
+          const jsonStatusOk = json.status === undefined || json.status
+          // If the response HTTP status code is not in the 'ok' range (200's)
+          // or the status flag in the JSON (curses you FPNG!) isn't OK,
+          // toss an error with as much data associated with the error that
+          // is available.
+          if (!response.ok || !jsonStatusOk) {
+            const requestErrorReport:RequestErrorReportType = {
+              statusCode: response.status,
+              statusText: response.statusText,
+              errorCode: json.errorCode,
+              errorMessageText: json.errorMessageText,
+              infoMessageText: json.infoMessageText,
+              warnMessageText: json.warnMessageText
+            }
+            reject(new RequestError(requestErrorReport))
+          }
+          // Oh! Sweet. All good.
+          resolve(json.model || json)
+        })
+        .catch((e:Error):Promise => {
+          // Probably caused by response.json() parsing illegal JSON.
+          reject(e)
+        })
+    }
+    else if (!response.ok) {
+      // For the 500's where the error comming back may not have any 'content-type'
+      // header.
+      reject(new RequestError({
+        statusCode: response.status,
+        statusText: response.statusText
+      }))
     }
     else {
-      throw new RequestError({
-        statusCode: response,
-        statusText: response.statusText
-      })
+      reject(new RequestError({
+        statusCode: 799,
+        statusText: "Wrong error handler! The service isn't returning JSON upon success."
+      }))
     }
+  })
+}
+
+// Hmmm.... this is a whole lot easier... a simple header check.
+const _defaultHttpErrorHandler:Function = (response:Object):Object => {
+  if (!response.ok) {
+    throw new RequestError({
+      statusCode: response,
+      statusText: response.statusText
+    })
   }
   return response
 }
 
 export const defaultOpts:OptionsType = {
-  afterJSON:      null,
-  afterRequest:   null,
-  beforeRequest:  null,
-  cache:          'no-cache',
-  corsMode:       'cors',
-  credentials:    'omit',
-  errorHandler:    _defaultErrorHandler,
-  headers:        {'Accept': 'application/json'},
-  httpMethod:     'GET',
-  isMocking:      false,
-  queryParams:    null,
+  afterJSON: null,
+  afterRequest: null,
+  beforeRequest: null,
+  cache: 'no-cache',
+  corsMode: 'cors',
+  credentials: 'omit',
+  jsonErrorHandler: _defaultJsonErrorHandler,
+  httpErrorHandler: _defaultHttpErrorHandler,
+  headers: {'Accept': 'application/json'},
+  httpMethod: 'GET',
+  isMocking: false,
+  queryParams: null,
   rootContextKey: 'default'
 }
 
@@ -354,6 +388,8 @@ export class Request {
     return this
   }
 
+  // mockedResponseData is responsible for including necessary headers.
+  // I.e.: 'content-type'
   mock(mockedResponseData:any):Request {
     this.opts.isMocking = true
     this.opts.mockData = mockedResponseData
@@ -405,10 +441,14 @@ export class Request {
           // by karma-json-fixtures-preprocessor using the ./test/resources/mockdata/**/*.json
           // files as source. Obviously, these JS objects are ONLY intended to be
           // available during test operations. See __MOCK__ in config/index.js.
-          const mockData = __mockData__[this.url.pathname]
+          const response = {
+            body:    __mockData__[this.url.pathname],
+            // TODO: added headers to __mockData__
+            headers: { "content-type": "application/json; charset=utf-8" }
+          }
           debugMocking(this.url.pathname + ' data: ' +
             JSON.stringify(__mockData__[this.url.pathname]))
-          fetchMock.mock(this.url.format(), this.opts.httpMethod, mockData)
+          fetchMock.mock(this.url.format(), this.opts.httpMethod, response)
         }
       }
       if (afterResponse || debugRequestTime.enabled) {
@@ -437,24 +477,27 @@ export class Request {
   // be possible to request another one of the following calls.
   then(resolve:Function, reject:?Function):any /* Promise */ {
     return this.execute()
-      .then(this.opts.errorHandler)
+      .then(this.opts.httpErrorHandler)
       .then(resolve, reject)
   }
 
   catch(reject:Function):any /* Promise */ {
     return this.execute()
-      .then(this.opts.errorHandler)
+      .then(this.opts.httpErrorHandler)
       .catch(reject)
   }
 
   json(strict:boolean = true):any /* Promise */ {
+    const jsonErrorHandler = this.opts.jsonErrorHandler
     return this.execute()
-      .then(this.opts.errorHandler)
-      .then((res:any):any /* Promise */ => res.json())
+      .then((res:any):any /* Promise */ => jsonErrorHandler(res))
+      // Since FPNG insists on embedding error status within the JSON,
+      // the jsonErrorHandler has to read the response JSON!  So, the
+      // response cannot be reread here by fetch's JSON reading support.
+      // .then((res:any):any /* Promise */ => res.json())
       .then((json:any):any /* Promise */ => {
         if (strict && !isObject(json)) {
-          throw new TypeError('Data not strict JSON (not Object): /n' +
-                                JSON.stringify(json))
+          throw new TypeError('Data not strict JSON (not Object): /n' + json)
         }
 
         if (this.opts.afterJSON) {
@@ -463,23 +506,22 @@ export class Request {
         return json
       })
       .catch((reason:Error) => {
-        
         if (isString(reason.message)) {
           const badJsonData = reason.message.includes('JSON.parse') ||
-                              reason.message.includes('not strict JSON')
-          reason.message    = {
+            reason.message.includes('not strict JSON')
+          reason.message = {
             statusCode: badJsonData ? 700 : 701,
             statusText: badJsonData ? 'Bad data response' : reason.message
           }
         }
         else if (isObject(reason.message)) {
-          reason.message    = {
+          reason.message = {
             statusCode: 702,
             statusText: JSON.stringify(reason.message)
           }
         }
         else {
-          reason.message    = {
+          reason.message = {
             statusCode: 666,
             statusText: 'Something truly confusing is going on...'
           }
@@ -490,7 +532,7 @@ export class Request {
 
   text():any /* Promise */ {
     return this.execute()
-      .then(this.opts.errorHandler)
+      .then(this.opts.httpErrorHandler)
       .then((res:Object):any /* Promise */=> res.text())
   }
 }
