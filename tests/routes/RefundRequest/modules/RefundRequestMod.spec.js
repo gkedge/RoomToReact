@@ -1135,7 +1135,7 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
             it('Test lookupReferencedData dispatch and all the dispatches it makes', () => {
               return actions.lookupReferencedData()(dispatchSpy, getStateSpy)
                 .then(() => {
-                  expect(dispatchSpy).to.have.callCount(12)
+                  expect(dispatchSpy).to.have.callCount(11)
                   expect(dispatchSpy).to.have.been.calledWithExactly({
                     type: LOOKUP_REFERENCED_DATA_START
                   })
@@ -1162,9 +1162,6 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
                   })
                   expect(dispatchSpy).to.have.been.calledWithExactly({
                     type: LOOKUP_REFERENCED_DATA_LOADED
-                  })
-                  expect(dispatchSpy).to.have.been.calledWithExactly({
-                    type: VALID_LOOKUP_END
                   })
                   
                   // mocking setup using fully configured request in fluentRequest.

@@ -303,7 +303,7 @@ function lookupReferencedDataError():ActionPayloadType {
 }
 
 export const lookupReferencedData = ():Function => {
-  return (dispatch:Function):any /* Promise */ => {
+  return (dispatch:Function, getState:Function):any /* Promise */ => {
     dispatch(lookupReferencedDataStart())
     // Though not presently used, purposely showing the args for a
     // 'resolve' tied to a Promise.spread() to help understand what
@@ -316,14 +316,10 @@ export const lookupReferencedData = ():Function => {
       if (debugTime.enabled) {
         debugTime('lookupReferencedData time: +' + allDispatches.time + 'ms')
       }
-      dispatch(lookupReferencedDataLoaded())
-      return dispatch(validLookupEnd())
+      
+      return dispatch(lookupReferencedDataLoaded())
     }
 
-    const reject = () => {
-      dispatch(lookupReferencedDataError())
-      dispatch(validLookupError())
-    }
     const allDispatches = ():Promise =>
       // Waaaait a minute... there ain't no spread() in the Promise spec!
       // See promisePlugins.js...
@@ -331,7 +327,13 @@ export const lookupReferencedData = ():Function => {
         dispatch(loadPaymentHistoryData()),
         dispatch(loadNamesData()),
         dispatch(loadAddressesData())],
-        resolve, reject)
+        resolve)
+        .catch((reason:any):any /* Promise*/ => {
+          if (!getState().refundRequest.isNegativeTesting) {
+            responseFail(reason, 'Failed to lookup referenced data')
+          }
+          return dispatch(lookupReferencedDataError())
+        })
 
     return debugTime.enabled ? dispatchTime(allDispatches)() : allDispatches()
   }
@@ -357,11 +359,19 @@ function validLookupError():ActionPayloadType {
 }
 
 export function validLookup(lookupFormData:LookupFormDataType):Function {
-  return (dispatch:Function):any /* Promise */ => {
+  return (dispatch:Function, getState:Function):any /* Promise */ => {
     dispatch(validLookupStart(lookupFormData))
     dispatch(resetRefundRequestForm())
 
     return dispatch(lookupReferencedData())
+      .then(() => dispatch(validLookupEnd()))
+      .catch((reason:any):any /* Promise*/ => {
+        if (!getState().refundRequest.isNegativeTesting) {
+          responseFail(reason, 'Failed to validate lookup')
+        }
+        return dispatch(validLookupError())
+      })
+      .catch(() => dispatch(validLookupError()))
   }
 }
 
