@@ -1,5 +1,3 @@
-// Testing the connected component:
-// http://stackoverflow.com/a/36890932
 
 import React from 'react'
 import RefundRequest from 'routes/RefundRequest/components/RefundRequest'
@@ -64,7 +62,7 @@ describe('(Route/Container) RefundRequest/RefundRequestContainer', () => {
   // })
 
   describe('Test react-redux connect() actions', () => {
-    it('Test react-redux connect()\'ed store with loadingPdf action.', () => {
+    it("Test react-redux connect()'ed store with loadingPdf action.", () => {
       const loadingPdfAction = actions.loadingPdf({})
       store.dispatch(loadingPdfAction)
 
@@ -72,7 +70,7 @@ describe('(Route/Container) RefundRequest/RefundRequestContainer', () => {
       expect(mockedActions).to.be.eql([loadingPdfAction])
     })
 
-    it('Test react-redux connect()\'ed store with pdfBinary action.', () => {
+    it("Test react-redux connect()'ed store with pdfBinary action.", () => {
       const pdfBinaryAction = actions.pdfBinary(base64ToBinary('Yow'))
       store.dispatch(pdfBinaryAction)
 
@@ -80,7 +78,7 @@ describe('(Route/Container) RefundRequest/RefundRequestContainer', () => {
       expect(mockedActions).to.be.eql([pdfBinaryAction])
     })
 
-    it('Test react-redux connect()\'ed store with pdfLoaded action.', () => {
+    it("Test react-redux connect()'ed store with pdfLoaded action.", () => {
       const pdfLoadAction = actions.pdfLoaded()
       store.dispatch(pdfLoadAction)
 
@@ -88,7 +86,7 @@ describe('(Route/Container) RefundRequest/RefundRequestContainer', () => {
       expect(mockedActions).to.be.eql([pdfLoadAction])
     })
 
-    it('Test react-redux connect()\'ed store with postRefundRequest action.', () => {
+    it("Test react-redux connect()'ed store with postRefundRequest action.", () => {
       const postRefundRequestAction = actions.postRefundRequest()
       store.dispatch(postRefundRequestAction)
 

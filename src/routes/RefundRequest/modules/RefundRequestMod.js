@@ -28,8 +28,10 @@ import {
 import _debug from 'debug'
 import {reset} from 'redux-form'
 import url from 'url'
-import {upper, lower} from 'reusable/utilities/dataUtils'
 import cloneDeep from 'lodash/cloneDeep'
+
+import {upper, lower} from 'reusable/utilities/dataUtils'
+import {createReducer} from 'reusable/utilities/reduxStoreUtils'
 
 // import dispatchTime from 'promise-time'
 import {promiseTime as dispatchTime} from 'reusable/utilities/promisePlugins'
@@ -666,7 +668,6 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
 // ------------------------------------
 // Reducer
 // ------------------------------------
-
 export const initialState:ShortType = {
   pdf:                   {
     isError:       false,
@@ -730,14 +731,14 @@ export const initialState:ShortType = {
   isNegativeTesting:     false
 }
 
+const reducer:Function = createReducer(initialState, LOAD_REFUND_REQUEST_ACTION_HANDLERS)
 export const unknownAction:ActionPayloadType = {type: "Unknown"}
-
 export default function refundRequestReducer(state:ShortType = initialState,
                                              action:ActionPayloadType = unknownAction):ShortType {
-  const handler = LOAD_REFUND_REQUEST_ACTION_HANDLERS[action.type]
-  return handler ? handler(state, action) : state
+  
+  return reducer(state, action)
 }
-
+  
 (function() {
   setRootContext('default', url.parse('http://dev-fpng-jboss-3.etc.uspto.gov:8080/refunds-services/v1/'))
 

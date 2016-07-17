@@ -3,6 +3,10 @@ import {LookupForm} from 'routes/RefundRequest/components/LookupForm'
 import sinon from 'sinon';
 import {mount, shallow} from 'enzyme';
 
+
+// Testing the connected component:
+// http://stackoverflow.com/a/36890932
+
 const props = {
   fields:       {
     isError:      false,
