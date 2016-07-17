@@ -16,7 +16,7 @@ import refundRequestReducer, {
   LOAD_ADDRESSES_START, LOAD_ADDRESSES_LOADED, LOAD_ADDRESSES_ERROR,
   LOAD_PAYMENT_HISTORY_DATA_START, LOAD_PAYMENT_HISTORY_DATA_LOADED, LOAD_PAYMENT_HISTORY_DATA_ERROR,
   PDF_BINARY, PDF_LOADED,
-  PRE_RESET_REFUND_REQUEST_FORM, POST_RESET_REFUND_REQUEST_FORM,
+  RESET_REFUND_REQUEST_FORM_START, RESET_REFUND_REQUEST_FORM_END,
   POST_REFUND_REQUEST, SAVED_REFUND_REQUEST,
   VALID_LOOKUP_START, VALID_LOOKUP_END, VALID_LOOKUP_ERROR, 
   CLEAR_ERROR_REPORT, RESET_STATE,
@@ -204,129 +204,224 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
       })
     })
 
-    describe('Reset Refund Form Actions', () => {
-      it('Should export a constant PRE_RESET_REFUND_REQUEST_FORM.', () => {
-        expect(PRE_RESET_REFUND_REQUEST_FORM).to.equal('refund/RefundRequest/PRE_RESET_REFUND_REQUEST_FORM')
-      })
-
-      it('Should export a constant POST_RESET_REFUND_REQUEST_FORM.', () => {
-        expect(POST_RESET_REFUND_REQUEST_FORM).to.equal('refund/RefundRequest/POST_RESET_REFUND_REQUEST_FORM')
-      })
-
-      // TODO: reset refund needs a thunk test like this validateLookup thunk test:
-      // describe('validLookup thunk', () => {
-      //   const stateHolder = {
-      //     state: {
-      //       refundRequest: cloneDeep(initialState)
-      //     }
-      //   }
-      //   stateHolder.state.refundRequest.lookupForm = cloneDeep(lookupFormData)
-      //
-      //   const {dispatchSpy, getStateSpy} = reducerSpy(refundRequestReducer, stateHolder)
-      //   let originalRootContext = null;
-      //
-      //   beforeEach(() => {
-      //     originalRootContext = setRootContext('', url.parse(baseAPI))
-      //   })
-      //
-      //   afterEach(() => {
-      //     stateHolder.state.refundRequest = cloneDeep(initialState)
-      //     dispatchSpy.reset()
-      //     getStateSpy.reset()
-      //     // mocking setup using fully configured request in fluentRequest.
-      //     fetchMock.restore()
-      //     setRootContext('', originalRootContext)
-      //   })
-      //
-      //   it('Should be exported as a function.', () => {
-      //     expect(actions.validLookup).to.be.a('function')
-      //   })
-      //
-      //   it('Should return a function (is a thunk).', () => {
-      //     expect(actions.validLookup(cloneDeep(lookupFormData))).to.be.a('function')
-      //   })
-      //
-      //   it('Running validLookup through store returns Promise.', () => {
-      //     return expect(actions.validLookup(cloneDeep(lookupFormData))(dispatchSpy, getStateSpy))
-      //       .to.eventually.be.fulfilled
-      //   })
-      //
-      //   it('Test validLookup dispatch and all the dispatches it makes', () => {
-      //     return actions.validLookup(cloneDeep(lookupFormData))(dispatchSpy, getStateSpy)
-      //       .then(() => {
-      //         expect(dispatchSpy).to.have.callCount(17)
-      //         expect(dispatchSpy).to.have.been.calledWithExactly({
-      //           type:    VALID_LOOKUP_START,
-      //           payload: lookupFormData
-      //         })
-      //         // Neither of these work to test if resetRefundRequestForm() has been called:
-      //         // expect(dispatchSpy).to.have.been.calledWith(actions.resetRefundRequestForm)
-      //         // expect(dispatchSpy).to.have.been.calledWith(() => {})
-      //         expect(dispatchSpy).to.have.been.calledWithExactly({
-      //           type: PRE_RESET_REFUND_REQUEST_FORM
-      //         })
-      //         expect(dispatchSpy).to.have.been.calledWithExactly({
-      //           meta: {form: "resetRefundRequestForm"},
-      //           type: "redux-form/RESET"
-      //         })
-      //         expect(dispatchSpy).to.have.been.calledWithExactly({
-      //           type: POST_RESET_REFUND_REQUEST_FORM
-      //         })
-      //         expect(dispatchSpy).to.have.been.calledWithExactly({
-      //           type: LOOKUP_REFERENCED_DATA_START
-      //         })
-      //         expect(dispatchSpy).to.have.been.calledWithExactly({
-      //           type: LOAD_PAYMENT_HISTORY_DATA_START
-      //         })
-      //         expect(dispatchSpy).to.have.been.calledWithExactly({
-      //           type:    LOAD_PAYMENT_HISTORY_DATA_LOADED,
-      //           payload: paymentHistoryData
-      //         })
-      //         expect(dispatchSpy).to.have.been.calledWithExactly({
-      //           type: LOAD_NAMES_START
-      //         })
-      //         expect(dispatchSpy).to.have.been.calledWithExactly({
-      //           type:    LOAD_NAMES_LOADED,
-      //           payload: namesData
-      //         })
-      //         expect(dispatchSpy).to.have.been.calledWithExactly({
-      //           type: LOAD_ADDRESSES_START
-      //         })
-      //         expect(dispatchSpy).to.have.been.calledWithExactly({
-      //           type:    LOAD_ADDRESSES_LOADED,
-      //           payload: addressesData
-      //         })
-      //         expect(dispatchSpy).to.have.been.calledWithExactly({
-      //           type: LOOKUP_REFERENCED_DATA_LOADED
-      //         })
-      //         // mocking setup using fully configured request in fluentRequest.
-      //         expect(fetchMock.called(paymentHistoryAPI.format())).to.be.true
-      //         expect(fetchMock.called(namesAPI.format())).to.be.true
-      //         expect(fetchMock.called(addressesAPI.format())).to.be.true
-      //       })
-      //   })
-      //
-      //   it('State after validLookup contains lookupFormData, fees, names, addresses and entity
-      // types.', () => { const expected = cloneDeep(initialState) expected.lookupForm =
-      // lookupFormData expected.refundRequestForm.fees = paymentHistoryData
-      // expected.refundRequestForm.names = namesData expected.refundRequestForm.addresses =
-      // addressesData return actions.validLookup(lookupFormData)(dispatchSpy, getStateSpy)
-      // .then(() => { expect(stateHolder.state.refundRequest).to.eql(expected) }) }) })
-
-    })
-
     describe('Valid Lookup Actions And Subactions', () => {
 
-      it('Should export a constant VALID_LOOKUP_START.', () => {
-        expect(VALID_LOOKUP_START).to.equal('refund/RefundRequest/VALID_LOOKUP_START')
+      describe('Reset Refund Form Actions', () => {
+        it('Should export a constant RESET_REFUND_REQUEST_FORM_START.', () => {
+          expect(RESET_REFUND_REQUEST_FORM_START).to.equal('refund/RefundRequest/RESET_REFUND_REQUEST_FORM_START')
+        })
+  
+        it('Should export a constant RESET_REFUND_REQUEST_FORM_END.', () => {
+          expect(RESET_REFUND_REQUEST_FORM_END).to.equal('refund/RefundRequest/RESET_REFUND_REQUEST_FORM_END')
+        })
+  
+        // TODO: reset refund needs a thunk test like this validateLookup thunk test:
+        // describe('validLookup thunk', () => {
+        //   const stateHolder = {
+        //     state: {
+        //       refundRequest: cloneDeep(initialState)
+        //     }
+        //   }
+        //   stateHolder.state.refundRequest.lookupForm = cloneDeep(lookupFormData)
+        //
+        //   const {dispatchSpy, getStateSpy} = reducerSpy(refundRequestReducer, stateHolder)
+        //   let originalRootContext = null;
+        //
+        //   beforeEach(() => {
+        //     originalRootContext = setRootContext('', url.parse(baseAPI))
+        //   })
+        //
+        //   afterEach(() => {
+        //     stateHolder.state.refundRequest = cloneDeep(initialState)
+        //     dispatchSpy.reset()
+        //     getStateSpy.reset()
+        //     // mocking setup using fully configured request in fluentRequest.
+        //     fetchMock.restore()
+        //     setRootContext('', originalRootContext)
+        //   })
+        //
+        //   it('Should be exported as a function.', () => {
+        //     expect(actions.validLookup).to.be.a('function')
+        //   })
+        //
+        //   it('Should return a function (is a thunk).', () => {
+        //     expect(actions.validLookup(cloneDeep(lookupFormData))).to.be.a('function')
+        //   })
+        //
+        //   it('Running validLookup through store returns Promise.', () => {
+        //     return expect(actions.validLookup(cloneDeep(lookupFormData))(dispatchSpy, getStateSpy))
+        //       .to.eventually.be.fulfilled
+        //   })
+        //
+        //   it('Test validLookup dispatch and all the dispatches it makes', () => {
+        //     return actions.validLookup(cloneDeep(lookupFormData))(dispatchSpy, getStateSpy)
+        //       .then(() => {
+        //         expect(dispatchSpy).to.have.callCount(17)
+        //         expect(dispatchSpy).to.have.been.calledWithExactly({
+        //           type:    VALID_LOOKUP_START,
+        //           payload: lookupFormData
+        //         })
+        //         // Neither of these work to test if resetRefundRequestForm() has been called:
+        //         // expect(dispatchSpy).to.have.been.calledWith(actions.resetRefundRequestForm)
+        //         // expect(dispatchSpy).to.have.been.calledWith(() => {})
+        //         expect(dispatchSpy).to.have.been.calledWithExactly({
+        //           type: RESET_REFUND_REQUEST_FORM_START
+        //         })
+        //         expect(dispatchSpy).to.have.been.calledWithExactly({
+        //           meta: {form: "resetRefundRequestForm"},
+        //           type: "redux-form/RESET"
+        //         })
+        //         expect(dispatchSpy).to.have.been.calledWithExactly({
+        //           type: RESET_REFUND_REQUEST_FORM_END
+        //         })
+        //         expect(dispatchSpy).to.have.been.calledWithExactly({
+        //           type: LOOKUP_REFERENCED_DATA_START
+        //         })
+        //         expect(dispatchSpy).to.have.been.calledWithExactly({
+        //           type: LOAD_PAYMENT_HISTORY_DATA_START
+        //         })
+        //         expect(dispatchSpy).to.have.been.calledWithExactly({
+        //           type:    LOAD_PAYMENT_HISTORY_DATA_LOADED,
+        //           payload: paymentHistoryData
+        //         })
+        //         expect(dispatchSpy).to.have.been.calledWithExactly({
+        //           type: LOAD_NAMES_START
+        //         })
+        //         expect(dispatchSpy).to.have.been.calledWithExactly({
+        //           type:    LOAD_NAMES_LOADED,
+        //           payload: namesData
+        //         })
+        //         expect(dispatchSpy).to.have.been.calledWithExactly({
+        //           type: LOAD_ADDRESSES_START
+        //         })
+        //         expect(dispatchSpy).to.have.been.calledWithExactly({
+        //           type:    LOAD_ADDRESSES_LOADED,
+        //           payload: addressesData
+        //         })
+        //         expect(dispatchSpy).to.have.been.calledWithExactly({
+        //           type: LOOKUP_REFERENCED_DATA_LOADED
+        //         })
+        //         // mocking setup using fully configured request in fluentRequest.
+        //         expect(fetchMock.called(paymentHistoryAPI.format())).to.be.true
+        //         expect(fetchMock.called(namesAPI.format())).to.be.true
+        //         expect(fetchMock.called(addressesAPI.format())).to.be.true
+        //       })
+        //   })
+        //
+        //   it('State after validLookup contains lookupFormData, fees, names, addresses and entity
+        // types.', () => { const expected = cloneDeep(initialState) expected.lookupForm =
+        // lookupFormData expected.refundRequestForm.fees = paymentHistoryData
+        // expected.refundRequestForm.names = namesData expected.refundRequestForm.addresses =
+        // addressesData return actions.validLookup(lookupFormData)(dispatchSpy, getStateSpy)
+        // .then(() => { expect(stateHolder.state.refundRequest).to.eql(expected) }) }) })
+  
       })
-
-      it('Should be exported as a function.', () => {
-        expect(actions.validLookup).to.be.a('function')
-      })
-
+  
       describe('Lookup Reference Data Actions and Subactions', () => {
 
+        describe('Reset Refund Request Form Actions', () => {
+          describe('resetRefundRequestFormStart', () => {
+            it('Should export a constant RESET_REFUND_REQUEST_FORM_START.', () => {
+              expect(RESET_REFUND_REQUEST_FORM_START).to.equal('refund/RefundRequest/RESET_REFUND_REQUEST_FORM_START')
+            })
+    
+            it('Should be exported as a function.', () => {
+              expect(actions.resetRefundRequestFormStart).to.be.a('function')
+            })
+    
+            it('Should return an action with type "RESET_REFUND_REQUEST_FORM_START".', () => {
+              expect(actions.resetRefundRequestFormStart())
+                .to.have.property('type', RESET_REFUND_REQUEST_FORM_START)
+            })
+    
+            it('Mutate state through reducer expected to set refund form `reseting` truth', () => {
+              const testStartState = cloneDeep(initialState)
+              const expected = cloneDeep(testStartState)
+              expected.isResettingRefundForm = true;
+    
+              const state = refundRequestReducer(testStartState,
+                actions.resetRefundRequestFormStart())
+    
+              expect(state).to.eql(expected)
+            })
+          })
+    
+          describe('resetRefundRequestFormEnd', () => {
+            it('Should export a constant RESET_REFUND_REQUEST_FORM_END.', () => {
+              expect(RESET_REFUND_REQUEST_FORM_END).to.equal('refund/RefundRequest/RESET_REFUND_REQUEST_FORM_END')
+            })
+            
+            it('Should be exported as a function.', () => {
+              expect(actions.resetRefundRequestFormEnd).to.be.a('function')
+            })
+    
+            it('Should return an action with type "RESET_REFUND_REQUEST_FORM_END".', () => {
+              expect(actions.resetRefundRequestFormEnd())
+                .to.have.property('type', RESET_REFUND_REQUEST_FORM_END)
+            })
+    
+            it('Mutate state through reducer expected to indicate refund form finished`reseting`', () => {
+              const testStartState = cloneDeep(initialState)
+              const expected = cloneDeep(testStartState)
+              let state = refundRequestReducer(testStartState, actions.resetRefundRequestFormStart())
+              state = refundRequestReducer(state, actions.resetRefundRequestFormEnd())
+    
+              expect(state).to.eql(expected)
+            })
+    
+          })
+    
+          describe('resetRefundRequestForm (thunk)', () => {
+            const stateHolder = {
+              state: {
+                refundRequest: cloneDeep(initialState)
+              }
+            }
+            const {dispatchSpy, getStateSpy} = reducerSpy(refundRequestReducer, stateHolder)
+    
+            afterEach(() => {
+              stateHolder.state.refundRequest = cloneDeep(initialState)
+              dispatchSpy.reset()
+              getStateSpy.reset()
+            })
+    
+            it('Should be exported as a function.', () => {
+              expect(actions.resetRefundRequestForm).to.be.a('function')
+            })
+    
+            it('Should return a function (is a thunk).', () => {
+              expect(actions.resetRefundRequestForm()).to.be.a('function')
+            })
+    
+            it('Fetching resetRefundRequestForm through store returns void', () => {
+              return expect(actions.resetRefundRequestForm()(dispatchSpy, getStateSpy))
+                .to.be.void
+            })
+    
+            it('Test resetRefundRequestForm dispatch and all the dispatches it makes', () => {
+              actions.resetRefundRequestForm()(dispatchSpy, getStateSpy)
+              expect(dispatchSpy).to.have.been.calledThrice
+              expect(dispatchSpy).to.have.been.calledWithExactly({
+                type: RESET_REFUND_REQUEST_FORM_START
+              })
+              expect(dispatchSpy).to.have.been.calledWithExactly({
+                meta: { form: "resetRefundRequestForm" },
+                type: "redux-form/RESET"
+              })
+              expect(dispatchSpy).to.have.been.calledWithExactly({
+                type: RESET_REFUND_REQUEST_FORM_END
+              })
+            })
+    
+            it('State after resetRefundRequestForm contains fees.', () => {
+              const expected = cloneDeep(initialState)
+              actions.resetRefundRequestForm()(dispatchSpy, getStateSpy)
+              expect(stateHolder.state.refundRequest).to.eql(expected)
+            })
+            
+          })
+        })
+        
         describe('Payment History Actions', () => {
     
           describe('loadPaymentHistoryDataStart', () => {
@@ -1147,6 +1242,10 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
         })
       })
 
+      it('Should be exported as a function.', () => {
+        expect(actions.validLookup).to.be.a('function')
+      })
+
       describe('validLookup (thunk)', () => {
         const stateHolder                          = {
           state: {
@@ -1192,14 +1291,14 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
               // expect(dispatchSpy).to.have.been.calledWith(actions.resetRefundRequestForm)
               // expect(dispatchSpy).to.have.been.calledWith(() => {})
               expect(dispatchSpy).to.have.been.calledWithExactly({
-                type: PRE_RESET_REFUND_REQUEST_FORM
+                type: RESET_REFUND_REQUEST_FORM_START
               })
               expect(dispatchSpy).to.have.been.calledWithExactly({
                 meta: { form: "resetRefundRequestForm" },
                 type: "redux-form/RESET"
               })
               expect(dispatchSpy).to.have.been.calledWithExactly({
-                type: POST_RESET_REFUND_REQUEST_FORM
+                type: RESET_REFUND_REQUEST_FORM_END
               })
               expect(dispatchSpy).to.have.been.calledWithExactly({
                 type: LOOKUP_REFERENCED_DATA_START

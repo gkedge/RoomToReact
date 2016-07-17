@@ -56,8 +56,8 @@ export const LOAD_NAMES_ERROR = 'refund/RefundRequest/LOAD_NAMES_ERROR'
 export const LOAD_PAYMENT_HISTORY_DATA_START = 'refund/RefundRequest/LOAD_PAYMENT_HISTORY_DATA_START'
 export const LOAD_PAYMENT_HISTORY_DATA_LOADED = 'refund/RefundRequest/LOAD_PAYMENT_HISTORY_DATA_LOADED'
 export const LOAD_PAYMENT_HISTORY_DATA_ERROR = 'refund/RefundRequest/LOAD_PAYMENT_HISTORY_DATA_ERROR'
-export const PRE_RESET_REFUND_REQUEST_FORM = 'refund/RefundRequest/PRE_RESET_REFUND_REQUEST_FORM'
-export const POST_RESET_REFUND_REQUEST_FORM = 'refund/RefundRequest/POST_RESET_REFUND_REQUEST_FORM'
+export const RESET_REFUND_REQUEST_FORM_START = 'refund/RefundRequest/RESET_REFUND_REQUEST_FORM_START'
+export const RESET_REFUND_REQUEST_FORM_END = 'refund/RefundRequest/RESET_REFUND_REQUEST_FORM_END'
 export const CLEAR_ERROR_REPORT = 'refund/RefundRequest/CLEAR_ERROR_REPORT'
 export const RESET_STATE = 'refund/RefundRequest/RESET_STATE'
 export const SAVED_REFUND_REQUEST = 'refund/RefundRequest/SAVED_REFUND_REQUEST'
@@ -254,24 +254,24 @@ export function resetState():ActionPayloadType {
   }
 }
 
-function preResetRefundRequestForm():ActionPayloadType {
+function resetRefundRequestFormStart():ActionPayloadType {
   return {
-    type: PRE_RESET_REFUND_REQUEST_FORM
+    type: RESET_REFUND_REQUEST_FORM_START
   }
 }
 
-function postResetRefundRequestForm():ActionPayloadType {
+function resetRefundRequestFormEnd():ActionPayloadType {
   return {
-    type: POST_RESET_REFUND_REQUEST_FORM
+    type: RESET_REFUND_REQUEST_FORM_END
   }
 }
 
 function resetRefundRequestForm():Function {
   return (dispatch:Function) => {
-    dispatch(preResetRefundRequestForm())
+    dispatch(resetRefundRequestFormStart())
     // TODO: Hope this isn't async... Check.
     dispatch(reset('resetRefundRequestForm'))
-    dispatch(postResetRefundRequestForm())
+    dispatch(resetRefundRequestFormEnd())
   }
 }
 
@@ -390,8 +390,8 @@ export const actions = {
   clearErrorReport,
   resetState,
   resetRefundRequestForm,
-  preResetRefundRequestForm,
-  postResetRefundRequestForm,
+  resetRefundRequestFormStart,
+  resetRefundRequestFormEnd,
   validLookup,
   validLookupStart,
   validLookupEnd,
@@ -553,14 +553,14 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
       isSaved:  action.payload.isSaved
     })
   },
-  [PRE_RESET_REFUND_REQUEST_FORM]:    (state:ShortType):ShortType => {
+  [RESET_REFUND_REQUEST_FORM_START]:    (state:ShortType):ShortType => {
     return ({
       ...state,
       isResettingRefundForm: true,
       refundRequestForm:     initialState.refundRequestForm
     })
   },
-  [POST_RESET_REFUND_REQUEST_FORM]:   (state:ShortType):ShortType => {
+  [RESET_REFUND_REQUEST_FORM_END]:   (state:ShortType):ShortType => {
     return ({
       ...state,
       isResettingRefundForm: false

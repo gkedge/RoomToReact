@@ -136,7 +136,10 @@ describe('fluentRequest', function () { // Can't use '() ==> here...
       expect(request.getUrl().format()).to.be.equal(expectedUrl)
     })
     
-    it('setQueryParams()', () => {
+  })
+
+  describe('queryParam', () => {
+    it('setQueryParam()', () => {
       const expectedUrl = getRootContext().format() +
                           testPartialUrlStr + 
                           '?pet=turtle&name=Yertle'
@@ -148,9 +151,6 @@ describe('fluentRequest', function () { // Can't use '() ==> here...
       expect(request.getUrl().format()).to.be.equal(expectedUrl)
     })
 
-  })
-
-  describe('queryParam', () => {
   })
 
   describe('# get', () => {
