@@ -1,5 +1,8 @@
 /* @flow */
 
+// TODO: might be able to remove some the serious amoutn of boiler plate going
+// on in here with: https://github.com/acdlite/redux-actions
+
 import type {ActionPayloadType, RequestErrorReportType} from 'reusable/interfaces/FpngTypes'
 
 import type {
@@ -31,7 +34,7 @@ import url from 'url'
 import cloneDeep from 'lodash/cloneDeep'
 
 import {upper, lower} from 'reusable/utilities/dataUtils'
-import {createReducer} from 'reusable/utilities/reduxStoreUtils'
+import {createReducer, unknownAction} from 'reusable/utilities/reduxStoreUtils'
 
 // import dispatchTime from 'promise-time'
 import {promiseTime as dispatchTime} from 'reusable/utilities/promisePlugins'
@@ -72,20 +75,22 @@ export const VALID_LOOKUP_ERROR = 'refund/RefundRequest/VALID_LOOKUP_ERROR'
 // ------------------------------------
 // https://github.com/wbinnssmith/redux-normalizr-middleware
 
-function loadPaymentHistoryDataStart():ActionPayloadType {
+export const loadPaymentHistoryDataStart = ():ActionPayloadType => {
   return {
     type: LOAD_PAYMENT_HISTORY_DATA_START
   }
 }
 
-function loadPaymentHistoryDataLoaded(paymentHistoryData:PaymentHistoryDataType):ActionPayloadType {
+export const loadPaymentHistoryDataLoaded = 
+               (paymentHistoryData:PaymentHistoryDataType):ActionPayloadType => {
   return {
     type:    LOAD_PAYMENT_HISTORY_DATA_LOADED,
     payload: paymentHistoryData
   }
 }
 
-function loadPaymentHistoryDataError(errorMessage:RequestErrorReportType):ActionPayloadType {
+export const loadPaymentHistoryDataError = 
+               (errorMessage:RequestErrorReportType):ActionPayloadType => {
   return {
     type:    LOAD_PAYMENT_HISTORY_DATA_ERROR,
     payload: errorMessage
@@ -114,20 +119,20 @@ export const loadPaymentHistoryData = ():Function => {
   }
 }
 
-function loadNamesDataStart():ActionPayloadType {
+export const loadNamesDataStart = ():ActionPayloadType => {
   return {
     type: LOAD_NAMES_START
   }
 }
 
-function loadNamesDataLoaded(namesData:NamesDataType):ActionPayloadType {
+export const loadNamesDataLoaded = (namesData:NamesDataType):ActionPayloadType => {
   return {
     type:    LOAD_NAMES_LOADED,
     payload: namesData
   }
 }
 
-function loadNamesDataError():ActionPayloadType {
+export const loadNamesDataError = ():ActionPayloadType => {
   return {
     type: LOAD_NAMES_ERROR
   }
@@ -158,26 +163,26 @@ export const loadNamesData = ():Function => {
   }
 }
 
-function loadAddressesDataStart():ActionPayloadType {
+export const loadAddressesDataStart = ():ActionPayloadType => {
   return {
     type: LOAD_ADDRESSES_START
   }
 }
 
-function loadAddressesDataLoaded(addressesData:AddressesDataType):ActionPayloadType {
+export const loadAddressesDataLoaded = (addressesData:AddressesDataType):ActionPayloadType => {
   return {
     type:    LOAD_ADDRESSES_LOADED,
     payload: addressesData
   }
 }
 
-function loadAddressesDataError():ActionPayloadType {
+export const loadAddressesDataError = ():ActionPayloadType => {
   return {
     type: LOAD_ADDRESSES_ERROR
   }
 }
 
-export const loadAddressesData = ():Function => {
+export const loadAddressesData:Function  = ():Function => {
   return (dispatch:Function, getState:Function):any /* Promise */ => {
     let lookupForm = getState().refundRequest.lookupForm
     const loadAddressesAPI = url.parse('patents/' +
@@ -202,7 +207,7 @@ export const loadAddressesData = ():Function => {
   }
 }
 
-export function loadingPdf(pdfFile:Object):ActionPayloadType {
+export const loadingPdf:Function = (pdfFile:Object):ActionPayloadType => {
   return {
     type:    LOADING_PDF,
     payload: {
@@ -211,7 +216,7 @@ export function loadingPdf(pdfFile:Object):ActionPayloadType {
   }
 }
 
-export function pdfBinary(pdfRaw:Uint8Array):ActionPayloadType {
+export const pdfBinary = (pdfRaw:Uint8Array):ActionPayloadType => {
   return {
     type:    PDF_BINARY,
     payload: {
@@ -220,13 +225,13 @@ export function pdfBinary(pdfRaw:Uint8Array):ActionPayloadType {
   }
 }
 
-export function pdfLoaded():ActionPayloadType {
+export const pdfLoaded = ():ActionPayloadType => {
   return {
     type: PDF_LOADED
   }
 }
 
-export function postRefundRequest():ActionPayloadType {
+export const postRefundRequest = ():ActionPayloadType => {
   return {
     type:    POST_REFUND_REQUEST,
     payload: {
@@ -236,7 +241,7 @@ export function postRefundRequest():ActionPayloadType {
   }
 }
 
-export function savedRefundRequest():ActionPayloadType {
+export const savedRefundRequest = ():ActionPayloadType => {
   return {
     type:    SAVED_REFUND_REQUEST,
     payload: {
@@ -246,31 +251,31 @@ export function savedRefundRequest():ActionPayloadType {
   }
 }
 
-export function clearErrorReport():ActionPayloadType {
+export const clearErrorReport = ():ActionPayloadType => {
   return {
     type: CLEAR_ERROR_REPORT
   }
 }
 
-export function resetState():ActionPayloadType {
+export const resetState = ():ActionPayloadType => {
   return {
     type: RESET_STATE
   }
 }
 
-function resetRefundRequestFormStart():ActionPayloadType {
+export const resetRefundRequestFormStart = ():ActionPayloadType => {
   return {
     type: RESET_REFUND_REQUEST_FORM_START
   }
 }
 
-function resetRefundRequestFormEnd():ActionPayloadType {
+export const resetRefundRequestFormEnd = ():ActionPayloadType => {
   return {
     type: RESET_REFUND_REQUEST_FORM_END
   }
 }
 
-function resetRefundRequestForm():Function {
+export const resetRefundRequestForm = ():Function => {
   return (dispatch:Function) => {
     dispatch(resetRefundRequestFormStart())
     // TODO: Hope this isn't async... Check.
@@ -288,19 +293,19 @@ export const saveRefundRequest = (/* asciiPDF:string */):Function => {
   }
 }
 
-function lookupReferencedDataStart():ActionPayloadType {
+export const lookupReferencedDataStart = ():ActionPayloadType => {
   return {
     type: LOOKUP_REFERENCED_DATA_START
   }
 }
 
-function lookupReferencedDataLoaded():ActionPayloadType {
+export const lookupReferencedDataLoaded = ():ActionPayloadType => {
   return {
     type: LOOKUP_REFERENCED_DATA_LOADED
   }
 }
 
-function lookupReferencedDataError():ActionPayloadType {
+export const lookupReferencedDataError = ():ActionPayloadType => {
   return {
       type: LOOKUP_REFERENCED_DATA_ERROR
     }
@@ -343,20 +348,20 @@ export const lookupReferencedData = ():Function => {
   }
 }
 
-function validLookupStart(lookupFormData:LookupFormDataType):ActionPayloadType {
+export const validLookupStart = (lookupFormData:LookupFormDataType):ActionPayloadType => {
   return {
       type:    VALID_LOOKUP_START,
       payload: lookupFormData
     }
 }
 
-function validLookupEnd():ActionPayloadType {
+export const validLookupEnd = ():ActionPayloadType => {
   return {
       type: VALID_LOOKUP_END
     }
 }
 
-function validLookupError():ActionPayloadType {
+export const validLookupError = ():ActionPayloadType => {
   return {
       type: VALID_LOOKUP_ERROR
     }
@@ -377,39 +382,6 @@ export function validLookup(lookupFormData:LookupFormDataType):Function {
       })
       .catch(() => dispatch(validLookupError()))
   }
-}
-
-export const actions = {
-  loadAddressesData,
-  loadAddressesDataStart,
-  loadAddressesDataLoaded,
-  loadAddressesDataError,
-  loadingPdf,
-  lookupReferencedDataStart,
-  lookupReferencedDataLoaded,
-  loadNamesData,
-  loadNamesDataStart,
-  loadNamesDataLoaded,
-  loadNamesDataError,
-  loadPaymentHistoryData,
-  loadPaymentHistoryDataStart,
-  loadPaymentHistoryDataLoaded,
-  loadPaymentHistoryDataError,
-  pdfBinary,
-  pdfLoaded,
-  lookupReferencedData,
-  postRefundRequest,
-  saveRefundRequest,
-  savedRefundRequest,
-  clearErrorReport,
-  resetState,
-  resetRefundRequestForm,
-  resetRefundRequestFormStart,
-  resetRefundRequestFormEnd,
-  validLookup,
-  validLookupStart,
-  validLookupEnd,
-  validLookupError
 }
 
 /*eslint "key-spacing": 0*/
@@ -731,14 +703,12 @@ export const initialState:ShortType = {
   isNegativeTesting:     false
 }
 
-const reducer:Function = createReducer(initialState, LOAD_REFUND_REQUEST_ACTION_HANDLERS)
-export const unknownAction:ActionPayloadType = {type: "Unknown"}
+const reducer = createReducer(initialState, LOAD_REFUND_REQUEST_ACTION_HANDLERS)
 export default function refundRequestReducer(state:ShortType = initialState,
                                              action:ActionPayloadType = unknownAction):ShortType {
-  
   return reducer(state, action)
 }
-  
+
 (function() {
   setRootContext('default', url.parse('http://dev-fpng-jboss-3.etc.uspto.gov:8080/refunds-services/v1/'))
 

@@ -1,6 +1,12 @@
 /*
  http://jamesknelson.com/using-es6-in-the-browser-with-babel-6-and-webpack/
  */
+
+// TODO: I am starting to leverage lodash more in the app.
+// Should consider both of these to reduce JS size:
+// 1) https://www.npmjs.com/package/babel-plugin-lodash
+// 2) https://github.com/lodash/lodash-webpack-plugin
+
 import webpack from 'webpack'
 import cssnano from 'cssnano'
 import HtmlWebpackPlugin from 'html-webpack-plugin'

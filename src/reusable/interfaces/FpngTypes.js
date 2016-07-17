@@ -13,3 +13,5 @@ export type RequestErrorReportType = {
   warnMessageText: ?Array<string>
 }
 
+export type StateMapType = { [key: string]: any }
+export type MapOfActionCreatorsType = { [key: string]: Function }

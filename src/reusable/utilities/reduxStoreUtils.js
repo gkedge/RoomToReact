@@ -1,7 +1,18 @@
+/* @ flow */
 // http://redux.js.org/docs/recipes/ReducingBoilerplate.html: Generating Reducers
 
-export function createReducer(initialState, handlers) {
-  return function reducer(state = initialState, action) {
+import type {
+  ActionPayloadType, 
+  StateMapType, 
+  MapOfActionCreatorsType 
+} from 'reusable/interfaces/FpngTypes'
+
+export const unknownAction:ActionPayloadType = {type: "Unknown"}
+
+export function createReducer(initialState:StateMapType,
+                              handlers:MapOfActionCreatorsType):Function {
+  return function reducer(state:StateMapType = initialState,
+                          action:ActionPayloadType = unknownAction) {
     if (handlers.hasOwnProperty(action.type)) {
       return handlers[action.type](state, action)
     } else {

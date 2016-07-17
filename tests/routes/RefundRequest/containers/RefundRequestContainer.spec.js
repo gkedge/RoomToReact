@@ -2,7 +2,7 @@
 import React from 'react'
 import RefundRequest from 'routes/RefundRequest/components/RefundRequest'
 import RefundRequestContainer from 'routes/RefundRequest/containers/RefundRequestContainer'
-import {actions, initialState} from 'routes/RefundRequest/modules/RefundRequestMod'
+import * as actions from 'routes/RefundRequest/modules/RefundRequestMod'
 import configureMockStore from 'redux-mock-store';
 import {routerMiddleware} from 'react-router-redux'
 import thunk from 'redux-thunk'
