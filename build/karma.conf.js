@@ -55,7 +55,7 @@ const karmaConfig = {
       // running tests to be restarted whereas changing test-bundler.js:testsContext
       // will be reflected immediately.
       //
-      // grep: "loadPaymentHistoryData"
+      // grep: "loadAddressesData"
     }
   },
   singleRun:         !argv.watch,

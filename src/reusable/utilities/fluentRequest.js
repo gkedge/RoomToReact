@@ -448,6 +448,10 @@ export class Request {
             // TODO: added headers to __mockData__
             headers: { "content-type": "application/json; charset=utf-8" }
           }
+          if (!response.body) {
+            console.error("Didn't find mock data for: " + 
+                          this.url.pathname)
+          }
           debugMocking(this.url.pathname + ' data: ' +
             JSON.stringify(__mockData__[this.url.pathname]))
           fetchMock.mock(this.url.format(), this.opts.httpMethod, response)

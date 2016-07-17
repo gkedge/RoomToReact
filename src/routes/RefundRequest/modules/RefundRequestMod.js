@@ -134,8 +134,9 @@ function loadNamesDataError():ActionPayloadType {
 export const loadNamesData = ():Function => {
   return (dispatch:Function, getState:Function):any /* Promise */ => {
     let lookupForm = getState().refundRequest.lookupForm
-    const loadNamesAPI = url.parse('name')
-    // const loadNamesAPI = url.parse('patents/' + lookupForm.referenceNum + '/personNames')
+    const loadNamesAPI = url.parse('patents/' +
+                                   lookupForm.referenceNum +
+                                   '/personNames')
     debug('loadNamesData: Lookup Form: ' + JSON.stringify(lookupForm))
     dispatch(loadNamesDataStart())
 
@@ -177,8 +178,9 @@ function loadAddressesDataError():ActionPayloadType {
 export const loadAddressesData = ():Function => {
   return (dispatch:Function, getState:Function):any /* Promise */ => {
     let lookupForm = getState().refundRequest.lookupForm
-    const loadAddressesAPI = url.parse('address')
-    // const loadAddressesAPI = url.parse('patents/' + lookupForm.referenceNum + '/addresses')
+    const loadAddressesAPI = url.parse('patents/' +
+                                       lookupForm.referenceNum +
+                                       '/addresses')
     debug('loadAddressesData: Lookup Form: ' + JSON.stringify(lookupForm))
     dispatch(loadAddressesDataStart())
 
@@ -696,15 +698,22 @@ export const initialState:ShortType = {
       name:    null
     },
     names:                   null,
-    address:                 {
-      isError: false,
-      found:   false,
-      role:    null,
-      addr0:   null,
-      addr1:   null,
-      city:    null,
-      state:   null,
-      zip:     null
+    address: {
+      isError              : false,
+      found                : false,
+      version              : 0,
+      streetLineOne        : null,
+      streetLineTwo        : null,
+      cityName             : null,
+      geographicRegionModel: {
+        geographicRegionCategory: null,
+        geographicRegionText    : null,
+        geographicRegionName    : null
+      },
+      countryCode          : null,
+      countryName          : null,
+      postalCode           : null,
+      type                 : null
     },
     addresses:               null,
     isLoadingPaymentHistory: false,
