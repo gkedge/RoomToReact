@@ -43,7 +43,7 @@ const mapActionCreators:{
   validLookup
 }
 
-// The 'pure'ity option (true by default), enlists redux to internally attempt 
+// The 'pure'ity option (true by default), enlists redux to internally attempt
 // optimization of React.Component.shouldcomponentupdate() via the components
 // registration with Redux.connnect() below.
 //

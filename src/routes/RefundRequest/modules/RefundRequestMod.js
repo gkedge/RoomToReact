@@ -81,21 +81,21 @@ export const loadPaymentHistoryDataStart = ():ActionPayloadType => {
   }
 }
 
-export const loadPaymentHistoryDataLoaded = 
+export const loadPaymentHistoryDataLoaded =
                (paymentHistoryData:PaymentHistoryDataType):ActionPayloadType => {
-  return {
-    type:    LOAD_PAYMENT_HISTORY_DATA_LOADED,
-    payload: paymentHistoryData
-  }
-}
+                 return {
+                   type:    LOAD_PAYMENT_HISTORY_DATA_LOADED,
+                   payload: paymentHistoryData
+                 }
+               }
 
-export const loadPaymentHistoryDataError = 
+export const loadPaymentHistoryDataError =
                (errorMessage:RequestErrorReportType):ActionPayloadType => {
-  return {
-    type:    LOAD_PAYMENT_HISTORY_DATA_ERROR,
-    payload: errorMessage
-  }
-}
+                 return {
+                   type:    LOAD_PAYMENT_HISTORY_DATA_ERROR,
+                   payload: errorMessage
+                 }
+               }
 
 export const loadPaymentHistoryData = ():Function => {
   return (dispatch:Function, getState:Function):any /* Promise */ => {
@@ -307,8 +307,8 @@ export const lookupReferencedDataLoaded = ():ActionPayloadType => {
 
 export const lookupReferencedDataError = ():ActionPayloadType => {
   return {
-      type: LOOKUP_REFERENCED_DATA_ERROR
-    }
+    type: LOOKUP_REFERENCED_DATA_ERROR
+  }
 }
 
 export const lookupReferencedData = ():Function => {
@@ -318,14 +318,13 @@ export const lookupReferencedData = ():Function => {
     // 'resolve' tied to a Promise.spread() to help understand what
     // it does very differently than a Promise.all() and provide a
     // hint if they ever are needed in the future.
+
     // eslint-disable-next-line no-unused-vars
-    const resolve = (paymentHistoryData:?any,
-                     namesData:?any,
-                     addressesData:?any):any /* Promise */ => {
+    const resolve = (paymentHistoryData:?any, namesData:?any, addressesData:?any):any /* Promise */ => {
       if (debugTime.enabled) {
         debugTime('lookupReferencedData time: +' + allDispatches.time + 'ms')
       }
-      
+
       return dispatch(lookupReferencedDataLoaded())
     }
 
@@ -350,21 +349,21 @@ export const lookupReferencedData = ():Function => {
 
 export const validLookupStart = (lookupFormData:LookupFormDataType):ActionPayloadType => {
   return {
-      type:    VALID_LOOKUP_START,
-      payload: lookupFormData
-    }
+    type:    VALID_LOOKUP_START,
+    payload: lookupFormData
+  }
 }
 
 export const validLookupEnd = ():ActionPayloadType => {
   return {
-      type: VALID_LOOKUP_END
-    }
+    type: VALID_LOOKUP_END
+  }
 }
 
 export const validLookupError = ():ActionPayloadType => {
   return {
-      type: VALID_LOOKUP_ERROR
-    }
+    type: VALID_LOOKUP_ERROR
+  }
 }
 
 export function validLookup(lookupFormData:LookupFormDataType):Function {
@@ -634,7 +633,7 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
       }
     })
   }
-  
+
 }
 
 // ------------------------------------

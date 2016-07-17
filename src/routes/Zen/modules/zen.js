@@ -78,15 +78,15 @@ const ZEN_ACTION_HANDLERS = {
     return ({
       ...state,
       zens:     state.zens.concat(action.payload),
-      current:  action.payload.id, 
+      current:  action.payload.id,
       fetching: false
     })
   },
   [REQUEST_ZEN_ERROR]: (state:ZenStateObjectType, action:{payload: ZenObjectType}):ZenStateObjectType => {
     return ({
       ...state,
-      zens      : state.zens.concat(action.payload),
-      fetching  : false,
+      zens:       state.zens.concat(action.payload),
+      fetching:   false,
       fetchError: true
     })
   },

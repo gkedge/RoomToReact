@@ -7,7 +7,7 @@ export type ActionPayloadType = {
 export type RequestErrorReportType = {
   statusCode: number,
   statusText: string,
-  errorCode:  ?number,
+  errorCode: ?number,
   errorMessageText: ?Array<string>,
   infoMessageText: ?Array<string>,
   warnMessageText: ?Array<string>

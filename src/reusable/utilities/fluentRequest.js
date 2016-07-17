@@ -143,7 +143,7 @@ export const responseFail = (reason:any, message:?string) => {
 }
 
 const _defaultJsonErrorHandler:Function = (response:Object):Promise => {
-  return new Promise((resolve:Function, reject:Function):any /* Promise */  => {
+  return new Promise((resolve:Function, reject:Function):any /* Promise */ => {
     const contentType = response.headers.get("content-type")
     if (contentType && contentType.indexOf("application/json") !== -1) {
       return response.json()
@@ -155,12 +155,12 @@ const _defaultJsonErrorHandler:Function = (response:Object):Promise => {
           // is available.
           if (!response.ok || !jsonStatusOk) {
             const requestErrorReport:RequestErrorReportType = {
-              statusCode: response.status,
-              statusText: response.statusText,
-              errorCode: json.errorCode,
+              statusCode:       response.status,
+              statusText:       response.statusText,
+              errorCode:        json.errorCode,
               errorMessageText: json.errorMessageText,
-              infoMessageText: json.infoMessageText,
-              warnMessageText: json.warnMessageText
+              infoMessageText:  json.infoMessageText,
+              warnMessageText:  json.warnMessageText
             }
             reject(new RequestError(requestErrorReport))
           }
@@ -201,19 +201,19 @@ const _defaultHttpErrorHandler:Function = (response:Object):Object => {
 }
 
 export const defaultOpts:OptionsType = {
-  afterJSON: null,
-  afterRequest: null,
-  beforeRequest: null,
-  cache: 'no-cache',
-  corsMode: 'cors',
-  credentials: 'omit',
+  afterJSON:        null,
+  afterRequest:     null,
+  beforeRequest:    null,
+  cache:            'no-cache',
+  corsMode:         'cors',
+  credentials:      'omit',
   jsonErrorHandler: _defaultJsonErrorHandler,
   httpErrorHandler: _defaultHttpErrorHandler,
-  headers: {'Accept': 'application/json'},
-  httpMethod: 'GET',
-  isMocking: false,
-  queryParams: null,
-  rootContextKey: 'default'
+  headers:          {'Accept': 'application/json'},
+  httpMethod:       'GET',
+  isMocking:        false,
+  queryParams:      null,
+  rootContextKey:   'default'
 }
 
 const methods = ['DELETE', 'GET', 'HEAD', 'OPTIONS', 'POST', 'PUT']
@@ -307,13 +307,13 @@ export class Request {
 
   setMimeType(type:string):Request {
     switch (type) {
-      case 'json':
-        type = 'application/json; charset=utf-8'
-        break
-      case 'form':
-      case 'urlencoded':
-        type = 'application/x-www-form-urlencoded; charset=utf-8'
-        break
+    case 'json':
+      type = 'application/json; charset=utf-8'
+      break
+    case 'form':
+    case 'urlencoded':
+      type = 'application/x-www-form-urlencoded; charset=utf-8'
+      break
     }
 
     this.opts.headers['content-type'] = type
@@ -328,13 +328,13 @@ export class Request {
   isMimeType(typeToCheck:string):boolean {
     const currentType:?string = this.getMimeType()
     switch (typeToCheck) {
-      case 'json':
-        return currentType === 'application/json; charset=utf-8'
-      case 'form':
-      case 'urlencoded':
-        return currentType === 'application/x-www-form-urlencoded; charset=utf-8'
-      default:
-        return false
+    case 'json':
+      return currentType === 'application/json; charset=utf-8'
+    case 'form':
+    case 'urlencoded':
+      return currentType === 'application/x-www-form-urlencoded; charset=utf-8'
+    default:
+      return false
     }
   }
 
@@ -449,7 +449,7 @@ export class Request {
             headers: { "content-type": "application/json; charset=utf-8" }
           }
           if (!response.body) {
-            console.error("Didn't find mock data for: " + 
+            console.error("Didn't find mock data for: " +
                           this.url.pathname)
           }
           debugMocking(this.url.pathname + ' data: ' +

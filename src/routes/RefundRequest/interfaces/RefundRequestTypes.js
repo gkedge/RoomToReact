@@ -38,20 +38,20 @@ export type NamesPayloadType = NamesDataType
 
 export type GeographicRegionModelType = {
   "geographicRegionCategory": ?string,
-  "geographicRegionText"    : ?string,
-  "geographicRegionName"    : ?string
+  "geographicRegionText" : ?string,
+  "geographicRegionName" : ?string
 }
 
 export type AddressesDatumType = {
-  version              : number,
-  streetLineOne        : ?string,
-  streetLineTwo        : ?string,
-  cityName             : ?string,
+  version : number,
+  streetLineOne : ?string,
+  streetLineTwo : ?string,
+  cityName : ?string,
   geographicRegionModel: GeographicRegionModelType,
-  countryCode          : ?string,
-  countryName          : ?string,
-  postalCode           : ?string,
-  type                 : ?string
+  countryCode : ?string,
+  countryName : ?string,
+  postalCode : ?string,
+  type : ?string
 }
 
 export type AddressesDataType = Array<AddressesDatumType>
@@ -67,15 +67,15 @@ type RefundRequestNameStateType = {
 type RefundRequestAddressStateType = {
   isError: boolean,
   found: boolean,
-  version              : number,
-  streetLineOne        : ?string,
-  streetLineTwo        : ?string,
-  cityName             : ?string,
+  version : number,
+  streetLineOne : ?string,
+  streetLineTwo : ?string,
+  cityName : ?string,
   geographicRegionModel: GeographicRegionModelType,
-  countryCode          : ?string,
-  countryName          : ?string,
-  postalCode           : ?string,
-  type                 : ?string
+  countryCode : ?string,
+  countryName : ?string,
+  postalCode : ?string,
+  type : ?string
 }
 
 export type RefundRequestStateType = {
