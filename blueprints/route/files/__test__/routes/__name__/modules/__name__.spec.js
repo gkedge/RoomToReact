@@ -9,7 +9,7 @@ import <%= camelEntityName %>Reducer, {
 // http://redux.js.org/docs/recipes/WritingTests.html
 // Disregard any reference to nock as that is a server-side
 // only solution; using fetch-mock instead.
-import fetchMock from 'fetch-mock'
+// import fetchMock from 'fetch-mock'
 
 describe('(Route Module) <%= pascalEntityName %>', () => {
   describe('(Actions)', () => {

@@ -1,6 +1,6 @@
 /* @flow */
 // https://davidwalsh.name/fetch
-import fetch from 'isomorphic-fetch'
+import 'whatwg-fetch'  // isomorphic-fetch contains the browser-specific whatwg-fetch
 
 import type { <%= pascalEntityName %>Object, <%= pascalEntityName %>StateObject } from '../interfaces/<%= camelEntityName %>.js'
 

@@ -45,6 +45,7 @@ const config = {
     colors : true
   },
   compiler_vendor : [
+    'url',
     'debug',
     'history',
     'react',

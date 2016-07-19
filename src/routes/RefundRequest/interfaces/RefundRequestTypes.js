@@ -1,6 +1,6 @@
 /* @flow */
 
-import type {ActionPayloadType, RequestErrorReportType} from 'reusable/interfaces/FpngTypes'
+import type {ActionPayloadType, RequestIssueReportType} from 'reusable/interfaces/FpngTypes'
 
 export type PdfStateType = {
   isError: boolean,
@@ -13,7 +13,7 @@ export type PdfStateType = {
 }
 
 export type LookupStateType = {
-  isError: ?boolean,
+  isIssue: ?boolean,
   isLookingUp: ?boolean,
   referenceNum: ?string,
   dateFrom: ?string,
@@ -59,13 +59,15 @@ export type AddressesDataType = Array<AddressesDatumType>
 export type AddressesPayloadType = AddressesDataType
 
 type RefundRequestNameStateType = {
-  isError: boolean,
+  isIssue: boolean,
+  issueReport: ?Array<RequestIssueReportType>,
   found: boolean,
-  name: ?NamesType
+  name: ?NamesDataType
 }
 
 type RefundRequestAddressStateType = {
-  isError: boolean,
+  isIssue: boolean,
+  issueReport: ?Array<RequestIssueReportType>,
   found: boolean,
   version : number,
   streetLineOne : ?string,
@@ -81,8 +83,8 @@ type RefundRequestAddressStateType = {
 export type RefundRequestStateType = {
   // I don't understand why each of these entries MUST be optional
   // to get through a type check when creating a RefundRequest. Ugh!
-  isError: ?boolean,
-  errorReport: ?Array<RequestErrorReportType>,
+  isIssue: ?boolean,
+  issueReport: ?Array<RequestIssueReportType>,
   fees: ?PaymentHistoryStateType,
   depositAccountNum: ?number,
   reason: ?string,

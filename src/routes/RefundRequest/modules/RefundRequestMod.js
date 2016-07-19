@@ -3,7 +3,7 @@
 // TODO: might be able to remove some the serious amoutn of boiler plate going
 // on in here with: https://github.com/acdlite/redux-actions
 
-import type {ActionPayloadType, RequestErrorReportType} from 'reusable/interfaces/FpngTypes'
+import type {ActionPayloadType, RequestIssueReportType} from 'reusable/interfaces/FpngTypes'
 
 import type {
   LookupFormPayloadType,
@@ -45,35 +45,43 @@ const debugTime = _debug('refunds:RefundRequestMod:time')
 // ------------------------------------
 // Constants
 // ------------------------------------
-export const LOADING_PDF = 'refund/RefundRequest/LOADING_PDF'
-export const PDF_BINARY = 'refund/RefundRequest/PDF_BINARY'
-export const PDF_LOADED = 'refund/RefundRequest/PDF_LOADED'
-export const POST_REFUND_REQUEST = 'refund/RefundRequest/POST_REFUND_REQUEST'
-export const LOOKUP_REFERENCED_DATA_START = 'refund/RefundRequest/LOOKUP_REFERENCED_DATA_START'
-export const LOOKUP_REFERENCED_DATA_LOADED = 'refund/RefundRequest/LOOKUP_REFERENCED_DATA_LOADED'
-export const LOOKUP_REFERENCED_DATA_ERROR = 'refund/RefundRequest/LOOKUP_REFERENCED_DATA_ERROR'
-export const LOAD_ADDRESSES_START = 'refund/RefundRequest/LOAD_ADDRESSES_START'
-export const LOAD_ADDRESSES_LOADED = 'refund/RefundRequest/LOAD_ADDRESSES_LOADED'
-export const LOAD_ADDRESSES_ERROR = 'refund/RefundRequest/LOAD_ADDRESSES_ERROR'
-export const LOAD_NAMES_START = 'refund/RefundRequest/LOAD_NAMES_START'
-export const LOAD_NAMES_LOADED = 'refund/RefundRequest/LOAD_NAMES_LOADED'
-export const LOAD_NAMES_ERROR = 'refund/RefundRequest/LOAD_NAMES_ERROR'
-export const LOAD_PAYMENT_HISTORY_DATA_START = 'refund/RefundRequest/LOAD_PAYMENT_HISTORY_DATA_START'
-export const LOAD_PAYMENT_HISTORY_DATA_LOADED = 'refund/RefundRequest/LOAD_PAYMENT_HISTORY_DATA_LOADED'
-export const LOAD_PAYMENT_HISTORY_DATA_ERROR = 'refund/RefundRequest/LOAD_PAYMENT_HISTORY_DATA_ERROR'
-export const RESET_REFUND_REQUEST_FORM_START = 'refund/RefundRequest/RESET_REFUND_REQUEST_FORM_START'
-export const RESET_REFUND_REQUEST_FORM_END = 'refund/RefundRequest/RESET_REFUND_REQUEST_FORM_END'
-export const CLEAR_ERROR_REPORT = 'refund/RefundRequest/CLEAR_ERROR_REPORT'
-export const RESET_STATE = 'refund/RefundRequest/RESET_STATE'
-export const SAVED_REFUND_REQUEST = 'refund/RefundRequest/SAVED_REFUND_REQUEST'
-export const VALID_LOOKUP_START = 'refund/RefundRequest/VALID_LOOKUP_START'
-export const VALID_LOOKUP_END = 'refund/RefundRequest/VALID_LOOKUP_END'
-export const VALID_LOOKUP_ERROR = 'refund/RefundRequest/VALID_LOOKUP_ERROR'
+export const LOADING_PDF = '@@refund/request/LOADING_PDF'
+export const PDF_BINARY = '@@refund/request/PDF_BINARY'
+export const PDF_LOADED = '@@refund/request/PDF_LOADED'
+export const POST_REFUND_REQUEST = '@@refund/request/POST_REFUND_REQUEST'
+export const LOOKUP_REFERENCED_DATA_START = '@@refund/request/LOOKUP_REFERENCED_DATA_START'
+export const LOOKUP_REFERENCED_DATA_LOADED = '@@refund/request/LOOKUP_REFERENCED_DATA_LOADED'
+export const LOOKUP_REFERENCED_DATA_ISSUE = '@@refund/request/LOOKUP_REFERENCED_DATA_ISSUE'
+export const LOAD_ADDRESSES_START = '@@refund/request/LOAD_ADDRESSES_START'
+export const LOAD_ADDRESSES_LOADED = '@@refund/request/LOAD_ADDRESSES_LOADED'
+export const LOAD_ADDRESSES_ISSUE = '@@refund/request/LOAD_ADDRESSES_ISSUE'
+export const LOAD_NAMES_START = '@@refund/request/LOAD_NAMES_START'
+export const LOAD_NAMES_LOADED = '@@refund/request/LOAD_NAMES_LOADED'
+export const LOAD_NAMES_ISSUE = '@@refund/request/LOAD_NAMES_ISSUE'
+export const LOAD_PAYMENT_HISTORY_DATA_START = '@@refund/request/LOAD_PAYMENT_HISTORY_DATA_START'
+export const LOAD_PAYMENT_HISTORY_DATA_LOADED = '@@refund/request/LOAD_PAYMENT_HISTORY_DATA_LOADED'
+export const LOAD_PAYMENT_HISTORY_DATA_ISSUE = '@@refund/request/LOAD_PAYMENT_HISTORY_DATA_ISSUE'
+export const RESET_REFUND_REQUEST_FORM_START = '@@refund/request/RESET_REFUND_REQUEST_FORM_START'
+export const RESET_REFUND_REQUEST_FORM_END = '@@refund/request/RESET_REFUND_REQUEST_FORM_END'
+export const CLEAR_ISSUE_REPORT = '@@refund/request/CLEAR_ISSUE_REPORT'
+export const RESET_STATE = '@@refund/request/RESET_STATE'
+export const SAVED_REFUND_REQUEST = '@@refund/request/SAVED_REFUND_REQUEST'
+export const ISSUE_RAISED = '@@refund/request/ISSUE_RAISED'
+export const VALID_LOOKUP_START = '@@refund/request/VALID_LOOKUP_START'
+export const VALID_LOOKUP_END = '@@refund/request/VALID_LOOKUP_END'
+export const VALID_LOOKUP_ISSUE = '@@refund/request/VALID_LOOKUP_ISSUE'
 
 // ------------------------------------
 // Actions
 // ------------------------------------
 // https://github.com/wbinnssmith/redux-normalizr-middleware
+
+export const raiseIssue = (issueMessage:RequestIssueReportType):ActionPayloadType => {
+  return {
+    type: ISSUE_RAISED,
+    payload: issueMessage
+  }
+}
 
 export const loadPaymentHistoryDataStart = ():ActionPayloadType => {
   return {
@@ -82,20 +90,22 @@ export const loadPaymentHistoryDataStart = ():ActionPayloadType => {
 }
 
 export const loadPaymentHistoryDataLoaded =
-               (paymentHistoryData:PaymentHistoryDataType):ActionPayloadType => {
-                 return {
-                   type:    LOAD_PAYMENT_HISTORY_DATA_LOADED,
-                   payload: paymentHistoryData
-                 }
-               }
+  (paymentHistoryData:PaymentHistoryDataType):ActionPayloadType => {
+    return {
+      type: LOAD_PAYMENT_HISTORY_DATA_LOADED,
+      payload: paymentHistoryData
+    }
+  }
 
-export const loadPaymentHistoryDataError =
-               (errorMessage:RequestErrorReportType):ActionPayloadType => {
-                 return {
-                   type:    LOAD_PAYMENT_HISTORY_DATA_ERROR,
-                   payload: errorMessage
-                 }
-               }
+export const loadPaymentHistoryDataIssue = (issueMessage:RequestIssueReportType):Function => {
+  return (dispatch:Function) => {
+    dispatch({
+      type: LOAD_PAYMENT_HISTORY_DATA_ISSUE,
+      payload: issueMessage
+    })
+    dispatch(raiseIssue(issueMessage))
+  }
+}
 
 export const loadPaymentHistoryData = ():Function => {
   return (dispatch:Function, getState:Function):any /* Promise */ => {
@@ -114,7 +124,7 @@ export const loadPaymentHistoryData = ():Function => {
         if (!getState().refundRequest.isNegativeTesting) {
           responseFail(reason, 'Failed to load payment history')
         }
-        return dispatch(loadPaymentHistoryDataError(reason.message))
+        return dispatch(loadPaymentHistoryDataIssue(reason.message))
       })
   }
 }
@@ -132,9 +142,13 @@ export const loadNamesDataLoaded = (namesData:NamesDataType):ActionPayloadType =
   }
 }
 
-export const loadNamesDataError = ():ActionPayloadType => {
-  return {
-    type: LOAD_NAMES_ERROR
+export const loadNamesDataIssue = (issueMessage:RequestIssueReportType):Function => {
+  return (dispatch:Function) => {
+    dispatch({
+      type: LOAD_NAMES_ISSUE,
+      payload: issueMessage
+    })
+    dispatch(raiseIssue(issueMessage))
   }
 }
 
@@ -154,11 +168,11 @@ export const loadNamesData = ():Function => {
         // TODO: check schema during development.
         return dispatch(loadNamesDataLoaded(jsonData))
       })
-      .catch((reason:any):any => {
+      .catch((reason:Error):any => {
         if (!getState().refundRequest.isNegativeTesting) {
           responseFail(reason, 'Failed to load names associated with patent/trademark')
         }
-        return dispatch(loadNamesDataError())
+        return dispatch(loadNamesDataIssue(reason.message))
       })
   }
 }
@@ -176,9 +190,13 @@ export const loadAddressesDataLoaded = (addressesData:AddressesDataType):ActionP
   }
 }
 
-export const loadAddressesDataError = ():ActionPayloadType => {
-  return {
-    type: LOAD_ADDRESSES_ERROR
+export const loadAddressesDataIssue = (issueMessage:RequestIssueReportType):Function => {
+  return (dispatch:Function) => {
+    dispatch({
+      type: LOAD_ADDRESSES_ISSUE,
+      payload: issueMessage
+    })
+    dispatch(raiseIssue(issueMessage))
   }
 }
 
@@ -198,11 +216,11 @@ export const loadAddressesData:Function  = ():Function => {
         // TODO: check schema during development.
         return dispatch(loadAddressesDataLoaded(jsonData))
       })
-      .catch((reason:any):any /* Promise*/ => {
+      .catch((reason:Error):any /* Promise*/ => {
         if (!getState().refundRequest.isNegativeTesting) {
           responseFail(reason, 'Failed to load addresses associated with patent/trademark')
         }
-        return dispatch(loadAddressesDataError())
+        return dispatch(loadAddressesDataIssue(reason.message))
       })
   }
 }
@@ -251,9 +269,9 @@ export const savedRefundRequest = ():ActionPayloadType => {
   }
 }
 
-export const clearErrorReport = ():ActionPayloadType => {
+export const clearIssueReport = ():ActionPayloadType => {
   return {
-    type: CLEAR_ERROR_REPORT
+    type: CLEAR_ISSUE_REPORT
   }
 }
 
@@ -305,9 +323,9 @@ export const lookupReferencedDataLoaded = ():ActionPayloadType => {
   }
 }
 
-export const lookupReferencedDataError = ():ActionPayloadType => {
+export const lookupReferencedDataIssue = ():ActionPayloadType => {
   return {
-    type: LOOKUP_REFERENCED_DATA_ERROR
+    type: LOOKUP_REFERENCED_DATA_ISSUE
   }
 }
 
@@ -340,7 +358,7 @@ export const lookupReferencedData = ():Function => {
           if (!getState().refundRequest.isNegativeTesting) {
             responseFail(reason, 'Failed to lookup referenced data')
           }
-          return dispatch(lookupReferencedDataError())
+          return dispatch(lookupReferencedDataIssue())
         })
 
     return debugTime.enabled ? dispatchTime(allDispatches)() : allDispatches()
@@ -360,9 +378,9 @@ export const validLookupEnd = ():ActionPayloadType => {
   }
 }
 
-export const validLookupError = ():ActionPayloadType => {
+export const validLookupIssue = ():ActionPayloadType => {
   return {
-    type: VALID_LOOKUP_ERROR
+    type: VALID_LOOKUP_ISSUE
   }
 }
 
@@ -372,14 +390,14 @@ export function validLookup(lookupFormData:LookupFormDataType):Function {
     dispatch(resetRefundRequestForm())
 
     return dispatch(lookupReferencedData())
-      .then(() => dispatch(validLookupEnd()))
+      .then(():any /* Promise */ => dispatch(validLookupEnd()))
       .catch((reason:any):any /* Promise*/ => {
         if (!getState().refundRequest.isNegativeTesting) {
           responseFail(reason, 'Failed to validate lookup')
         }
-        return dispatch(validLookupError())
+        return dispatch(validLookupIssue())
       })
-      .catch(() => dispatch(validLookupError()))
+      .catch(() => dispatch(validLookupIssue()))
   }
 }
 
@@ -408,14 +426,19 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
       }
     })
   },
-  [LOAD_ADDRESSES_ERROR]:             (state:ShortType):ShortType => {
+  [LOAD_ADDRESSES_ISSUE]:             (state:ShortType,
+                                       action:{payload: RequestIssueReportType}):ShortType => {
+    const issueReport =
+      cloneDeep(state.refundRequestForm.addresses.issueReport)
+    issueReport.push(action.payload)
     return ({
       ...state,
       refundRequestForm: {
         ...state.refundRequestForm,
         address: {
           ...state.refundRequestForm.address,
-          isError: true
+          isIssue: true,
+          issueReport: issueReport
         }
       }
     })
@@ -443,14 +466,18 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
       }
     })
   },
-  [LOAD_NAMES_ERROR]:                 (state:ShortType):ShortType => {
+  [LOAD_NAMES_ISSUE]:                 (state:ShortType,
+                                       action:{payload: RequestIssueReportType}):ShortType => {
+    const issueReport = cloneDeep(state.refundRequestForm.names.issueReport)
+    issueReport.push(action.payload)
     return ({
       ...state,
       refundRequestForm: {
         ...state.refundRequestForm,
         name: {
           ...state.refundRequestForm.name,
-          isError: true
+          isIssue: true,
+          issueReport: issueReport
         }
       }
     })
@@ -475,16 +502,16 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
       }
     })
   },
-  [LOAD_PAYMENT_HISTORY_DATA_ERROR]:  (state:ShortType,
-                                       action:{payload: RequestErrorReportType}):ShortType => {
-    const errorReport = cloneDeep(state.refundRequestForm.errorReport)
-    errorReport.push(action.payload)
+  [LOAD_PAYMENT_HISTORY_DATA_ISSUE]:  (state:ShortType,
+                                       action:{payload: RequestIssueReportType}):ShortType => {
+    const issueReport = cloneDeep(state.refundRequestForm.issueReport)
+    issueReport.push(action.payload)
     return ({
       ...state,
       refundRequestForm: {
         ...state.refundRequestForm,
-        isError:     true,
-        errorReport: errorReport
+        isIssue:     true,
+        issueReport: issueReport
       }
     })
   },
@@ -507,7 +534,7 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
     // No affect to state, ... yet.
     return state
   },
-  [LOOKUP_REFERENCED_DATA_ERROR]:      (state:ShortType):ShortType => {
+  [LOOKUP_REFERENCED_DATA_ISSUE]:      (state:ShortType):ShortType => {
     // No affect to state, ... yet.
     return state
   },
@@ -559,26 +586,26 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
       isSaved:  action.payload.isSaved
     })
   },
-  [CLEAR_ERROR_REPORT]:               (state:ShortType):ShortType => {
+  [CLEAR_ISSUE_REPORT]:               (state:ShortType):ShortType => {
     return ({
       ...state,
       lookupForm: {
         ...state.lookupForm,
-        isError: false
+        isIssue: false
       },
       refundRequestForm: {
         ...state.refundRequestForm,
-        isError:     false,
-        errorReport: [],
+        isIssue:     false,
+        issueReport: [],
         address: {
           ...state.refundRequestForm.address,
-          isError: false
-          // errorReport: []
+          isIssue: false,
+          issueReport: []
         },
         name: {
           ...state.refundRequestForm.name,
-          isError: false
-          // errorReport: []
+          isIssue: false,
+          issueReport: []
         }
       }
     })
@@ -623,12 +650,12 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
       }
     })
   },
-  [VALID_LOOKUP_ERROR]:             (state:ShortType):ShortType => {
+  [VALID_LOOKUP_ISSUE]:             (state:ShortType):ShortType => {
     return ({
       ...state,
       lookupForm: {
         ...state.lookupForm,
-        isError    : true,
+        isIssue    : true,
         isLookingUp: false
       }
     })
@@ -650,7 +677,7 @@ export const initialState:ShortType = {
     scale:         0
   },
   lookupForm:            {
-    isError:      false,
+    isIssue:      false,
     isLookingUp:  false,
     referenceNum: null,
     dateFrom:     null,
@@ -658,20 +685,22 @@ export const initialState:ShortType = {
     email:        null
   },
   refundRequestForm:     {
-    isError:                 false,
-    errorReport:             [],
+    isIssue:                 false,
+    issueReport:             [],
     fees:                    null,
     depositAccountNum:       null,
     reason:                  null,
     rationale:               null,
     name:                    {
-      isError: false,
-      found:   false,
-      name:    null
+      isIssue:     false,
+      issueReport: [],
+      found:       false,
+      name:        null
     },
     names:                   null,
     address: {
-      isError              : false,
+      isIssue              : false,
+      issueReport          : [],
       found                : false,
       version              : 0,
       streetLineOne        : null,

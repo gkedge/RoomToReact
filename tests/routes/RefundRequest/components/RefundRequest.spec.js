@@ -16,7 +16,7 @@ const props = {
   },
   lookupFormData: {
     lookupForm: {
-      isError:      false,
+      isIssue:      false,
       isLookingUp:  false,
       referenceNum: 'Yow',
       dateFrom:     null,
@@ -26,19 +26,21 @@ const props = {
   },
   refundRequestFormData: {
     refundRequestForm: {
-      isError:           false,
-      errorReport:       [],
+      isIssue:           false,
+      issueReport:       [],
       fees:              [],
       depositAccountNum: 0,
       reason:            null,
       rationale:         null,
       name:              {
-        isError: false,
+        isIssue: false,
+        issueReport:       [],
         found:   false,
         name:    ''
       },
       address:           {
-        isError: false,
+        isIssue: false,
+        issueReport:       [],
         found:   false,
         address: {
           role:  null,

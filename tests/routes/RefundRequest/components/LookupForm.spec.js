@@ -9,7 +9,7 @@ import {mount, shallow} from 'enzyme';
 
 const props = {
   fields:       {
-    isError:      false,
+    isIssue:      false,
     isLookingUp:  false,
     referenceNum: 'Yow',
     dateFrom:     null,

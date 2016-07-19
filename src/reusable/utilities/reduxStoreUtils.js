@@ -4,7 +4,7 @@
 import type {
   ActionPayloadType,
   StateMapType,
-  MapOfActionCreatorsType
+  MapActionNameToCreatorFuctType
 } from 'reusable/interfaces/FpngTypes'
 
 export const unknownAction:ActionPayloadType = {
@@ -12,7 +12,7 @@ export const unknownAction:ActionPayloadType = {
 }
 
 export function createReducer(initialState:StateMapType,
-                              handlers:MapOfActionCreatorsType):Function {
+                              handlers:MapActionNameToCreatorFuctType):Function {
   return function reducer(state:StateMapType = initialState,
                           action:ActionPayloadType = unknownAction) {
     if (handlers.hasOwnProperty(action.type)) {

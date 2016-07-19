@@ -1,10 +1,12 @@
+import {Url} from 'url'
+
 export type ActionPayloadType = {
   type: string,
   meta: ?Object,
   payload: ?any
 }
 
-export type RequestErrorReportType = {
+export type RequestIssueReportType = {
   statusCode: number,
   statusText: string,
   errorCode: ?number,
@@ -13,5 +15,12 @@ export type RequestErrorReportType = {
   warnMessageText: ?Array<string>
 }
 
-export type StateMapType = { [key: string]: any }
-export type MapOfActionCreatorsType = { [key: string]: Function }
+export type MapToStringType = { [key: string]: string }
+export type MapToUrlType = { [key: string]: Url}
+export type MapToAnyType = { [key: string]: any }
+export type StateMapType = MapToAnyType
+
+export type MapToFunctionType = { [key: string]: Function }
+export type MapActionNameToCreatorFuctType = MapToFunctionType
+
+

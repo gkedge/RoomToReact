@@ -1,5 +1,6 @@
 /* @flow */
-import type { ActionPayloadType } from 'reusable/interfaces/FpngTypes'
+
+import type {ActionPayloadType} from 'reusable/interfaces/FpngTypes'
 
 // ------------------------------------
 // Constants

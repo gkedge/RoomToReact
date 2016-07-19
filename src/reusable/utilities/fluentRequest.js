@@ -4,8 +4,8 @@
 // Differences are semantic, type safety and the addition of mock creation.
 
 // A good fetch-focused blog: // https://davidwalsh.name/fetch
-import type {RequestErrorReportType} from 'reusable/interfaces/FpngTypes'
-import RequestError from 'reusable/errors/RequestError'
+import type {RequestIssueReportType, MapToUrlType, MapToStringType} from 'reusable/interfaces/FpngTypes'
+import RequestIssue from 'reusable/errors/RequestIssue'
 
 import 'whatwg-fetch'  // isomorphic-fetch contains the browser-specific whatwg-fetch
 import _debug from 'debug'
@@ -20,12 +20,8 @@ import includes from 'lodash/includes'
 // import fetchTime from 'promise-time'
 import {promiseTime as fetchTime} from 'reusable/utilities/promisePlugins'
 
-// TODO: Only 'require()' this when mock() called.
-import fetchMock from 'fetch-mock'
-
-export type MapToStringType = { [key: string]: string }
-
-export type MapToUrlType = { [key: string]: Url}
+export type MapToHeaderType = MapToStringType
+export type MapToQueryType = MapToStringType
 
 export type OptionsType = {
   afterJSON: ? Function,
@@ -36,10 +32,10 @@ export type OptionsType = {
   credentials: ? string,
   jsonErrorHandler: ? Function,
   httpErrorHandler: ? Function,
-  headers: ? MapToStringType,
+  headers: ? MapToHeaderType,
   httpMethod: ? string,
   isMocking: ?boolean,
-  queryParams: ?MapToStringType,
+  queryParams: ?MapToQueryType,
   rootContextKey: ? string // Only provide in ctor Options; not setOptions()
 }
 
@@ -154,7 +150,7 @@ const _defaultJsonErrorHandler:Function = (response:Object):Promise => {
           // toss an error with as much data associated with the error that
           // is available.
           if (!response.ok || !jsonStatusOk) {
-            const requestErrorReport:RequestErrorReportType = {
+            const requestIssueReport:RequestIssueReportType = {
               statusCode:       response.status,
               statusText:       response.statusText,
               errorCode:        json.errorCode,
@@ -162,9 +158,9 @@ const _defaultJsonErrorHandler:Function = (response:Object):Promise => {
               infoMessageText:  json.infoMessageText,
               warnMessageText:  json.warnMessageText
             }
-            reject(new RequestError(requestErrorReport))
+            reject(new RequestIssue(requestIssueReport))
           }
-          // Oh! Sweet. All good.
+          // Oh! Sweet. All good. Just resolve the model (sans messages & error codes)
           resolve(json.model || json)
         })
         .catch((e:Error):Promise => {
@@ -175,13 +171,13 @@ const _defaultJsonErrorHandler:Function = (response:Object):Promise => {
     else if (!response.ok) {
       // For the 500's where the error comming back may not have any 'content-type'
       // header.
-      reject(new RequestError({
+      reject(new RequestIssue({
         statusCode: response.status,
         statusText: response.statusText
       }))
     }
     else {
-      reject(new RequestError({
+      reject(new RequestIssue({
         statusCode: 799,
         statusText: "Wrong error handler! The service isn't returning JSON upon success."
       }))
@@ -192,7 +188,7 @@ const _defaultJsonErrorHandler:Function = (response:Object):Promise => {
 // Hmmm.... this is a whole lot easier... a simple header check.
 const _defaultHttpErrorHandler:Function = (response:Object):Object => {
   if (!response.ok) {
-    throw new RequestError({
+    throw new RequestIssue({
       statusCode: response,
       statusText: response.statusText
     })
@@ -293,7 +289,7 @@ export class Request {
     return this.url
   }
 
-  setHeaders(headers:MapToStringType):Request {
+  setHeaders(headers:MapToHeaderType):Request {
     each(headers, (header:string, headerKey:string) => {
       this.setHeader(headerKey, header)
     })
@@ -338,7 +334,7 @@ export class Request {
     }
   }
 
-  setQueryParams(queryParams:MapToStringType):Request {
+  setQueryParams(queryParams:MapToQueryType):Request {
     let newQueryParams = _stringify(queryParams)
     if (newQueryParams) {
       newQueryParams = (this.url.query ? '&' : '?') + newQueryParams
@@ -434,29 +430,34 @@ export class Request {
       }
 
       if (this.opts.isMocking) {
-        if (this.opts.mockData) {
-          fetchMock.mock(this.url.format(), this.opts.httpMethod, this.opts.mockData)
-        }
-        else /* auto-mocking */ {
-          // Read JSON response data available in the __mockData__ map.  The URL's
-          // pathname acts as the key. The __mockData__ response data is loaded by karma
-          // by karma-json-fixtures-preprocessor using the ./test/resources/mockdata/**/*.json
-          // files as source. Obviously, these JS objects are ONLY intended to be
-          // available during test operations. See __MOCK__ in config/index.js.
-          const response = {
-            body:    __mockData__[this.url.pathname],
-            // TODO: added headers to __mockData__
-            headers: { "content-type": "application/json; charset=utf-8" }
+        require.ensure(['fetch-mock'], (require) => {
+          const fetchMock = require('fetch-mock')
+
+          if (this.opts.mockData) {
+            fetchMock.mock(this.url.format(), this.opts.httpMethod, this.opts.mockData)
           }
-          if (!response.body) {
-            console.error("Didn't find mock data for: " +
-                          this.url.pathname)
+          else /* auto-mocking */ {
+            // Read JSON response data available in the __mockData__ map.  The URL's
+            // pathname acts as the key. The __mockData__ response data is loaded by karma
+            // by karma-json-fixtures-preprocessor using the ./test/resources/mockdata/**/*.json
+            // files as source. Obviously, these JS objects are ONLY intended to be
+            // available during test operations. See __MOCK__ in config/index.js.
+            const response = {
+              body: __mockData__[this.url.pathname],
+              // TODO: added headers to __mockData__
+              headers: {"content-type": "application/json; charset=utf-8"}
+            }
+            if (!response.body) {
+              console.error("Didn't find mock data for: " +
+                this.url.pathname)
+            }
+            debugMocking(this.url.pathname + ' data: ' +
+              JSON.stringify(__mockData__[this.url.pathname]))
+            fetchMock.mock(this.url.format(), this.opts.httpMethod, response)
           }
-          debugMocking(this.url.pathname + ' data: ' +
-            JSON.stringify(__mockData__[this.url.pathname]))
-          fetchMock.mock(this.url.format(), this.opts.httpMethod, response)
-        }
+        })
       }
+
       if (afterResponse || debugRequestTime.enabled) {
         // fetchTime() is a timer focused on functions that return
         // a Promise.
