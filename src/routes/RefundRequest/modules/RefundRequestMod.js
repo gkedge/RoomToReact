@@ -409,9 +409,6 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
       refundRequestForm: {
         ...state.refundRequestForm,
         isLoadingAddresses: true,
-        address:            {
-          ...state.refundRequestForm.address
-        }
       }
     })
   },
@@ -422,23 +419,29 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
       refundRequestForm: {
         ...state.refundRequestForm,
         isLoadingAddresses: false,
-        addresses:          action.payload
+        addresses:          {
+          ...state.refundRequestForm.addresses,
+          data: action.payload
+        }
       }
     })
   },
   [LOAD_ADDRESSES_ISSUE]:             (state:ShortType,
                                        action:{payload: RequestIssueReportType}):ShortType => {
-    const issueReport =
-      cloneDeep(state.refundRequestForm.addresses.issueReport)
+    const issueReport = cloneDeep(state.lookupForm.issueReport)
     issueReport.push(action.payload)
     return ({
       ...state,
+      lookupForm: {
+        ...state.lookupForm,
+        isIssue: true,
+        issueReport: issueReport
+      },
       refundRequestForm: {
         ...state.refundRequestForm,
-        address: {
-          ...state.refundRequestForm.address,
-          isIssue: true,
-          issueReport: issueReport
+        addresses:          {
+          ...state.refundRequestForm.addresses,
+          isIssue: true
         }
       }
     })
@@ -448,10 +451,7 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
       ...state,
       refundRequestForm: {
         ...state.refundRequestForm,
-        isLoadingNames: true,
-        name:           {
-          ...state.refundRequestForm.name
-        }
+        isLoadingNames: true
       }
     })
   },
@@ -462,22 +462,29 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
       refundRequestForm: {
         ...state.refundRequestForm,
         isLoadingNames: false,
-        names:          action.payload
+        names:          {
+          ...state.refundRequestForm.names,
+          data: action.payload
+        }
       }
     })
   },
   [LOAD_NAMES_ISSUE]:                 (state:ShortType,
                                        action:{payload: RequestIssueReportType}):ShortType => {
-    const issueReport = cloneDeep(state.refundRequestForm.names.issueReport)
+    const issueReport = cloneDeep(state.lookupForm.issueReport)
     issueReport.push(action.payload)
     return ({
       ...state,
+      lookupForm: {
+        ...state.lookupForm,
+        isIssue: true,
+        issueReport: issueReport
+      },
       refundRequestForm: {
         ...state.refundRequestForm,
-        name: {
-          ...state.refundRequestForm.name,
-          isIssue: true,
-          issueReport: issueReport
+        names:          {
+          ...state.refundRequestForm.names,
+          isIssue: true
         }
       }
     })
@@ -504,13 +511,13 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
   },
   [LOAD_PAYMENT_HISTORY_DATA_ISSUE]:  (state:ShortType,
                                        action:{payload: RequestIssueReportType}):ShortType => {
-    const issueReport = cloneDeep(state.refundRequestForm.issueReport)
+    const issueReport = cloneDeep(state.lookupForm.issueReport)
     issueReport.push(action.payload)
     return ({
       ...state,
-      refundRequestForm: {
-        ...state.refundRequestForm,
-        isIssue:     true,
+      lookupForm: {
+        ...state.lookupForm,
+        isIssue: true,
         issueReport: issueReport
       }
     })
@@ -591,23 +598,21 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
       ...state,
       lookupForm: {
         ...state.lookupForm,
-        isIssue: false
+        isIssue: false,
+        issueReport: []
       },
+
       refundRequestForm: {
         ...state.refundRequestForm,
-        isIssue:     false,
-        issueReport: [],
-        address: {
-          ...state.refundRequestForm.address,
-          isIssue: false,
-          issueReport: []
+        addresses:          {
+          ...state.refundRequestForm.addresses,
+          isIssue: false
         },
-        name: {
-          ...state.refundRequestForm.name,
-          isIssue: false,
-          issueReport: []
+        names:          {
+          ...state.refundRequestForm.names,
+          isIssue: false
         }
-      }
+      }      
     })
   },
   [RESET_STATE]:                      ():ShortType => {
@@ -678,6 +683,7 @@ export const initialState:ShortType = {
   },
   lookupForm:            {
     isIssue:      false,
+    issueReport:  null,
     isLookingUp:  false,
     referenceNum: null,
     dateFrom:     null,
@@ -685,38 +691,29 @@ export const initialState:ShortType = {
     email:        null
   },
   refundRequestForm:     {
-    isIssue:                 false,
-    issueReport:             [],
-    fees:                    null,
+    fees:                    {
+      isIssue:      false,
+      data:         null      
+    },
     depositAccountNum:       null,
     reason:                  null,
     rationale:               null,
     name:                    {
-      isIssue:     false,
-      issueReport: [],
       found:       false,
       name:        null
     },
-    names:                   null,
-    address: {
-      isIssue              : false,
-      issueReport          : [],
-      found                : false,
-      version              : 0,
-      streetLineOne        : null,
-      streetLineTwo        : null,
-      cityName             : null,
-      geographicRegionModel: {
-        geographicRegionCategory: null,
-        geographicRegionText    : null,
-        geographicRegionName    : null
-      },
-      countryCode          : null,
-      countryName          : null,
-      postalCode           : null,
-      type                 : null
+    names:                   {
+      isIssue:      false,
+      data:         null      
     },
-    addresses:               null,
+    address: {
+      found                : false,
+      address              : null
+    },
+    addresses: {
+      isIssue: false,
+      data   : null
+    },
     isLoadingPaymentHistory: false,
     isLoadingNames:          false,
     isLoadingAddresses:      false,

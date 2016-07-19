@@ -13,7 +13,8 @@ export type PdfStateType = {
 }
 
 export type LookupStateType = {
-  isIssue: ?boolean,
+  isIssue: boolean,
+  issueReport: ?Array<RequestIssueReportType>,
   isLookingUp: ?boolean,
   referenceNum: ?string,
   dateFrom: ?string,
@@ -32,14 +33,22 @@ export type NamesDatumType = {
   lastName: string
 }
 
-export type NamesDataType = Array<NamesDatumType>
+export type NamesDataType = {
+  isIssue: boolean,
+  data: ?Array<NamesDatumType>
+}
 
-export type NamesPayloadType = NamesDataType
+export type NamesPayloadType = Array<NamesDatumType>
 
 export type GeographicRegionModelType = {
   "geographicRegionCategory": ?string,
   "geographicRegionText" : ?string,
   "geographicRegionName" : ?string
+}
+
+type RefundRequestNameStateType = {
+  found: boolean,
+  name: ?NamesDatumType
 }
 
 export type AddressesDatumType = {
@@ -54,65 +63,18 @@ export type AddressesDatumType = {
   type : ?string
 }
 
-export type AddressesDataType = Array<AddressesDatumType>
-
-export type AddressesPayloadType = AddressesDataType
-
-type RefundRequestNameStateType = {
-  isIssue: boolean,
-  issueReport: ?Array<RequestIssueReportType>,
-  found: boolean,
-  name: ?NamesDataType
-}
-
 type RefundRequestAddressStateType = {
-  isIssue: boolean,
-  issueReport: ?Array<RequestIssueReportType>,
   found: boolean,
-  version : number,
-  streetLineOne : ?string,
-  streetLineTwo : ?string,
-  cityName : ?string,
-  geographicRegionModel: GeographicRegionModelType,
-  countryCode : ?string,
-  countryName : ?string,
-  postalCode : ?string,
-  type : ?string
+  address: ?AddressesDatumType
 }
 
-export type RefundRequestStateType = {
-  // I don't understand why each of these entries MUST be optional
-  // to get through a type check when creating a RefundRequest. Ugh!
-  isIssue: ?boolean,
-  issueReport: ?Array<RequestIssueReportType>,
-  fees: ?PaymentHistoryStateType,
-  depositAccountNum: ?number,
-  reason: ?string,
-  rationale: ?string,
-  name: ?RefundRequestNameStateType,
-  names: ?NamesDataType,
-  address: ?RefundRequestAddressStateType,
-  addresses: ?AddressesDataType,
-  phone: ?number,
-  isLoadingPaymentHistory: ?boolean,
-  isLoadingNames: ?boolean,
-  isLoadingAddresses: ?boolean,
-  attorneyDocketNum: ?number,
-  acknowledgement: ?boolean,
-  requestDate: ?string
+export type AddressesDataType = {
+  isIssue: boolean,
+  data: ?Array<AddressesDatumType>
 }
 
-export type RefundRequestFormDataType = RefundRequestStateType
+export type AddressesPayloadType = Array<AddressesDatumType>
 
-export type RefundRequestStateObjectType = {
-  pdf: PdfStateType,
-  lookupForm: LookupStateType,
-  refundRequestForm: RefundRequestStateType,
-  isResettingRefundForm: boolean,
-  isSaving: boolean,
-  isSaved: boolean,
-  isNegativeTesting: boolean
-}
 
 /* Action Payload Types */
 export type PdfLoadingPayloadType = {
@@ -141,7 +103,13 @@ export type PaymentHistoryDatumType = {
   model: ?Array<PaymentHistoryModelType>
 }
 export type PaymentHistoryDataType = PaymentHistoryDatumType
-export type PaymentHistoryStateType = PaymentHistoryDataType
+
+export type FeesDataType = {
+  isIssue: ?boolean,
+  data: ?Array<PaymentHistoryItemType>
+}
+
+
 export type PaymentHistoryDataPayloadType = PaymentHistoryDataType
 
 export type PdfReadPayloadType = {
@@ -154,3 +122,37 @@ export type SaveRefundRequestPayloadType = {
 }
 
 export type SaveRefundRequestDataType = SaveRefundRequestPayloadType
+
+export type RefundRequestStateType = {
+  // I don't understand why each of these entries MUST be optional
+  // to get through a type check when creating a RefundRequest. Ugh!
+  fees: ?FeesDataType,
+  depositAccountNum: ?number,
+  reason: ?string,
+  rationale: ?string,
+  name: ?RefundRequestNameStateType,
+  names: ?NamesDataType,
+  address: ?RefundRequestAddressStateType,
+  addresses: ?AddressesDataType,
+  phone: ?number,
+  isLoadingPaymentHistory: ?boolean,
+  isLoadingNames: ?boolean,
+  isLoadingAddresses: ?boolean,
+  attorneyDocketNum: ?number,
+  acknowledgement: ?boolean,
+  requestDate: ?string
+}
+
+export type RefundRequestFormDataType = RefundRequestStateType
+
+export type RefundRequestStateObjectType = {
+  pdf: PdfStateType,
+  lookupForm: LookupStateType,
+  refundRequestForm: RefundRequestStateType,
+  isResettingRefundForm: boolean,
+  isSaving: boolean,
+  isSaved: boolean,
+  isNegativeTesting: boolean
+}
+
+

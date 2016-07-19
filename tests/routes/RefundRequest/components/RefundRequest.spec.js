@@ -34,13 +34,11 @@ const props = {
       rationale:         null,
       name:              {
         isIssue: false,
-        issueReport:       [],
         found:   false,
         name:    ''
       },
       address:           {
         isIssue: false,
-        issueReport:       [],
         found:   false,
         address: {
           role:  null,

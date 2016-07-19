@@ -743,8 +743,9 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
 
             it('State after loadNamesDataIssue issue report.', () => {
               const expected = cloneDeep(acts.initialState)
+              expected.lookupForm.isIssue = true
+              expected.lookupForm.issueReport = [ requestIssueReport ]
               expected.refundRequestForm.names.isIssue = true
-              expected.refundRequestForm.names.issueReport = [ requestIssueReport ]
               acts.loadNamesDataIssue(requestIssueReport)(dispatchSpy, getStateSpy)
               expect(stateHolder.state.refundRequest).to.eql(expected)
             })
@@ -976,9 +977,10 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
 
             it('State after loadAddressesDataIssue expected to contain issue report.', () => {
               const expected = cloneDeep(acts.initialState)
+              expected.lookupForm.isIssue = true
+              expected.lookupForm.issueReport = [ requestIssueReport ]
               expected.refundRequestForm.addresses.isIssue = true
-              expected.refundRequestForm.addresses.issueReport = [ requestIssueReport ]
-              acts.loadAddressesDataIssue(requestIssueReport)(dispatchSpy, getStateSpy)
+              acts.loadNamesDataIssue(requestIssueReport)(dispatchSpy, getStateSpy)
               expect(stateHolder.state.refundRequest).to.eql(expected)
             })
           })
