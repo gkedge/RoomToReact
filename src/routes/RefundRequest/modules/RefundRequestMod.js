@@ -1,14 +1,18 @@
 /* @flow */
 
-// TODO: might be able to remove some the serious amoutn of boiler plate going
+// TODO: might be able to remove some the serious amount of boiler plate going
 // on in here with: https://github.com/acdlite/redux-actions
 
-import type {ActionPayloadType, RequestIssueReportType} from 'reusable/interfaces/FpngTypes'
+import type {
+  ActionPayloadType,
+  RequestIssueReportType,
+  RequestIssuePayloadType
+} from 'reusable/interfaces/FpngTypes'
 
 import type {
-  LookupFormPayloadType,
+  LookupPayloadType,
   PdfLoadingPayloadType,
-  LookupFormDataType,
+  LookupDataType,
   NamesDataType,
   NamesPayloadType,
   AddressesDataType,
@@ -22,16 +26,18 @@ import type {
 
 type ShortType = RefundRequestStateObjectType
 
+import _debug from 'debug'
+import {reset} from 'redux-form'
+import url from 'url'
+import cloneDeep from 'lodash/cloneDeep'
+import isString from 'lodash/isString'
+
 import {
   get, post, put,
   getRootContext,
   setRootContext,
   responseFail
 } from 'reusable/utilities/fluentRequest'
-import _debug from 'debug'
-import {reset} from 'redux-form'
-import url from 'url'
-import cloneDeep from 'lodash/cloneDeep'
 
 import {upper, lower} from 'reusable/utilities/dataUtils'
 import {createReducer, unknownAction} from 'reusable/utilities/reduxStoreUtils'
@@ -39,46 +45,52 @@ import {createReducer, unknownAction} from 'reusable/utilities/reduxStoreUtils'
 // import dispatchTime from 'promise-time'
 import {promiseTime as dispatchTime} from 'reusable/utilities/promisePlugins'
 
-const debug = _debug('refunds:RefundRequestMod:debug')
+const debug     = _debug('refunds:RefundRequestMod:debug')
 const debugTime = _debug('refunds:RefundRequestMod:time')
 
 // ------------------------------------
 // Constants
 // ------------------------------------
-export const LOADING_PDF = '@@refund/request/LOADING_PDF'
-export const PDF_BINARY = '@@refund/request/PDF_BINARY'
-export const PDF_LOADED = '@@refund/request/PDF_LOADED'
-export const POST_REFUND_REQUEST = '@@refund/request/POST_REFUND_REQUEST'
-export const LOOKUP_REFERENCED_DATA_START = '@@refund/request/LOOKUP_REFERENCED_DATA_START'
-export const LOOKUP_REFERENCED_DATA_LOADED = '@@refund/request/LOOKUP_REFERENCED_DATA_LOADED'
-export const LOOKUP_REFERENCED_DATA_ISSUE = '@@refund/request/LOOKUP_REFERENCED_DATA_ISSUE'
-export const LOAD_ADDRESSES_START = '@@refund/request/LOAD_ADDRESSES_START'
-export const LOAD_ADDRESSES_LOADED = '@@refund/request/LOAD_ADDRESSES_LOADED'
-export const LOAD_ADDRESSES_ISSUE = '@@refund/request/LOAD_ADDRESSES_ISSUE'
-export const LOAD_NAMES_START = '@@refund/request/LOAD_NAMES_START'
-export const LOAD_NAMES_LOADED = '@@refund/request/LOAD_NAMES_LOADED'
-export const LOAD_NAMES_ISSUE = '@@refund/request/LOAD_NAMES_ISSUE'
-export const LOAD_PAYMENT_HISTORY_DATA_START = '@@refund/request/LOAD_PAYMENT_HISTORY_DATA_START'
+export const LOADING_PDF                      = '@@refund/request/LOADING_PDF'
+export const PDF_BINARY                       = '@@refund/request/PDF_BINARY'
+export const PDF_LOADED                       = '@@refund/request/PDF_LOADED'
+export const POST_REFUND_REQUEST              = '@@refund/request/POST_REFUND_REQUEST'
+export const LOOKUP_REFERENCED_DATA_START     = '@@refund/request/LOOKUP_REFERENCED_DATA_START'
+export const LOOKUP_REFERENCED_DATA_LOADED    = '@@refund/request/LOOKUP_REFERENCED_DATA_LOADED'
+export const LOOKUP_REFERENCED_DATA_ISSUE     = '@@refund/request/LOOKUP_REFERENCED_DATA_ISSUE'
+export const LOAD_ADDRESSES_START             = '@@refund/request/LOAD_ADDRESSES_START'
+export const LOAD_ADDRESSES_LOADED            = '@@refund/request/LOAD_ADDRESSES_LOADED'
+export const LOAD_ADDRESSES_ISSUE             = '@@refund/request/LOAD_ADDRESSES_ISSUE'
+export const LOAD_NAMES_START                 = '@@refund/request/LOAD_NAMES_START'
+export const LOAD_NAMES_LOADED                = '@@refund/request/LOAD_NAMES_LOADED'
+export const LOAD_NAMES_ISSUE                 = '@@refund/request/LOAD_NAMES_ISSUE'
+export const LOAD_PAYMENT_HISTORY_DATA_START  = '@@refund/request/LOAD_PAYMENT_HISTORY_DATA_START'
 export const LOAD_PAYMENT_HISTORY_DATA_LOADED = '@@refund/request/LOAD_PAYMENT_HISTORY_DATA_LOADED'
-export const LOAD_PAYMENT_HISTORY_DATA_ISSUE = '@@refund/request/LOAD_PAYMENT_HISTORY_DATA_ISSUE'
-export const RESET_REFUND_REQUEST_FORM_START = '@@refund/request/RESET_REFUND_REQUEST_FORM_START'
-export const RESET_REFUND_REQUEST_FORM_END = '@@refund/request/RESET_REFUND_REQUEST_FORM_END'
-export const CLEAR_ISSUE_REPORT = '@@refund/request/CLEAR_ISSUE_REPORT'
-export const RESET_STATE = '@@refund/request/RESET_STATE'
-export const SAVED_REFUND_REQUEST = '@@refund/request/SAVED_REFUND_REQUEST'
-export const ISSUE_RAISED = '@@refund/request/ISSUE_RAISED'
-export const VALID_LOOKUP_START = '@@refund/request/VALID_LOOKUP_START'
-export const VALID_LOOKUP_END = '@@refund/request/VALID_LOOKUP_END'
-export const VALID_LOOKUP_ISSUE = '@@refund/request/VALID_LOOKUP_ISSUE'
+export const LOAD_PAYMENT_HISTORY_DATA_ISSUE  = '@@refund/request/LOAD_PAYMENT_HISTORY_DATA_ISSUE'
+export const RESET_REFUND_REQUEST_FORM_START  = '@@refund/request/RESET_REFUND_REQUEST_FORM_START'
+export const RESET_REFUND_REQUEST_FORM_END    = '@@refund/request/RESET_REFUND_REQUEST_FORM_END'
+export const CLEAR_ISSUE_REPORT               = '@@refund/request/CLEAR_ISSUE_REPORT'
+export const RESET_STATE                      = '@@refund/request/RESET_STATE'
+export const SAVED_REFUND_REQUEST             = '@@refund/request/SAVED_REFUND_REQUEST'
+export const ISSUE_RAISED                     = '@@refund/request/ISSUE_RAISED'
+export const VALID_LOOKUP_START               = '@@refund/request/VALID_LOOKUP_START'
+export const VALID_LOOKUP_END                 = '@@refund/request/VALID_LOOKUP_END'
+export const VALID_LOOKUP_ISSUE               = '@@refund/request/VALID_LOOKUP_ISSUE'
 
 // ------------------------------------
 // Actions
 // ------------------------------------
 // https://github.com/wbinnssmith/redux-normalizr-middleware
 
-export const raiseIssue = (issueMessage:RequestIssueReportType):ActionPayloadType => {
+export const raiseIssue = (issueMessage:any):ActionPayloadType => {
+  if (isString(issueMessage)) {
+    issueMessage = {
+      statusCode: 710,
+      statusText: issueMessage
+    }
+  }
   return {
-    type: ISSUE_RAISED,
+    type:    ISSUE_RAISED,
     payload: issueMessage
   }
 }
@@ -90,26 +102,25 @@ export const loadPaymentHistoryDataStart = ():ActionPayloadType => {
 }
 
 export const loadPaymentHistoryDataLoaded =
-  (paymentHistoryData:PaymentHistoryDataType):ActionPayloadType => {
-    return {
-      type: LOAD_PAYMENT_HISTORY_DATA_LOADED,
-      payload: paymentHistoryData
-    }
-  }
+               (paymentHistoryData:PaymentHistoryDataType):ActionPayloadType => {
+                 return {
+                   type:    LOAD_PAYMENT_HISTORY_DATA_LOADED,
+                   payload: paymentHistoryData
+                 }
+               }
 
-export const loadPaymentHistoryDataIssue = (issueMessage:RequestIssueReportType):Function => {
+export const loadPaymentHistoryDataIssue = (issueMessage:any):Function => {
   return (dispatch:Function) => {
-    dispatch({
-      type: LOAD_PAYMENT_HISTORY_DATA_ISSUE,
-      payload: issueMessage
-    })
     dispatch(raiseIssue(issueMessage))
+    dispatch({
+      type: LOAD_PAYMENT_HISTORY_DATA_ISSUE
+    })
   }
 }
 
 export const loadPaymentHistoryData = ():Function => {
   return (dispatch:Function, getState:Function):any /* Promise */ => {
-    let lookupForm = getState().refundRequest.lookupForm
+    let lookupForm          = getState().refundRequest.lookupForm
     const paymentHistoryAPI = url.parse('paymentHistory/' + lookupForm.referenceNum)
     debug('loadPaymentHistoryData: Lookup Form: ' + JSON.stringify(lookupForm))
     dispatch(loadPaymentHistoryDataStart())
@@ -126,6 +137,8 @@ export const loadPaymentHistoryData = ():Function => {
         }
         return dispatch(loadPaymentHistoryDataIssue(reason.message))
       })
+      .catch(
+        (reason:Error):any /* Promise*/ => dispatch(loadPaymentHistoryDataIssue(reason.message)))
   }
 }
 
@@ -144,17 +157,16 @@ export const loadNamesDataLoaded = (namesData:NamesDataType):ActionPayloadType =
 
 export const loadNamesDataIssue = (issueMessage:RequestIssueReportType):Function => {
   return (dispatch:Function) => {
-    dispatch({
-      type: LOAD_NAMES_ISSUE,
-      payload: issueMessage
-    })
     dispatch(raiseIssue(issueMessage))
+    dispatch({
+      type: LOAD_NAMES_ISSUE
+    })
   }
 }
 
 export const loadNamesData = ():Function => {
   return (dispatch:Function, getState:Function):any /* Promise */ => {
-    let lookupForm = getState().refundRequest.lookupForm
+    let lookupForm     = getState().refundRequest.lookupForm
     const loadNamesAPI = url.parse('patents/' +
                                    lookupForm.referenceNum +
                                    '/personNames')
@@ -174,6 +186,7 @@ export const loadNamesData = ():Function => {
         }
         return dispatch(loadNamesDataIssue(reason.message))
       })
+      .catch((reason:Error):any /* Promise*/ => dispatch(loadNamesDataIssue(reason.message)))
   }
 }
 
@@ -192,17 +205,16 @@ export const loadAddressesDataLoaded = (addressesData:AddressesDataType):ActionP
 
 export const loadAddressesDataIssue = (issueMessage:RequestIssueReportType):Function => {
   return (dispatch:Function) => {
-    dispatch({
-      type: LOAD_ADDRESSES_ISSUE,
-      payload: issueMessage
-    })
     dispatch(raiseIssue(issueMessage))
+    dispatch({
+      type: LOAD_ADDRESSES_ISSUE
+    })
   }
 }
 
-export const loadAddressesData:Function  = ():Function => {
+export const loadAddressesData:Function = ():Function => {
   return (dispatch:Function, getState:Function):any /* Promise */ => {
-    let lookupForm = getState().refundRequest.lookupForm
+    let lookupForm         = getState().refundRequest.lookupForm
     const loadAddressesAPI = url.parse('patents/' +
                                        lookupForm.referenceNum +
                                        '/addresses')
@@ -222,6 +234,7 @@ export const loadAddressesData:Function  = ():Function => {
         }
         return dispatch(loadAddressesDataIssue(reason.message))
       })
+      .catch((reason:Error):any /* Promise*/ => dispatch(loadAddressesDataIssue(reason.message)))
   }
 }
 
@@ -338,7 +351,8 @@ export const lookupReferencedData = ():Function => {
     // hint if they ever are needed in the future.
 
     // eslint-disable-next-line no-unused-vars
-    const resolve = (paymentHistoryData:?any, namesData:?any, addressesData:?any):any /* Promise */ => {
+    const resolve = (paymentHistoryData:?any, namesData:?any,
+                     addressesData:?any):any /* Promise */ => {
       if (debugTime.enabled) {
         debugTime('lookupReferencedData time: +' + allDispatches.time + 'ms')
       }
@@ -349,10 +363,12 @@ export const lookupReferencedData = ():Function => {
     const allDispatches = ():Promise =>
       // Waaaait a minute... there ain't no spread() in the Promise spec!
       // See promisePlugins.js...
-      Promise.spread([
-        dispatch(loadPaymentHistoryData()),
-        dispatch(loadNamesData()),
-        dispatch(loadAddressesData())],
+      Promise.spread(
+        [
+          dispatch(loadPaymentHistoryData()),
+          dispatch(loadNamesData()),
+          dispatch(loadAddressesData())
+        ],
         resolve)
         .catch((reason:any):any /* Promise*/ => {
           if (!getState().refundRequest.isNegativeTesting) {
@@ -360,12 +376,13 @@ export const lookupReferencedData = ():Function => {
           }
           return dispatch(lookupReferencedDataIssue())
         })
+        .catch(():any /* Promise*/ => dispatch(lookupReferencedDataIssue()))
 
     return debugTime.enabled ? dispatchTime(allDispatches)() : allDispatches()
   }
 }
 
-export const validLookupStart = (lookupFormData:LookupFormDataType):ActionPayloadType => {
+export const validLookupStart = (lookupFormData:LookupDataType):ActionPayloadType => {
   return {
     type:    VALID_LOOKUP_START,
     payload: lookupFormData
@@ -384,7 +401,7 @@ export const validLookupIssue = ():ActionPayloadType => {
   }
 }
 
-export function validLookup(lookupFormData:LookupFormDataType):Function {
+export function validLookup(lookupFormData:LookupDataType):Function {
   return (dispatch:Function, getState:Function):any /* Promise */ => {
     dispatch(validLookupStart(lookupFormData))
     dispatch(resetRefundRequestForm())
@@ -397,18 +414,28 @@ export function validLookup(lookupFormData:LookupFormDataType):Function {
         }
         return dispatch(validLookupIssue())
       })
-      .catch(() => dispatch(validLookupIssue()))
+      .catch(():any /* Promise*/ => dispatch(validLookupIssue()))
   }
 }
 
 /*eslint "key-spacing": 0*/
 const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
+  [ISSUE_RAISED]:                     (state:ShortType,
+                                       action:{payload: RequestIssueReportType}):ShortType => {
+    const issueReport = cloneDeep(state.issueReport)
+    issueReport.push(action.payload)
+    return ({
+      ...state,
+      isIssue:     true,
+      issueReport: issueReport
+    })
+  },
   [LOAD_ADDRESSES_START]:             (state:ShortType):ShortType => {
     return ({
       ...state,
       refundRequestForm: {
         ...state.refundRequestForm,
-        isLoadingAddresses: true,
+        isLoadingAddresses: true
       }
     })
   },
@@ -426,19 +453,12 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
       }
     })
   },
-  [LOAD_ADDRESSES_ISSUE]:             (state:ShortType,
-                                       action:{payload: RequestIssueReportType}):ShortType => {
-    const issueReport = cloneDeep(state.lookupForm.issueReport)
-    issueReport.push(action.payload)
+  [LOAD_ADDRESSES_ISSUE]:             (state:ShortType):ShortType => {
     return ({
       ...state,
-      lookupForm: {
-        ...state.lookupForm,
-        isIssue: true,
-        issueReport: issueReport
-      },
       refundRequestForm: {
         ...state.refundRequestForm,
+        isLoadingAddresses: false,
         addresses:          {
           ...state.refundRequestForm.addresses,
           isIssue: true
@@ -469,19 +489,12 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
       }
     })
   },
-  [LOAD_NAMES_ISSUE]:                 (state:ShortType,
-                                       action:{payload: RequestIssueReportType}):ShortType => {
-    const issueReport = cloneDeep(state.lookupForm.issueReport)
-    issueReport.push(action.payload)
+  [LOAD_NAMES_ISSUE]:                 (state:ShortType):ShortType => {
     return ({
       ...state,
-      lookupForm: {
-        ...state.lookupForm,
-        isIssue: true,
-        issueReport: issueReport
-      },
       refundRequestForm: {
         ...state.refundRequestForm,
+        isLoadingNames: false,
         names:          {
           ...state.refundRequestForm.names,
           isIssue: true
@@ -505,20 +518,23 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
       refundRequestForm: {
         ...state.refundRequestForm,
         isLoadingPaymentHistory: false,
-        fees:                    action.payload
+        fees:                    {
+          ...state.refundRequestForm.fees,
+          data: action.payload[0].items
+        }
       }
     })
   },
-  [LOAD_PAYMENT_HISTORY_DATA_ISSUE]:  (state:ShortType,
-                                       action:{payload: RequestIssueReportType}):ShortType => {
-    const issueReport = cloneDeep(state.lookupForm.issueReport)
-    issueReport.push(action.payload)
+  [LOAD_PAYMENT_HISTORY_DATA_ISSUE]:  (state:ShortType):ShortType => {
     return ({
       ...state,
-      lookupForm: {
-        ...state.lookupForm,
-        isIssue: true,
-        issueReport: issueReport
+      refundRequestForm: {
+        ...state.refundRequestForm,
+        isLoadingPaymentHistory: false,
+        fees:                    {
+          ...state.refundRequestForm.fees,
+          isIssue: true
+        }
       }
     })
   },
@@ -533,17 +549,33 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
       }
     })
   },
-  [LOOKUP_REFERENCED_DATA_START]:      (state:ShortType):ShortType => {
-    // No affect to state, ... yet.
-    return state
+  [LOOKUP_REFERENCED_DATA_START]:     (state:ShortType):ShortType => {
+    return ({
+      ...state,
+      lookupForm: {
+        ...state.lookupForm,
+        isLookingUp: true
+      }
+    })
   },
-  [LOOKUP_REFERENCED_DATA_LOADED]:      (state:ShortType):ShortType => {
-    // No affect to state, ... yet.
-    return state
+  [LOOKUP_REFERENCED_DATA_LOADED]:    (state:ShortType):ShortType => {
+    return ({
+      ...state,
+      lookupForm: {
+        ...state.lookupForm,
+        isLookingUp: false
+      }
+    })
   },
-  [LOOKUP_REFERENCED_DATA_ISSUE]:      (state:ShortType):ShortType => {
-    // No affect to state, ... yet.
-    return state
+  [LOOKUP_REFERENCED_DATA_ISSUE]:     (state:ShortType):ShortType => {
+    return ({
+      ...state,
+      lookupForm: {
+        ...state.lookupForm,
+        isIssue:     true,
+        isLookingUp: false
+      }
+    })
   },
   [PDF_BINARY]:                       (state:ShortType,
                                        action:{payload: PdfReadPayloadType}):ShortType => {
@@ -572,14 +604,14 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
       isSaved:  action.payload.isSaved
     })
   },
-  [RESET_REFUND_REQUEST_FORM_START]:    (state:ShortType):ShortType => {
+  [RESET_REFUND_REQUEST_FORM_START]:  (state:ShortType):ShortType => {
     return ({
       ...state,
       isResettingRefundForm: true,
       refundRequestForm:     initialState.refundRequestForm
     })
   },
-  [RESET_REFUND_REQUEST_FORM_END]:   (state:ShortType):ShortType => {
+  [RESET_REFUND_REQUEST_FORM_END]:    (state:ShortType):ShortType => {
     return ({
       ...state,
       isResettingRefundForm: false
@@ -596,23 +628,28 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
   [CLEAR_ISSUE_REPORT]:               (state:ShortType):ShortType => {
     return ({
       ...state,
-      lookupForm: {
+      isIssue:     false,
+      issueReport: [],
+      lookupForm:  {
         ...state.lookupForm,
-        isIssue: false,
-        issueReport: []
+        isIssue: false
       },
 
       refundRequestForm: {
         ...state.refundRequestForm,
-        addresses:          {
+        fees:      {
+          ...state.refundRequestForm.fees,
+          isIssue: false
+        },
+        addresses: {
           ...state.refundRequestForm.addresses,
           isIssue: false
         },
-        names:          {
+        names:     {
           ...state.refundRequestForm.names,
           isIssue: false
         }
-      }      
+      }
     })
   },
   [RESET_STATE]:                      ():ShortType => {
@@ -621,11 +658,11 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
     })
   },
   [VALID_LOOKUP_START]:               (state:ShortType,
-                                       action:{payload: LookupFormPayloadType}):ShortType => {
-    const payload = action.payload
+                                       action:{payload: LookupPayloadType}):ShortType => {
+    const payload    = action.payload
     let referenceNum = payload.referenceNum
-    // Stripe any slashes or commas
-    referenceNum = referenceNum.replace(/,/g, '')
+    // Strip any slashes or commas
+    referenceNum     = referenceNum.replace(/,/g, '')
     referenceNum.length < 18
       ? referenceNum.replace(/\//g, '')
       : referenceNum
@@ -638,7 +675,6 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
       ...state,
       lookupForm: {
         ...state.lookupForm,
-        isLookingUp:  true,
         referenceNum: payload.referenceNum,
         dateFrom:     payload.dateFrom,
         dateTo:       payload.dateTo,
@@ -646,26 +682,12 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
       }
     })
   },
-  [VALID_LOOKUP_END]:               (state:ShortType):ShortType => {
-    return ({
-      ...state,
-      lookupForm: {
-        ...state.lookupForm,
-        isLookingUp:  false
-      }
-    })
+  [VALID_LOOKUP_END]:                 (state:ShortType):ShortType => {
+    return state
   },
-  [VALID_LOOKUP_ISSUE]:             (state:ShortType):ShortType => {
-    return ({
-      ...state,
-      lookupForm: {
-        ...state.lookupForm,
-        isIssue    : true,
-        isLookingUp: false
-      }
-    })
+  [VALID_LOOKUP_ISSUE]:               (state:ShortType):ShortType => {
+    return state
   }
-
 }
 
 // ------------------------------------
@@ -683,7 +705,7 @@ export const initialState:ShortType = {
   },
   lookupForm:            {
     isIssue:      false,
-    issueReport:  null,
+    issueReport:  [],
     isLookingUp:  false,
     referenceNum: null,
     dateFrom:     null,
@@ -692,27 +714,27 @@ export const initialState:ShortType = {
   },
   refundRequestForm:     {
     fees:                    {
-      isIssue:      false,
-      data:         null      
+      isIssue: false,
+      data:    null
     },
     depositAccountNum:       null,
     reason:                  null,
     rationale:               null,
     name:                    {
-      found:       false,
-      name:        null
+      found: false,
+      name:  null
     },
     names:                   {
-      isIssue:      false,
-      data:         null      
-    },
-    address: {
-      found                : false,
-      address              : null
-    },
-    addresses: {
       isIssue: false,
-      data   : null
+      data:    null
+    },
+    address:                 {
+      found:   false,
+      address: null
+    },
+    addresses:               {
+      isIssue: false,
+      data:    null
     },
     isLoadingPaymentHistory: false,
     isLoadingNames:          false,
@@ -722,10 +744,12 @@ export const initialState:ShortType = {
     acknowledgement:         false,
     requestDate:             null
   },
+  isIssue:               false,
   isResettingRefundForm: false,
   isSaving:              false,
   isSaved:               false,
-  isNegativeTesting:     false
+  isNegativeTesting:     false,
+  issueReport:           []
 }
 
 const reducer = createReducer(initialState, LOAD_REFUND_REQUEST_ACTION_HANDLERS)
@@ -734,8 +758,9 @@ export default function refundRequestReducer(state:ShortType = initialState,
   return reducer(state, action)
 }
 
-(function() {
-  setRootContext('default', url.parse('http://dev-fpng-jboss-3.etc.uspto.gov:8080/refunds-services/v1/'))
+(function () {
+  setRootContext('default',
+    url.parse('http://dev-fpng-jboss-3.etc.uspto.gov:8080/refunds-services/v1/'))
 
   // setRootContext('default', url.parse('http://ud18174.uspto.gov:8080/refunds-services/v1/'))
 })()

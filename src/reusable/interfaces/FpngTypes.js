@@ -15,6 +15,8 @@ export type RequestIssueReportType = {
   warnMessageText: ?Array<string>
 }
 
+export type RequestIssuePayloadType = RequestIssueReportType
+
 export type MapToStringType = { [key: string]: string }
 export type MapToUrlType = { [key: string]: Url}
 export type MapToAnyType = { [key: string]: any }
@@ -22,5 +24,3 @@ export type StateMapType = MapToAnyType
 
 export type MapToFunctionType = { [key: string]: Function }
 export type MapActionNameToCreatorFuctType = MapToFunctionType
-
-

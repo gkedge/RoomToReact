@@ -4,7 +4,7 @@ import sinon from 'sinon';
 import {mount, shallow} from 'enzyme';
 
 const props = {
-  pdfData:                {
+  pdfData:               {
     pdf: {
       isError:   false,
       isLoading: false,
@@ -14,9 +14,10 @@ const props = {
       scale:     1.0
     }
   },
-  lookupFormData: {
+  lookupFormData:        {
     lookupForm: {
       isIssue:      false,
+      issueReport:  [],
       isLookingUp:  false,
       referenceNum: 'Yow',
       dateFrom:     null,
@@ -26,48 +27,52 @@ const props = {
   },
   refundRequestFormData: {
     refundRequestForm: {
-      isIssue:           false,
-      issueReport:       [],
-      fees:              [],
-      depositAccountNum: 0,
-      reason:            null,
-      rationale:         null,
-      name:              {
+      isIssue:                 false,
+      issueReport:             [],
+      fees:                    {
         isIssue: false,
-        found:   false,
-        name:    ''
+        data:    null,
       },
-      address:           {
+      depositAccountNum:       0,
+      reason:                  null,
+      rationale:               null,
+      names:                   {
         isIssue: false,
-        found:   false,
-        address: {
-          role:  null,
-          addr0: null,
-          addr1: null,
-          city:  null,
-          state: null,
-          zip:   null
-        }
+        data:    null
       },
-      phone:             null,
-      isLoadingNames: false,
+      name:                    {
+        found: false,
+        name:  null
+      },
+      addresses:               {
+        isIssue: false,
+        data:    null
+      },
+      address:                 {
+        found:   false,
+        address: null
+      },
+      phone:                   null,
+      isLoadingNames:          false,
       isLoadingPaymentHistory: false,
-      attorneyDocketNum: 0,
-      acknowledgement:   false,
-      requestDate:       null
+      attorneyDocketNum:       0,
+      acknowledgement:         false,
+      requestDate:             null
     }
   },
-  saveRefundRequestData:  {
-    isSaving: false,
-    isSaved:  false
-  },
-  loadingPdf:             sinon.spy(),
-  lookupReferencedData:   sinon.spy(),
-  pdfBinary:              sinon.spy(),
-  pdfLoaded:              sinon.spy(),
-  resetState:             sinon.spy(),
-  saveRefundRequest:      sinon.spy(),
-  validLookup:            sinon.spy()
+  isIssue:               false,
+  isResettingRefundForm: false,
+  isSaving:              false,
+  isSaved:               false,
+  isNegativeTesting:     false,
+  issueReport:           [],
+  loadingPdf:            sinon.spy(),
+  lookupReferencedData:  sinon.spy(),
+  pdfBinary:             sinon.spy(),
+  pdfLoaded:             sinon.spy(),
+  resetState:            sinon.spy(),
+  saveRefundRequest:     sinon.spy(),
+  validLookup:           sinon.spy()
 }
 
 describe('(Route/Component) RefundRequest/RefundRequest', () => {

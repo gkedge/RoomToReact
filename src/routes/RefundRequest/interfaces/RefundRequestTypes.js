@@ -2,7 +2,7 @@
 
 import type {ActionPayloadType, RequestIssueReportType} from 'reusable/interfaces/FpngTypes'
 
-export type PdfStateType = {
+type PdfStateType = {
   isError: boolean,
   isLoading: boolean,
   file: any,
@@ -12,9 +12,12 @@ export type PdfStateType = {
   scale: ?number
 }
 
-export type LookupStateType = {
+export type PdfDataType = {
+  pdf: ?PdfStateType
+}
+
+export type LookupDataType = {
   isIssue: boolean,
-  issueReport: ?Array<RequestIssueReportType>,
   isLookingUp: ?boolean,
   referenceNum: ?string,
   dateFrom: ?string,
@@ -22,33 +25,41 @@ export type LookupStateType = {
   email: ?string
 }
 
-export type PdfDataType = {
-  pdf: ?PdfStateType
+type LookupStateType = LookupDataType
+
+export type LookupFormDataType = {
+  lookupForm: LookupDataType
 }
 
-export type LookupFormDataType = LookupStateType
+export type LookupPayloadType = LookupDataType
 
 export type NamesDatumType = {
-  firstName: ?string,
-  lastName: string
+  version: number,
+  prefixName: string,
+  firstName: string,
+  lastName: string,
+  middleName: string,
+  suffixName: string,
+  role: string
 }
 
-export type NamesDataType = {
+type RefundRequestNamesStateType = {
   isIssue: boolean,
   data: ?Array<NamesDatumType>
-}
-
-export type NamesPayloadType = Array<NamesDatumType>
-
-export type GeographicRegionModelType = {
-  "geographicRegionCategory": ?string,
-  "geographicRegionText" : ?string,
-  "geographicRegionName" : ?string
 }
 
 type RefundRequestNameStateType = {
   found: boolean,
   name: ?NamesDatumType
+}
+
+export type NamesDataType = Array<NamesDatumType>
+export type NamesPayloadType = NamesDataType
+
+export type GeographicRegionModelType = {
+  "geographicRegionCategory": ?string,
+  "geographicRegionText" : ?string,
+  "geographicRegionName" : ?string
 }
 
 export type AddressesDatumType = {
@@ -63,25 +74,23 @@ export type AddressesDatumType = {
   type : ?string
 }
 
+type RefundRequestAddressesStateType = {
+  isIssue: boolean,
+  data: ?Array<AddressesDatumType>
+}
+
 type RefundRequestAddressStateType = {
   found: boolean,
   address: ?AddressesDatumType
 }
 
-export type AddressesDataType = {
-  isIssue: boolean,
-  data: ?Array<AddressesDatumType>
-}
-
-export type AddressesPayloadType = Array<AddressesDatumType>
-
+export type AddressesDataType = Array<AddressesDatumType>
+export type AddressesPayloadType = AddressesDataType
 
 /* Action Payload Types */
 export type PdfLoadingPayloadType = {
   pdfFile: ?Object
 }
-
-export type LookupFormPayloadType = LookupFormDataType
 
 /* Payment History Types */
 export type PaymentHistoryItemType = {
@@ -95,22 +104,18 @@ export type PaymentHistoryItemType = {
   "mailRoomDate": string,
   "paymentMethodType": string
 }
-export type PaymentHistoryModelType = {
+export type PaymentHistoryModelType = [ {
   version: number,
   items: Array<PaymentHistoryItemType>
-}
-export type PaymentHistoryDatumType = {
-  model: ?Array<PaymentHistoryModelType>
-}
-export type PaymentHistoryDataType = PaymentHistoryDatumType
+}]
 
-export type FeesDataType = {
-  isIssue: ?boolean,
+export type PaymentHistoryDataType = PaymentHistoryModelType
+export type PaymentHistoryDataPayloadType = PaymentHistoryDataType
+
+export type FeesStateType = {
+  isIssue: boolean,
   data: ?Array<PaymentHistoryItemType>
 }
-
-
-export type PaymentHistoryDataPayloadType = PaymentHistoryDataType
 
 export type PdfReadPayloadType = {
   pdfRaw: Uint8Array
@@ -126,14 +131,14 @@ export type SaveRefundRequestDataType = SaveRefundRequestPayloadType
 export type RefundRequestStateType = {
   // I don't understand why each of these entries MUST be optional
   // to get through a type check when creating a RefundRequest. Ugh!
-  fees: ?FeesDataType,
+  fees: ?FeesStateType,
   depositAccountNum: ?number,
   reason: ?string,
   rationale: ?string,
   name: ?RefundRequestNameStateType,
-  names: ?NamesDataType,
+  names: ?RefundRequestNamesStateType,
   address: ?RefundRequestAddressStateType,
-  addresses: ?AddressesDataType,
+  addresses: ?RefundRequestAddressesStateType,
   phone: ?number,
   isLoadingPaymentHistory: ?boolean,
   isLoadingNames: ?boolean,
@@ -143,16 +148,18 @@ export type RefundRequestStateType = {
   requestDate: ?string
 }
 
-export type RefundRequestFormDataType = RefundRequestStateType
+export type RefundRequestFormDataType = {
+  refundRequestForm: ?RefundRequestStateType
+}
 
 export type RefundRequestStateObjectType = {
   pdf: PdfStateType,
   lookupForm: LookupStateType,
   refundRequestForm: RefundRequestStateType,
+  isIssue: boolean,
   isResettingRefundForm: boolean,
   isSaving: boolean,
   isSaved: boolean,
-  isNegativeTesting: boolean
+  isNegativeTesting: boolean,
+  issueReport: ?Array<RequestIssueReportType>
 }
-
-

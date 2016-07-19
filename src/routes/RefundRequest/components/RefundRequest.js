@@ -3,7 +3,9 @@
 import type {
   PdfDataType,
   RefundRequestFormDataType,
-  LookupFormDataType
+  LookupDataType,
+  LookupFormDataType,
+  SaveRefundRequestDataType
 } from '../interfaces/RefundRequestTypes'
 import React from 'react'
 import {Box, VBox, Center, Flex, Container} from 'react-layout-components'
@@ -22,6 +24,7 @@ type PropType = {
   refundRequestFormData: RefundRequestFormDataType,
   resetState: Function,
   saveRefundRequest: Function,
+  // saveRefundRequestData: SaveRefundRequestDataType,
   validLookup: Function
 }
 
@@ -50,8 +53,7 @@ export class RefundRequest extends React.Component {
     this.props.pdfLoaded()
   }
 
-  // TODO: Why isn't the data type LookupStateType?
-  handleSubmit(data:LookupFormDataType) {
+  handleSubmit(data:LookupDataType) {
     this.props.validLookup(data)
     console.log("Lookup submit values: " + JSON.stringify(data, null, 2))
   }

@@ -1,9 +1,9 @@
 /* @flow */
 
-import type {LookupFormDataType} from '../interfaces/RefundRequestTypes'
+import type {LookupDataType} from '../interfaces/RefundRequestTypes'
 
 type PropType = {
-  lookupForm: LookupFormDataType,
+  lookupForm: LookupDataType,
   form: string,
   anyTouched: boolean,
   dirty: boolean,
@@ -46,7 +46,7 @@ const invalidKeyToMessageMap = {
   'required':                     "Required"
 }
 
-const validate = (values:LookupFormDataType):Object => {
+const validate = (values:LookupDataType):Object => {
   const errors = {lookup: {}}
   const {referenceNum, dateFrom, dateTo, email} = values
 

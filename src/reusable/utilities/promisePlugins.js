@@ -5,8 +5,8 @@
 // That package uses incorrect modular system for us to leverage
 export const promiseTime:Function = (fn:Function):Function => {
   // This function cannot(!) be a 'this'-binding () ==> {}
-  const ret = function():any /* Promise */ {
-    const start = Date.now()
+  const ret = function ():any /* Promise */ {
+    const start   = Date.now()
     const promise = fn(...arguments)
 
     const retPromise = promise.then(
@@ -27,17 +27,17 @@ export const promiseTime:Function = (fn:Function):Function => {
   return ret
 }
 
-(function(Promise:Function /* Strange, but true... according to Flow */) {
+(function (Promise:Function /* Strange, but true... according to Flow */) {
   "use strict"
 
   // This function cannot(!) be a 'this'-binding () ==> {}
-  Promise.spread = function(promises:Array, fulfilled:Function, rejected:?Function):Promise {
+  Promise.spread = function (promises:Array, fulfilled:Function, rejected:?Function):Promise {
     return Promise.all(promises).spread(fulfilled, rejected)
   }
 
   // This function cannot(!) be a 'this'-binding () ==> {}
   // eslint-disable-next-line no-extend-native
-  Promise.prototype.spread = function(fulfilled:Function, rejected:?Function):Promise {
+  Promise.prototype.spread = function (fulfilled:Function, rejected:?Function):Promise {
     return this.then((allResults:Array):Promise => {
       return fulfilled(...allResults)
     }, rejected)

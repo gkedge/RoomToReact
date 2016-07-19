@@ -4,7 +4,11 @@
 // Differences are semantic, type safety and the addition of mock creation.
 
 // A good fetch-focused blog: // https://davidwalsh.name/fetch
-import type {RequestIssueReportType, MapToUrlType, MapToStringType} from 'reusable/interfaces/FpngTypes'
+import type {
+  RequestIssueReportType,
+  MapToUrlType,
+  MapToStringType
+} from 'reusable/interfaces/FpngTypes'
 import RequestIssue from 'reusable/errors/RequestIssue'
 
 import 'whatwg-fetch'  // isomorphic-fetch contains the browser-specific whatwg-fetch
@@ -39,10 +43,10 @@ export type OptionsType = {
   rootContextKey: ? string // Only provide in ctor Options; not setOptions()
 }
 
-const debugUrl = _debug("reusable:fluentRequest:url")
-const debugMocking = _debug("reusable:fluentRequest:mocking")
-const debugRequestTime = _debug("reusable:fluentRequest:time")
-const defaultRootContext:Url = urlUtil.parse('http://localhost:8080')
+const debugUrl                = _debug("reusable:fluentRequest:url")
+const debugMocking            = _debug("reusable:fluentRequest:mocking")
+const debugRequestTime        = _debug("reusable:fluentRequest:time")
+const defaultRootContext:Url  = urlUtil.parse('http://localhost:8080')
 const contextMap:MapToUrlType = {
   'default': defaultRootContext
 }
@@ -64,7 +68,7 @@ export const getRootContext = (key:? string):? Url => {
 }
 
 let serviceChainFailNumber = 0
-export const responseFail = (reason:any, message:?string) => {
+export const responseFail  = (reason:any, message:?string) => {
   try {
     message = (message || '')
     if (reason.skipLogging) {
@@ -80,8 +84,8 @@ export const responseFail = (reason:any, message:?string) => {
 
     if (reason instanceof Error) {
       message = Error.prototype.name +
-        '(' + serviceChain + '): ' +
-        message
+                '(' + serviceChain + '): ' +
+                message
       message += '\n' + reason.message
       if (isUndefined(reason.serviceChain)) {
         message += '\n' + reason.stack
@@ -205,7 +209,7 @@ export const defaultOpts:OptionsType = {
   credentials:      'omit',
   jsonErrorHandler: _defaultJsonErrorHandler,
   httpErrorHandler: _defaultHttpErrorHandler,
-  headers:          {'Accept': 'application/json'},
+  headers:          { 'Accept': 'application/json' },
   httpMethod:       'GET',
   isMocking:        false,
   queryParams:      null,
@@ -303,13 +307,13 @@ export class Request {
 
   setMimeType(type:string):Request {
     switch (type) {
-    case 'json':
-      type = 'application/json; charset=utf-8'
-      break
-    case 'form':
-    case 'urlencoded':
-      type = 'application/x-www-form-urlencoded; charset=utf-8'
-      break
+      case 'json':
+        type = 'application/json; charset=utf-8'
+        break
+      case 'form':
+      case 'urlencoded':
+        type = 'application/x-www-form-urlencoded; charset=utf-8'
+        break
     }
 
     this.opts.headers['content-type'] = type
@@ -324,13 +328,13 @@ export class Request {
   isMimeType(typeToCheck:string):boolean {
     const currentType:?string = this.getMimeType()
     switch (typeToCheck) {
-    case 'json':
-      return currentType === 'application/json; charset=utf-8'
-    case 'form':
-    case 'urlencoded':
-      return currentType === 'application/x-www-form-urlencoded; charset=utf-8'
-    default:
-      return false
+      case 'json':
+        return currentType === 'application/json; charset=utf-8'
+      case 'form':
+      case 'urlencoded':
+        return currentType === 'application/x-www-form-urlencoded; charset=utf-8'
+      default:
+        return false
     }
   }
 
@@ -395,8 +399,8 @@ export class Request {
   }
 
   execute():any /* Promise */ {
-    const {opts} = this
-    const {httpMethod, beforeRequest, afterResponse} = opts
+    const { opts } = this
+    const { httpMethod, beforeRequest, afterResponse } = opts
     opts.method = httpMethod
     opts.mode = opts.corsMode
     try {
@@ -430,7 +434,7 @@ export class Request {
       }
 
       if (this.opts.isMocking) {
-        require.ensure(['fetch-mock'], (require) => {
+        require.ensure(['fetch-mock'], (require:Function) => {
           const fetchMock = require('fetch-mock')
 
           if (this.opts.mockData) {
@@ -443,16 +447,16 @@ export class Request {
             // files as source. Obviously, these JS objects are ONLY intended to be
             // available during test operations. See __MOCK__ in config/index.js.
             const response = {
-              body: __mockData__[this.url.pathname],
+              body:    __mockData__[this.url.pathname],
               // TODO: added headers to __mockData__
-              headers: {"content-type": "application/json; charset=utf-8"}
+              headers: { "content-type": "application/json; charset=utf-8" }
             }
             if (!response.body) {
               console.error("Didn't find mock data for: " +
-                this.url.pathname)
+                            this.url.pathname)
             }
             debugMocking(this.url.pathname + ' data: ' +
-              JSON.stringify(__mockData__[this.url.pathname]))
+                         JSON.stringify(__mockData__[this.url.pathname]))
             fetchMock.mock(this.url.format(), this.opts.httpMethod, response)
           }
         })
@@ -515,7 +519,7 @@ export class Request {
       .catch((reason:Error) => {
         if (isString(reason.message)) {
           const badJsonData = reason.message.includes('JSON.parse') ||
-            reason.message.includes('not strict JSON')
+                              reason.message.includes('not strict JSON')
           reason.message = {
             statusCode: badJsonData ? 700 : 701,
             statusText: badJsonData ? 'Bad data response' : reason.message
@@ -544,14 +548,14 @@ export class Request {
   }
 }
 
-export const get = (url:Url, options:?OptionsType):Request => {
+export const get  = (url:Url, options:?OptionsType):Request => {
   return new Request(url, options)
 }
 export const post = (url:Url, options:?OptionsType):Request => {
   options.httpMethod = "POST"
   return new Request(url, options)
 }
-export const put = (url:Url, options:?OptionsType):Request => {
+export const put  = (url:Url, options:?OptionsType):Request => {
   options.httpMethod = "PUT"
   return new Request(url, options)
 }
