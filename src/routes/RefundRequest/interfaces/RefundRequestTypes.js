@@ -121,12 +121,21 @@ export type PdfReadPayloadType = {
   pdfRaw: Uint8Array
 }
 
-export type SaveRefundRequestPayloadType = {
-  isSaving: boolean,
-  isSaved: boolean
+export type MiscDataType = {
+  misc: {
+    isIssue: boolean,
+    isModalOpen: boolean,
+    isResettingRefundForm: boolean,
+    isNegativeTesting: boolean,
+    issueReport: Array<RequestIssueReportType>
+  }
 }
 
-export type SaveRefundRequestDataType = SaveRefundRequestPayloadType
+export type SaveRequestStateType = {
+  isSaving: boolean,
+  isSaved: boolean,
+  isIssue: boolean
+}
 
 export type RefundRequestStateType = {
   // I don't understand why each of these entries MUST be optional
@@ -156,10 +165,10 @@ export type RefundRequestStateObjectType = {
   pdf: PdfStateType,
   lookupForm: LookupStateType,
   refundRequestForm: RefundRequestStateType,
+  save: SaveRequestStateType,
   isIssue: boolean,
+  isModalOpen: boolean,
   isResettingRefundForm: boolean,
-  isSaving: boolean,
-  isSaved: boolean,
   isNegativeTesting: boolean,
-  issueReport: ?Array<RequestIssueReportType>
+  issueReport: Array<RequestIssueReportType>
 }

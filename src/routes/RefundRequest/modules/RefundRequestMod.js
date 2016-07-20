@@ -34,8 +34,7 @@ import isString from 'lodash/isString'
 
 import {
   get, post, put,
-  getRootContext,
-  setRootContext,
+  getRootContext, setRootContext,
   responseFail
 } from 'reusable/utilities/fluentRequest'
 
@@ -72,10 +71,13 @@ export const RESET_REFUND_REQUEST_FORM_END    = '@@refund/request/RESET_REFUND_R
 export const CLEAR_ISSUE_REPORT               = '@@refund/request/CLEAR_ISSUE_REPORT'
 export const RESET_STATE                      = '@@refund/request/RESET_STATE'
 export const SAVED_REFUND_REQUEST             = '@@refund/request/SAVED_REFUND_REQUEST'
+export const SAVED_REFUND_ISSUE               = '@@refund/request/SAVED_REFUND_ISSUE'
 export const ISSUE_RAISED                     = '@@refund/request/ISSUE_RAISED'
 export const VALID_LOOKUP_START               = '@@refund/request/VALID_LOOKUP_START'
 export const VALID_LOOKUP_END                 = '@@refund/request/VALID_LOOKUP_END'
 export const VALID_LOOKUP_ISSUE               = '@@refund/request/VALID_LOOKUP_ISSUE'
+export const OPEN_MODAL                       = '@@refund/request/OPEN_MODAL'
+export const CLOSE_MODAL                      = '@@refund/request/CLOSE_MODAL'
 
 // ------------------------------------
 // Actions
@@ -92,6 +94,18 @@ export const raiseIssue = (issueMessage:any):ActionPayloadType => {
   return {
     type:    ISSUE_RAISED,
     payload: issueMessage
+  }
+}
+
+export const openModal = ():ActionPayloadType => {
+  return {
+    type:    OPEN_MODAL
+  }
+}
+
+export const closeModal = ():ActionPayloadType => {
+  return {
+    type:    CLOSE_MODAL
   }
 }
 
@@ -264,63 +278,43 @@ export const pdfLoaded = ():ActionPayloadType => {
 
 export const postRefundRequest = ():ActionPayloadType => {
   return {
-    type:    POST_REFUND_REQUEST,
-    payload: {
-      isSaving: true,
-      isSaved:  false
-    }
+    type:    POST_REFUND_REQUEST
   }
 }
 
 export const savedRefundRequest = ():ActionPayloadType => {
   return {
-    type:    SAVED_REFUND_REQUEST,
-    payload: {
-      isSaving: false,
-      isSaved:  true
-    }
+    type:    SAVED_REFUND_REQUEST
   }
 }
 
-export const clearIssueReport = ():ActionPayloadType => {
-  return {
-    type: CLEAR_ISSUE_REPORT
-  }
-}
-
-export const resetState = ():ActionPayloadType => {
-  return {
-    type: RESET_STATE
-  }
-}
-
-export const resetRefundRequestFormStart = ():ActionPayloadType => {
-  return {
-    type: RESET_REFUND_REQUEST_FORM_START
-  }
-}
-
-export const resetRefundRequestFormEnd = ():ActionPayloadType => {
-  return {
-    type: RESET_REFUND_REQUEST_FORM_END
-  }
-}
-
-export const resetRefundRequestForm = ():Function => {
+export const saveRefundIssue = (issueMessage:RequestIssueReportType):Function => {
   return (dispatch:Function) => {
-    dispatch(resetRefundRequestFormStart())
-    // TODO: Hope this isn't async... Check.
-    dispatch(reset('resetRefundRequestForm'))
-    dispatch(resetRefundRequestFormEnd())
+    dispatch(raiseIssue(issueMessage))
+    dispatch({
+      type: SAVED_REFUND_ISSUE
+    })
   }
 }
 
-export const saveRefundRequest = (/* asciiPDF:string */):Function => {
-  return (dispatch:Function):any /* Promise */ => {
+export const saveRefundRequest = ():Function => {
+  return (dispatch:Function, getState:Function):any /* Promise */ => {
     dispatch(postRefundRequest())
-
-    return fetch('/refunds')
-      .then((/* data:Object */):any /* Promise */ => dispatch(savedRefundRequest()))
+    const postRefundAPI = url.parse('refunds')
+    return post(postRefundAPI)
+      .setMimeType('json')
+      .json()
+      .then(():any /* Promise*/ => {
+        // TODO: check schema during development.
+        return dispatch(savedRefundRequest())
+      })
+      .catch((reason:Error):any /* Promise*/ => {
+        if (!getState().refundRequest.isNegativeTesting) {
+          responseFail(reason, 'Failed to post refund.')
+        }
+        return dispatch(saveRefundIssue(reason.message))
+      })
+      .catch((reason:Error):any /* Promise*/ => dispatch(saveRefundIssue(reason.message)))
   }
 }
 
@@ -415,6 +409,39 @@ export function validLookup(lookupFormData:LookupDataType):Function {
         return dispatch(validLookupIssue())
       })
       .catch(():any /* Promise*/ => dispatch(validLookupIssue()))
+  }
+}
+
+export const clearIssueReport = ():ActionPayloadType => {
+  return {
+    type: CLEAR_ISSUE_REPORT
+  }
+}
+
+export const resetState = ():ActionPayloadType => {
+  return {
+    type: RESET_STATE
+  }
+}
+
+export const resetRefundRequestFormStart = ():ActionPayloadType => {
+  return {
+    type: RESET_REFUND_REQUEST_FORM_START
+  }
+}
+
+export const resetRefundRequestFormEnd = ():ActionPayloadType => {
+  return {
+    type: RESET_REFUND_REQUEST_FORM_END
+  }
+}
+
+export const resetRefundRequestForm = ():Function => {
+  return (dispatch:Function) => {
+    dispatch(resetRefundRequestFormStart())
+    // TODO: Hope this isn't async... Check.
+    dispatch(reset('resetRefundRequestForm'))
+    dispatch(resetRefundRequestFormEnd())
   }
 }
 
@@ -596,14 +623,6 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
       }
     })
   },
-  [POST_REFUND_REQUEST]:              (state:ShortType,
-                                       action:{payload: SaveRefundRequestPayloadType}):ShortType => {
-    return ({
-      ...state,
-      isSaving: action.payload.isSaving,
-      isSaved:  action.payload.isSaved
-    })
-  },
   [RESET_REFUND_REQUEST_FORM_START]:  (state:ShortType):ShortType => {
     return ({
       ...state,
@@ -617,12 +636,34 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
       isResettingRefundForm: false
     })
   },
-  [SAVED_REFUND_REQUEST]:             (state:ShortType,
-                                       action:{payload: SaveRefundRequestPayloadType}):ShortType => {
+  [POST_REFUND_REQUEST]:              (state:ShortType):ShortType => {
     return ({
-      ...initialState,
-      isSaving: action.payload.isSaving,
-      isSaved:  action.payload.isSaved
+      ...state,
+      save: {
+        ...state.save,
+        isSaving: true,
+        isSaved:  false
+      }
+    })
+  },
+  [SAVED_REFUND_REQUEST]:             (state:ShortType):ShortType => {
+    return ({
+      ...state,
+      save: {
+        ...state.save,
+        isSaving: false,
+        isSaved:  true
+      }
+    })
+  },
+  [SAVED_REFUND_ISSUE]:               (state:ShortType):ShortType => {
+    return ({
+      ...state,
+      save: {
+        ...state.save,
+        isSaving: false,
+        isIssue:  true
+      }
     })
   },
   [CLEAR_ISSUE_REPORT]:               (state:ShortType):ShortType => {
@@ -687,6 +728,18 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
   },
   [VALID_LOOKUP_ISSUE]:               (state:ShortType):ShortType => {
     return state
+  },
+  [OPEN_MODAL]:                       (state:ShortType):ShortType => {
+    return ({
+      ...state,
+      isModalOpen: true
+    })
+  },
+  [CLOSE_MODAL]:                      (state:ShortType):ShortType => {
+    return ({
+      ...state,
+      isModalOpen: false
+    })
   }
 }
 
@@ -744,10 +797,14 @@ export const initialState:ShortType = {
     acknowledgement:         false,
     requestDate:             null
   },
+  save:                  {
+    isIssue:               false,
+    isSaving:              false,
+    isSaved:               false
+  },
   isIssue:               false,
+  isModalOpen:           false,
   isResettingRefundForm: false,
-  isSaving:              false,
-  isSaved:               false,
   isNegativeTesting:     false,
   issueReport:           []
 }

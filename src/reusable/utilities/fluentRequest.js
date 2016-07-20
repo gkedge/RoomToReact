@@ -13,6 +13,7 @@ import RequestIssue from 'reusable/errors/RequestIssue'
 
 import 'whatwg-fetch'  // isomorphic-fetch contains the browser-specific whatwg-fetch
 import _debug from 'debug'
+import moment from 'moment'
 import urlUtil, {Url} from 'url'
 import assign from 'lodash/assign'
 import isUndefined from 'lodash/isUndefined'
@@ -156,6 +157,11 @@ const _defaultJsonErrorHandler:Function = (response:Object):Promise => {
           // is available.
           if (!response.ok || !jsonStatusOk) {
             const requestIssueReport:RequestIssueReportType = {
+              // TODO: Add path URL & Data/Time
+              // If 'response' doesn't have URL, json()
+              // will have to pass it in for use to report.
+              // url: response.getURL() ... I hope.
+              // time: moment()
               statusCode:       response.status,
               statusText:       response.statusText,
               errorCode:        json.errorCode,
@@ -502,6 +508,8 @@ export class Request {
   json(strict:boolean = true):any /* Promise */ {
     const jsonErrorHandler = this.opts.jsonErrorHandler
     return this.execute()
+    // TODO: determine if the URL is in the response. If not, pass
+    // it into the jsonErrorHandler for reporting purposes.
       .then((res:any):any /* Promise */ => jsonErrorHandler(res))
       // Since FPNG insists on embedding error status within the JSON,
       // the jsonErrorHandler has to read the response JSON!  So, the
@@ -556,10 +564,12 @@ export const get  = (url:Url, options:?OptionsType):Request => {
   return new Request(url, options)
 }
 export const post = (url:Url, options:?OptionsType):Request => {
+  options = options || {}
   options.httpMethod = "POST"
   return new Request(url, options)
 }
 export const put  = (url:Url, options:?OptionsType):Request => {
+  options = options || {}
   options.httpMethod = "PUT"
   return new Request(url, options)
 }

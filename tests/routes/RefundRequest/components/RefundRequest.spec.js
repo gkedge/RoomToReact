@@ -60,12 +60,26 @@ const props = {
       requestDate:             null
     }
   },
+  miscData: {
+    misc: {
+      isIssue:               false,
+      isModalOpen:           false,
+      isResettingRefundForm: false,
+      isNegativeTesting:     false,
+      issueReport:           []
+    }
+  },
+  save:                  {
+    isIssue:             false,
+    isSaving:            false,
+    isSaved:             false,
+  },
   isIssue:               false,
   isResettingRefundForm: false,
-  isSaving:              false,
-  isSaved:               false,
   isNegativeTesting:     false,
   issueReport:           [],
+  openModal:             sinon.spy(),
+  closeModal:            sinon.spy(),
   loadingPdf:            sinon.spy(),
   lookupReferencedData:  sinon.spy(),
   pdfBinary:             sinon.spy(),

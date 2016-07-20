@@ -85,7 +85,7 @@ const karmaConfig = {
   retryLimit:               4,
   browserComment_0:         'karma may not wait long enough for Chrome to start prior to retrying.',
   browserComment_1:         'https://github.com/karma-runner/karma/issues/2116',
-  browsers:                 [ /* 'SlimerJS', 'PhantomJS' */ 'Chrome', 'Firefox', 'IE'],
+  browsers:                 [ /* 'SlimerJS', 'Chrome', 'Firefox', 'IE' */ 'PhantomJS'],
   webpack:                  {
     devtool:    'cheap-module-source-map',
     resolve:    {

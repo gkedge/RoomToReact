@@ -6,6 +6,7 @@ export type ActionPayloadType = {
   payload: ?any
 }
 
+// TODO: Add path URL & Data/Time
 export type RequestIssueReportType = {
   statusCode: number,
   statusText: string,

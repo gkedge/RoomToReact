@@ -6,6 +6,8 @@ import makeRootReducer from './reducers'
 export default (initialState = {}, history) => {
   // ======================================================
   // Middleware Configuration
+  // Order seems to be important here:
+  // https://github.com/acdlite/redux-router/issues/87
   // ======================================================
   const middleware = [thunk, routerMiddleware(history)]
 

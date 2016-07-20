@@ -6,8 +6,10 @@ import type {
 
 import {connect} from 'react-redux'
 import {
+  closeModal,
   lookupReferencedData,
   loadingPdf,
+  openModal,
   pdfBinary,
   pdfLoaded,
   resetState,
@@ -26,20 +28,36 @@ const mapStateToProps = (state:Object):MapToObjectType => ({
   },
   refundRequestFormData: {
     refundRequestForm: state.refundRequest.refundRequestForm
+  },
+  saveRefundRequestFormData: {
+    saveRefundRequestForm: state.refundRequest.save
+  },
+  miscData: {
+    misc: {
+      isIssue:               state.refundRequest.isIssue,
+      isModalOpen:           state.refundRequest.isModalOpen,
+      isResettingRefundForm: state.refundRequest.isResettingRefundForm,
+      isNegativeTesting:     state.refundRequest.isNegativeTesting,
+      issueReport:           state.refundRequest.issueReport
+    }
   }
 })
 
 const mapActionCreators:{
+  closeModal: Function,
   lookupReferencedData: Function,
   loadingPdf: Function,
+  openModal: Function,
   pdfBinary: Function,
   pdfLoaded: Function,
   resetState: Function,
   saveRefundRequest: Function,
   validLookup: Function
 } = {
+  closeModal,
   lookupReferencedData,
   loadingPdf,
+  openModal,
   pdfBinary,
   pdfLoaded,
   resetState,
