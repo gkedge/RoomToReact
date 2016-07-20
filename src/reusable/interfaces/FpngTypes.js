@@ -19,6 +19,7 @@ export type RequestIssuePayloadType = RequestIssueReportType
 
 export type MapToStringType = { [key: string]: string }
 export type MapToUrlType = { [key: string]: Url}
+export type MapToObjectType = { [key: string]: Object }
 export type MapToAnyType = { [key: string]: any }
 export type StateMapType = MapToAnyType
 

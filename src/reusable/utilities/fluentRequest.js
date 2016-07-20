@@ -14,6 +14,7 @@ import RequestIssue from 'reusable/errors/RequestIssue'
 import 'whatwg-fetch'  // isomorphic-fetch contains the browser-specific whatwg-fetch
 import _debug from 'debug'
 import urlUtil, {Url} from 'url'
+import assign from 'lodash/assign'
 import isUndefined from 'lodash/isUndefined'
 import isEmpty from 'lodash/isEmpty'
 import isObject from 'lodash/isObject'
@@ -252,7 +253,7 @@ export class Request {
   constructor(url:Url, options:OptionsType = {}) {
     _normalizeOptions(options)
 
-    this.opts = Object.assign({}, defaultOpts, options)
+    this.opts = assign({}, defaultOpts, options)
 
     const rootContext = getRootContext(this.opts.rootContextKey)
     url.pathname = (rootContext.pathname || '') + (url.pathname || '')
@@ -270,7 +271,7 @@ export class Request {
     }
     _normalizeOptions(options)
 
-    this.opts = Object.assign({}, this.opts, options)
+    this.opts = assign({}, this.opts, options)
     return this
   }
 
@@ -357,7 +358,7 @@ export class Request {
 
   setPayload(payload:any):Request {
     if (isObject(payload) && isObject(this._payload)) {
-      this._payload = Object.assign(this._payload, payload)
+      this._payload = assign(this._payload, payload)
     }
     else if (typeof payload === 'string') {
       const type = this.getMimeType()
@@ -518,7 +519,10 @@ export class Request {
       })
       .catch((reason:Error) => {
         if (isString(reason.message)) {
-          const badJsonData = reason.message.includes('JSON.parse') ||
+          const badJsonData = reason.message.includes('JSON.parse') ||         // Firefox
+                              reason.message.includes('Invalid character') ||  // IE
+                              reason.message.includes('Unexpected token') ||   // Chrome
+                              reason.message.includes('JSON Parse error') ||   // PhantomJS
                               reason.message.includes('not strict JSON')
           reason.message = {
             statusCode: badJsonData ? 700 : 701,

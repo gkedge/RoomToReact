@@ -1,5 +1,9 @@
 /* @flow */
 
+import type {
+  MapToObjectType
+} from 'reusable/interfaces/FpngTypes'
+
 import {connect} from 'react-redux'
 import {
   lookupReferencedData,
@@ -13,7 +17,7 @@ import {
 
 import RefundRequest from '../components/RefundRequest'
 
-const mapStateToProps = (state:Object):Object => ({
+const mapStateToProps = (state:Object):MapToObjectType => ({
   pdfData: {
     pdf: state.refundRequest.pdf
   },

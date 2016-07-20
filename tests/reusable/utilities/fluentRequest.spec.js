@@ -20,7 +20,7 @@ import fetchMock from 'fetch-mock'
 const debug = _debug('test:fluentRequest')
 
 describe('fluentRequest', function () { // Can't use '() ==> here...
-  this.timeout(200); // ... because this 'this' would be wrong.
+  this.timeout(300); // ... because this 'this' would be wrong.
 
   const jsonType = 'application/json; charset=utf-8'
   const defaultRootContext = '//unit-test'

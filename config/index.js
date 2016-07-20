@@ -3,6 +3,7 @@ import path from 'path'
 import _debug from 'debug'
 import { argv } from 'yargs'
 import ip from 'ip'
+import assign from 'lodash/assign'
 
 const localip = ip.address()
 const debug = _debug('app:config:config')
@@ -132,7 +133,7 @@ const environments = require('./environments').default
 const overrides = environments[config.env]
 if (overrides) {
   debug('Found overrides, applying to default configuration.')
-  Object.assign(config, overrides(config))
+  assign(config, overrides(config))
 }
 else {
   debug('No environment overrides found, defaults will be used.')

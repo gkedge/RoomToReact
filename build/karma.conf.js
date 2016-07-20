@@ -17,8 +17,8 @@ function removeAllValuesFromAry(ary, val) {
 }
 
 const karmaConfig = {
-  basePath:          '../', // project root in relation to bin/karma.js
-  files:             [
+  basePath:                 '../', // project root in relation to bin/karma.js
+  files:                    [
     {
       pattern:  `./${config.dir_test}/test-bundler.js`,
       watched:  false,
@@ -32,7 +32,7 @@ const karmaConfig = {
       included: true
     }
   ],
-  mochaReporter: {
+  mochaReporter:            {
     showDiff:      true,
     output:        'full', // 'autowatch'
     ignoreSkipped: true,
@@ -43,12 +43,12 @@ const karmaConfig = {
       error:   'red'
     }
   },
-  client: {
+  client:                   {
     mocha: {
       // change Karma's debug.html to the mocha web reporter so that you
       // can see and rerun individual tests in the Karma [DEBUG] tab in
       // Chrome or Firefox.
-      reporter: 'html',
+      reporter: 'html'
 
       // Which tests are run by mocha is an intersection of this 'grep' and
       // test-bundler.js:testsContext.  Changing 'grep' requires the TDD, continuous
@@ -58,13 +58,13 @@ const karmaConfig = {
       // grep: "loadAddressesData"
     }
   },
-  singleRun:         !argv.watch,
-  frameworks:        ['mocha'],
+  singleRun:                !argv.watch,
+  frameworks:               ['mocha'],
   // reporters:         ['progress', 'mocha'],
-  reporters:         ['mocha'],
-  preprocessors:     {
-    [`${config.dir_test}/test-bundler.js`]:  ['webpack'],
-    './tests/resources/**/*.json': ['json_fixtures']
+  reporters:                ['mocha'],
+  preprocessors:            {
+    [`${config.dir_test}/test-bundler.js`]: ['webpack'],
+    './tests/resources/**/*.json':          ['json_fixtures']
   },
   jsonFixturesPreprocessor: {
     // strip this from the file path \ mock data name
@@ -73,19 +73,20 @@ const karmaConfig = {
     // prependPrefix:     'mock/',
     // change the global fixtures variable name
     variableName:      '__mockData__',
-    // camelize fixture filenames (e.g 'fixtures/aa-bb_cc.json' becomes __fixtures__['fixtures/aaBbCc'])
+    // camelize fixture filenames (e.g 'fixtures/aa-bb_cc.json' becomes
+    // __fixtures__['fixtures/aaBbCc'])
     camelizeFilenames: true
     // transform the filename
     // transformPath:     function(path) {
     //  return path + '.js'
     // }
   },
-  captureTimeout:    60000,
-  retryLimit:        4,
-  browserComment_0:  'karma does not wait long enough for Chrome chrome to start prior to retrying.',
-  browserComment_1:  'https://github.com/karma-runner/karma/issues/2116',
-  browsers:          [/* 'Chrome', 'Firefox', 'SlimerJS', 'PhantomJS' */ 'Firefox'],
-  webpack:           {
+  captureTimeout:           60000,
+  retryLimit:               4,
+  browserComment_0:         'karma may not wait long enough for Chrome to start prior to retrying.',
+  browserComment_1:         'https://github.com/karma-runner/karma/issues/2116',
+  browsers:                 [ /* 'SlimerJS', 'PhantomJS' */ 'Chrome', 'Firefox', 'IE'],
+  webpack:                  {
     devtool:    'cheap-module-source-map',
     resolve:    {
       ...webpackConfig.resolve,
@@ -116,10 +117,10 @@ const karmaConfig = {
     },
     sassLoader: webpackConfig.sassLoader
   },
-  webpackMiddleware: {
+  webpackMiddleware:        {
     noInfo: true
   },
-  coverageReporter:  {
+  coverageReporter:         {
     reporters: config.coverage_reporters
   }
 }

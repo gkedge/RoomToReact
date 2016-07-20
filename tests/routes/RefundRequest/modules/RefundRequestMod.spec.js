@@ -30,7 +30,7 @@ import cloneDeep from 'lodash/cloneDeep'
 
 describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
   describe('Actions', function () { // Can't use '() ==> here...
-    this.timeout(200); // ... because this 'this' would be wrong.
+    this.timeout(300); // ... because this 'this' would be wrong.
 
     const paymentHistoryData:PaymentHistoryDataType = [
       {
@@ -281,8 +281,6 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
           expect(acts.RESET_REFUND_REQUEST_FORM_END).to.equal(
             '@@refund/request/RESET_REFUND_REQUEST_FORM_END')
         })
-
-        // TODO: reset refund needs a thunk test like this validateLookup thunk test:
       })
 
       describe('Lookup Reference Data Actions and Subactions', () => {
