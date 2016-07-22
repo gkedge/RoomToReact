@@ -7,8 +7,10 @@ import type {
   MapActionNameToCreatorFuctType
 } from 'reusable/interfaces/FpngTypes'
 
+export const unknownActionType = "@@fpng/UnknownAction"
+
 export const unknownAction:ActionPayloadType = {
-  type: "Unknown"
+  type: unknownActionType
 }
 
 export function createReducer(initialState:StateMapType,

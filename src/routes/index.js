@@ -5,7 +5,6 @@ import Home from './Home'
 /*  Note: Instead of using JSX, we recommend using react-router
  PlainRoute objects to build route definitions.
  When creating a new async route, pass the instantiated store!   */
-
 export const createRoutes = (store) => {
   const routes = {
     path:       '/',
@@ -18,7 +17,8 @@ export const createRoutes = (store) => {
           // WITHOUT imports!
           require('./RefundRequest').default(store),
           require('./Counter').default(store),
-          require('./Zen').default(store)
+          require('./Zen').default(store),
+          require('reusable/components/404').default(store)
         ])
       })
     }

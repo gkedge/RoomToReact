@@ -9,7 +9,8 @@ import type {
 } from '../interfaces/RefundRequestTypes'
 
 import React from 'react'
-import {Box, VBox, Center, Flex, Container} from 'react-layout-components'
+import {Box, VBox, Center, Container} from 'react-layout-components'
+import SystemError from 'reusable/modules/SystemError/components/SystemError'
 import Modal from 'react-modal'
 
 import PdfPanel from 'reusable/components/PdfPanel/PdfPanel'

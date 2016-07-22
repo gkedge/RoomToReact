@@ -21,10 +21,10 @@ import type {
   PaymentHistoryDataPayloadType,
   PdfReadPayloadType,
   SaveRefundRequestPayloadType,
-  RefundRequestStateObjectType
+  RefundRequestStateType
 } from '../interfaces/RefundRequestTypes'
 
-type ShortType = RefundRequestStateObjectType
+type RrsType = RefundRequestStateType
 
 import _debug from 'debug'
 import {reset} from 'redux-form'
@@ -447,8 +447,8 @@ export const resetRefundRequestForm = ():Function => {
 
 /*eslint "key-spacing": 0*/
 const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
-  [ISSUE_RAISED]:                     (state:ShortType,
-                                       action:{payload: RequestIssueReportType}):ShortType => {
+  [ISSUE_RAISED]:                     (state:RrsType,
+                                       action:{payload: RequestIssueReportType}):RrsType => {
     const issueReport = cloneDeep(state.issueReport)
     issueReport.push(action.payload)
     return ({
@@ -457,7 +457,7 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
       issueReport: issueReport
     })
   },
-  [LOAD_ADDRESSES_START]:             (state:ShortType):ShortType => {
+  [LOAD_ADDRESSES_START]:             (state:RrsType):RrsType => {
     return ({
       ...state,
       refundRequestForm: {
@@ -466,8 +466,8 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
       }
     })
   },
-  [LOAD_ADDRESSES_LOADED]:            (state:ShortType,
-                                       action:{payload: AddressesPayloadType}):ShortType => {
+  [LOAD_ADDRESSES_LOADED]:            (state:RrsType,
+                                       action:{payload: AddressesPayloadType}):RrsType => {
     return ({
       ...state,
       refundRequestForm: {
@@ -480,7 +480,7 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
       }
     })
   },
-  [LOAD_ADDRESSES_ISSUE]:             (state:ShortType):ShortType => {
+  [LOAD_ADDRESSES_ISSUE]:             (state:RrsType):RrsType => {
     return ({
       ...state,
       refundRequestForm: {
@@ -493,7 +493,7 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
       }
     })
   },
-  [LOAD_NAMES_START]:                 (state:ShortType):ShortType => {
+  [LOAD_NAMES_START]:                 (state:RrsType):RrsType => {
     return ({
       ...state,
       refundRequestForm: {
@@ -502,8 +502,8 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
       }
     })
   },
-  [LOAD_NAMES_LOADED]:                (state:ShortType,
-                                       action:{payload: NamesPayloadType}):ShortType => {
+  [LOAD_NAMES_LOADED]:                (state:RrsType,
+                                       action:{payload: NamesPayloadType}):RrsType => {
     return ({
       ...state,
       refundRequestForm: {
@@ -516,7 +516,7 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
       }
     })
   },
-  [LOAD_NAMES_ISSUE]:                 (state:ShortType):ShortType => {
+  [LOAD_NAMES_ISSUE]:                 (state:RrsType):RrsType => {
     return ({
       ...state,
       refundRequestForm: {
@@ -529,7 +529,7 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
       }
     })
   },
-  [LOAD_PAYMENT_HISTORY_DATA_START]:  (state:ShortType):ShortType => {
+  [LOAD_PAYMENT_HISTORY_DATA_START]:  (state:RrsType):RrsType => {
     return ({
       ...state,
       refundRequestForm: {
@@ -538,8 +538,8 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
       }
     })
   },
-  [LOAD_PAYMENT_HISTORY_DATA_LOADED]: (state:ShortType,
-                                       action:{payload: PaymentHistoryDataPayloadType}):ShortType => {
+  [LOAD_PAYMENT_HISTORY_DATA_LOADED]: (state:RrsType,
+                                       action:{payload: PaymentHistoryDataPayloadType}):RrsType => {
     return ({
       ...state,
       refundRequestForm: {
@@ -552,7 +552,7 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
       }
     })
   },
-  [LOAD_PAYMENT_HISTORY_DATA_ISSUE]:  (state:ShortType):ShortType => {
+  [LOAD_PAYMENT_HISTORY_DATA_ISSUE]:  (state:RrsType):RrsType => {
     return ({
       ...state,
       refundRequestForm: {
@@ -565,8 +565,8 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
       }
     })
   },
-  [LOADING_PDF]:                      (state:ShortType,
-                                       action:{payload: PdfLoadingPayloadType}):ShortType => {
+  [LOADING_PDF]:                      (state:RrsType,
+                                       action:{payload: PdfLoadingPayloadType}):RrsType => {
     return ({
       ...state,
       pdf: {
@@ -576,7 +576,7 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
       }
     })
   },
-  [LOOKUP_REFERENCED_DATA_START]:     (state:ShortType):ShortType => {
+  [LOOKUP_REFERENCED_DATA_START]:     (state:RrsType):RrsType => {
     return ({
       ...state,
       lookupForm: {
@@ -585,7 +585,7 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
       }
     })
   },
-  [LOOKUP_REFERENCED_DATA_LOADED]:    (state:ShortType):ShortType => {
+  [LOOKUP_REFERENCED_DATA_LOADED]:    (state:RrsType):RrsType => {
     return ({
       ...state,
       lookupForm: {
@@ -594,7 +594,7 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
       }
     })
   },
-  [LOOKUP_REFERENCED_DATA_ISSUE]:     (state:ShortType):ShortType => {
+  [LOOKUP_REFERENCED_DATA_ISSUE]:     (state:RrsType):RrsType => {
     return ({
       ...state,
       lookupForm: {
@@ -604,8 +604,8 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
       }
     })
   },
-  [PDF_BINARY]:                       (state:ShortType,
-                                       action:{payload: PdfReadPayloadType}):ShortType => {
+  [PDF_BINARY]:                       (state:RrsType,
+                                       action:{payload: PdfReadPayloadType}):RrsType => {
     return ({
       ...state,
       pdf: {
@@ -614,7 +614,7 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
       }
     })
   },
-  [PDF_LOADED]:                       (state:ShortType):ShortType => {
+  [PDF_LOADED]:                       (state:RrsType):RrsType => {
     return ({
       ...state,
       pdf: {
@@ -623,20 +623,20 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
       }
     })
   },
-  [RESET_REFUND_REQUEST_FORM_START]:  (state:ShortType):ShortType => {
+  [RESET_REFUND_REQUEST_FORM_START]:  (state:RrsType):RrsType => {
     return ({
       ...state,
       isResettingRefundForm: true,
       refundRequestForm:     initialState.refundRequestForm
     })
   },
-  [RESET_REFUND_REQUEST_FORM_END]:    (state:ShortType):ShortType => {
+  [RESET_REFUND_REQUEST_FORM_END]:    (state:RrsType):RrsType => {
     return ({
       ...state,
       isResettingRefundForm: false
     })
   },
-  [POST_REFUND_REQUEST]:              (state:ShortType):ShortType => {
+  [POST_REFUND_REQUEST]:              (state:RrsType):RrsType => {
     return ({
       ...state,
       save: {
@@ -646,7 +646,7 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
       }
     })
   },
-  [SAVED_REFUND_REQUEST]:             (state:ShortType):ShortType => {
+  [SAVED_REFUND_REQUEST]:             (state:RrsType):RrsType => {
     return ({
       ...state,
       save: {
@@ -656,7 +656,7 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
       }
     })
   },
-  [SAVED_REFUND_ISSUE]:               (state:ShortType):ShortType => {
+  [SAVED_REFUND_ISSUE]:               (state:RrsType):RrsType => {
     return ({
       ...state,
       save: {
@@ -666,7 +666,7 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
       }
     })
   },
-  [CLEAR_ISSUE_REPORT]:               (state:ShortType):ShortType => {
+  [CLEAR_ISSUE_REPORT]:               (state:RrsType):RrsType => {
     return ({
       ...state,
       isIssue:     false,
@@ -693,13 +693,13 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
       }
     })
   },
-  [RESET_STATE]:                      ():ShortType => {
+  [RESET_STATE]:                      ():RrsType => {
     return ({
       ...initialState
     })
   },
-  [VALID_LOOKUP_START]:               (state:ShortType,
-                                       action:{payload: LookupPayloadType}):ShortType => {
+  [VALID_LOOKUP_START]:               (state:RrsType,
+                                       action:{payload: LookupPayloadType}):RrsType => {
     const payload    = action.payload
     let referenceNum = payload.referenceNum
     // Strip any slashes or commas
@@ -723,19 +723,19 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
       }
     })
   },
-  [VALID_LOOKUP_END]:                 (state:ShortType):ShortType => {
+  [VALID_LOOKUP_END]:                 (state:RrsType):RrsType => {
     return state
   },
-  [VALID_LOOKUP_ISSUE]:               (state:ShortType):ShortType => {
+  [VALID_LOOKUP_ISSUE]:               (state:RrsType):RrsType => {
     return state
   },
-  [OPEN_MODAL]:                       (state:ShortType):ShortType => {
+  [OPEN_MODAL]:                       (state:RrsType):RrsType => {
     return ({
       ...state,
       isModalOpen: true
     })
   },
-  [CLOSE_MODAL]:                      (state:ShortType):ShortType => {
+  [CLOSE_MODAL]:                      (state:RrsType):RrsType => {
     return ({
       ...state,
       isModalOpen: false
@@ -746,7 +746,7 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
 // ------------------------------------
 // Reducer
 // ------------------------------------
-export const initialState:ShortType = {
+export const initialState:RrsType = {
   pdf:                   {
     isError:       false,
     isLoading:     false,
@@ -810,8 +810,8 @@ export const initialState:ShortType = {
 }
 
 const reducer = createReducer(initialState, LOAD_REFUND_REQUEST_ACTION_HANDLERS)
-export default function refundRequestReducer(state:ShortType = initialState,
-                                             action:ActionPayloadType = unknownAction):ShortType {
+export default function (state:RrsType = initialState,
+                         action:ActionPayloadType = unknownAction):RrsType {
   return reducer(state, action)
 }
 

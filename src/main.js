@@ -6,6 +6,8 @@ import {syncHistoryWithStore} from 'react-router-redux'
 import createStore from './store/createStore'
 import AppContainer from './containers/AppContainer'
 import _debug from 'debug'
+import { initialState as systemErrorInitialState } from
+  'reusable/modules/SystemError/modules/SystemErrorMod'
 
 _debug.enable(process.env.DEBUG)
 
@@ -23,7 +25,10 @@ const browserHistory = useRouterHistory(createBrowserHistory)({
 // react-router-redux reducer under the routerKey "router" in src/routes/index.js,
 // so we need to provide a custom `selectLocationState` to inform
 // react-router-redux of its location.
-const initialState = window.___INITIAL_STATE__
+const initialState = {
+  // router:      window.___INITIAL_STATE__,
+  systemError: systemErrorInitialState
+}
 const store = createStore(initialState, browserHistory)
 const history = syncHistoryWithStore(browserHistory, store, {
   selectLocationState: (state) => state.router

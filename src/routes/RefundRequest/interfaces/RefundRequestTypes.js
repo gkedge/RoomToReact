@@ -137,7 +137,7 @@ export type SaveRequestStateType = {
   isIssue: boolean
 }
 
-export type RefundRequestStateType = {
+export type RefundRequestFormStateType = {
   // I don't understand why each of these entries MUST be optional
   // to get through a type check when creating a RefundRequest. Ugh!
   fees: ?FeesStateType,
@@ -158,13 +158,13 @@ export type RefundRequestStateType = {
 }
 
 export type RefundRequestFormDataType = {
-  refundRequestForm: ?RefundRequestStateType
+  refundRequestForm: ?RefundRequestFormStateType
 }
 
-export type RefundRequestStateObjectType = {
+export type RefundRequestStateType = {
   pdf: PdfStateType,
   lookupForm: LookupStateType,
-  refundRequestForm: RefundRequestStateType,
+  refundRequestForm: RefundRequestFormStateType,
   save: SaveRequestStateType,
   isIssue: boolean,
   isModalOpen: boolean,

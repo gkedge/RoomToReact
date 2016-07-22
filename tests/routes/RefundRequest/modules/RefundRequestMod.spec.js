@@ -1,4 +1,4 @@
-/* flow */
+/* @flow */
 
 import type {ActionPayloadType, RequestIssueReportType} from 'reusable/interfaces/FpngTypes'
 
@@ -17,14 +17,11 @@ import refundRequestReducer from 'routes/RefundRequest/modules/RefundRequestMod'
 // Disregard any reference to nock as that is a server-side
 // only solution; using fetch-mock instead.
 import {
-  get, post, put,
-  getRootContext,
-  setRootContext,
-  responseFail
+  getRootContext, setRootContext
 } from 'reusable/utilities/fluentRequest'
 import fetchMock from 'fetch-mock'
-import {reducerSpy} from '../../testRouterUtilities.spec'
-import {binary2Base64, base64ToBinary} from 'reusable/utilities/dataUtils'
+import {reducerSpy} from '../../../reusable/testReducerUtilities.spec'
+import {base64ToBinary} from 'reusable/utilities/dataUtils'
 import url from 'url'
 import cloneDeep from 'lodash/cloneDeep'
 
@@ -326,7 +323,6 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
 
               expect(state).to.eql(expected)
             })
-
         })
 
         describe('resetRefundRequestForm (thunk)', () => {
