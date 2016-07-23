@@ -10,8 +10,14 @@ import type {
   SaveRefundRequestPayloadType
 } from 'routes/RefundRequest/interfaces/RefundRequestTypes'
 
+import type {
+  SystemErrorReportType,
+  TimeStampedSystemErrorReportType,
+  SYS_ERROR_ADDED
+} from 'reusable/modules/SystemError'
+
 import * as acts from 'routes/RefundRequest/modules/RefundRequestMod'
-import refundRequestReducer from 'routes/RefundRequest/modules/RefundRequestMod'
+import refundRequestReducer, {ut} from 'routes/RefundRequest/modules/RefundRequestMod'
 
 // http://redux.js.org/docs/recipes/WritingTests.html
 // Disregard any reference to nock as that is a server-side
@@ -24,8 +30,56 @@ import {reducerSpy} from '../../../reusable/testReducerUtilities.spec'
 import {base64ToBinary} from 'reusable/utilities/dataUtils'
 import url from 'url'
 import cloneDeep from 'lodash/cloneDeep'
+import MockDate from 'mockdate'
+import moment from 'moment'
+import uuid from 'uuid'
 
 describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
+  const requestIssueReport:RequestIssueReportType = {
+    statusCode:       666,
+    statusText:       'The devil made me do it.',
+    errorCode:        999,
+    errorMessageText: ["Entering Dante's Inferno", "It's hot"],
+    infoMessageText:  ["Exiting Dante's Inferno"],
+    reqUrl:           url.parse('//beelzebub.com/'),
+    warnMessageText:  ["Is is getting hot or is it me?"]
+  }
+
+  const mockUuid           = '00000000-dead-beef-0000-000000000000'
+  const mockNowMsFromEpoch = 961041600000
+
+  describe('Utility Functions', function () { // Can't use '() ==> here...
+    this.timeout(100); // ... because this 'this' would be wrong.
+
+    describe('convertIssueReportToSysErrorReport', () => {
+      const failedAction = acts.LOOKUP_REFERENCED_DATA_ISSUE
+      const expected     = {
+        actionThatFailed: failedAction,
+        errorMessageText: requestIssueReport.errorMessageText.join(',\n'),
+        fpngErrorCode:    requestIssueReport.errorCode,
+        httpStatusCode:   requestIssueReport.statusCode,
+        httpStatusText:   requestIssueReport.statusText,
+        reqUrl:           requestIssueReport.reqUrl
+      }
+
+      it('Expected to be a function.', () => {
+        expect(ut._convertIssueReportToSysErrorReport).to.be.a('function')
+      })
+
+      it('Expected to return an object.', () => {
+        expect(ut._convertIssueReportToSysErrorReport(failedAction,
+          requestIssueReport)).to.be.object
+      })
+
+      it('Expected to return SystemErrorReportType data.', () => {
+        expect(ut._convertIssueReportToSysErrorReport(failedAction,
+          requestIssueReport))
+          .to.be.eql(expected)
+      })
+
+    })
+  })
+
   describe('Actions', function () { // Can't use '() ==> here...
     this.timeout(300); // ... because this 'this' would be wrong.
 
@@ -49,30 +103,30 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
     ]
     const namesData:NamesDataType                   = [
       {
-        "version"   : 0,
+        "version":    0,
         "prefixName": " ",
-        "firstName" : "TODD",
-        "lastName"  : "BLAKELY",
+        "firstName":  "TODD",
+        "lastName":   "BLAKELY",
         "middleName": " ",
         "suffixName": " ",
-        "role"      : "Attorney"
+        "role":       "Attorney"
       }
     ]
     const addressesData:AddressesDataType           = [
       {
-        "version"              : 0,
-        "streetLineOne"        : "1560 BROADWAY STEET, SUITE 1200",
-        "streetLineTwo"        : " ",
-        "cityName"             : "DENVER",
+        "version":               0,
+        "streetLineOne":         "1560 BROADWAY STEET, SUITE 1200",
+        "streetLineTwo":         " ",
+        "cityName":              "DENVER",
         "geographicRegionModel": {
           "geographicRegionCategory": null,
-          "geographicRegionText"    : "CO ",
-          "geographicRegionName"    : "COLORADO"
+          "geographicRegionText":     "CO ",
+          "geographicRegionName":     "COLORADO"
         },
-        "countryCode"          : "US",
-        "countryName"          : "UNITED STATES",
-        "postalCode"           : "80202",
-        "type"                 : "Attorney Address"
+        "countryCode":           "US",
+        "countryName":           "UNITED STATES",
+        "postalCode":            "80202",
+        "type":                  "Attorney Address"
       }
     ]
     const lookupData:LookupDataType                 = {
@@ -84,24 +138,12 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
       dateTo:       '2016-06-15',
       email:        'devnull@gmail.com'
     }
-    const issueReport:RequestIssueReportType        = {
-      statusCode: 666,
-      statusText: "Can't be gud..."
-    }
-    const requestIssueReport:RequestIssueReportType = {
-      statusCode:       666,
-      statusText:       'The devil made me do it.',
-      errorCode:        999,
-      errorMessageText: ["Entering Dante's Inferno"],
-      infoMessageText:  ["Exiting Dante's Inferno"],
-      warnMessageText:  ["Is is getting hot or is it me?"]
-    }
     const pdfBinaryData:Uint8Array                  = base64ToBinary('Yow')
 
     const pdfFile           = {}
     const baseAPI           = 'http://unit-test'
-    const paymentHistoryAPI =
-            url.parse(baseAPI + '/paymentHistory/' + lookupData.referenceNum)
+    const paymentHistoryAPI = url.parse(
+      baseAPI + '/paymentHistory/' + lookupData.referenceNum)
     const namesAPI          = url.parse(
       baseAPI + '/patents/' + lookupData.referenceNum + '/personNames')
     const addressesAPI      = url.parse(
@@ -165,6 +207,134 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
             const state = refundRequestReducer(testStartState, acts.raiseIssue(issueString))
 
             expect(state).to.eql(expected)
+          })
+      })
+    })
+
+    describe('System Errors', () => {
+
+      describe('showSystemError', () => {
+
+        it('Expected to export a constant SYSTEM_ERROR_SHOWN.', () => {
+          expect(acts.SYSTEM_ERROR_SHOWN).to.equal('@@refund/request/SYSTEM_ERROR_SHOWN')
+        })
+
+        it('Expected to be exported as a function.', () => {
+          expect(ut._showSystemError).to.be.a('function')
+        })
+
+        it('Expected to return an action with type "SYSTEM_ERROR_SHOWN".', () => {
+          expect(ut._showSystemError())
+            .to.have.property('type', acts.SYSTEM_ERROR_SHOWN)
+        })
+
+        it('Mutate state through reducer expected to produce system error `showing` truth', () => {
+          const testStartState       = cloneDeep(acts.initialState)
+          const expected             = cloneDeep(testStartState)
+          const state                = refundRequestReducer(testStartState, ut._showSystemError())
+          expected.isShowSystemError = true
+
+          expect(state).to.eql(expected)
+        })
+      })
+
+      describe('hideSystemError', () => {
+
+        it('Expected to export a constant SYSTEM_ERROR_HIDDEN.', () => {
+          expect(acts.SYSTEM_ERROR_HIDDEN).to.equal('@@refund/request/SYSTEM_ERROR_HIDDEN')
+        })
+
+        it('Expected to be exported as a function.', () => {
+          expect(ut._hideSystemError).to.be.a('function')
+        })
+
+        it('Expected to return an action with type "SYSTEM_ERROR_HIDDEN".', () => {
+          expect(ut._hideSystemError())
+            .to.have.property('type', acts.SYSTEM_ERROR_HIDDEN)
+        })
+
+        it('Mutate state through reducer expected to produce system error not `showing`', () => {
+          const testStartState = cloneDeep(acts.initialState)
+          const expected       = cloneDeep(testStartState)
+          const state          = refundRequestReducer(testStartState, ut._hideSystemError())
+
+          expect(state).to.eql(expected)
+        })
+      })
+
+      describe('systemError (thunk)', () => {
+        const stateHolder                             = {
+          state: {
+            refundRequest: cloneDeep(acts.initialState)
+          }
+        }
+        // stateHolder.state.systemError.sysErrReports = cloneDeep(lookupData)
+        const systemErrorReport:SystemErrorReportType = {
+          actionThatFailed: acts.LOOKUP_REFERENCED_DATA_ISSUE,
+          errorMessageText: ["It's hot", "Entering Dante's Inferno"].join(',\n'),
+          fpngErrorCode:    666,
+          httpStatusCode:   999,
+          httpStatusText:   'Flip Wilson made me do it.',
+          reqUrl:           url.parse('//mephistopheles.com/')
+        }
+
+        const capturedSystemError:TimeStampedSystemErrorReportType = {
+          id:           mockUuid,
+          receivedAt:   moment(mockNowMsFromEpoch).utc().format(),
+          sysErrReport: systemErrorReport
+        }
+
+        const { dispatchSpy, getStateSpy } = reducerSpy(refundRequestReducer, stateHolder)
+
+        beforeEach(() => {
+          // Mock Date.now() including (moment!). Fixed to the ms.
+          MockDate.set(mockNowMsFromEpoch)
+          sinon.stub(uuid, 'v4', function () {
+            return mockUuid
+          })
+        })
+
+        afterEach(() => {
+          MockDate.reset()
+          uuid.v4.restore()
+          stateHolder.state.refundRequest = cloneDeep(acts.initialState)
+          dispatchSpy.reset()
+          getStateSpy.reset()
+        })
+
+        it('Expected to be exported as a function.', () => {
+          expect(acts.systemError).to.be.a('function')
+        })
+
+        it('Expected to return a function (is a thunk).', () => {
+          expect(acts.systemError(cloneDeep(systemErrorReport))).to.be.a('function')
+        })
+
+        it('Thunk expected to return void.', () => {
+          return expect(
+            acts.systemError(cloneDeep(systemErrorReport))(dispatchSpy, getStateSpy))
+            .to.be.void
+        })
+
+        it('Confirm all expected thunk dispatches', () => {
+          acts.systemError(cloneDeep(systemErrorReport))(dispatchSpy, getStateSpy)
+          expect(dispatchSpy).to.have.callCount(2)
+          expect(dispatchSpy).to.have.been.calledWithExactly({
+            type: acts.SYSTEM_ERROR_SHOWN
+          })
+          expect(dispatchSpy).to.have.been.calledWithExactly({
+            type:    SYS_ERROR_ADDED,
+            payload: capturedSystemError
+          })
+        })
+
+        it(
+          'Final state mutation expected to contain showing system error.',
+          () => {
+            const expected             = cloneDeep(acts.initialState)
+            expected.isShowSystemError = true
+            acts.systemError(cloneDeep(systemErrorReport))(dispatchSpy, getStateSpy)
+            expect(stateHolder.state.refundRequest).to.eql(expected)
           })
       })
     })
@@ -267,7 +437,7 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
       })
     })
 
-    describe('Valid Lookup Actions And Subactions', () => {
+    describe('Valid Lookup Actions And Sub-actions', () => {
 
       describe('Reset Refund Request Form Actions', () => {
 
@@ -278,21 +448,21 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
           })
 
           it('Expected to be exported as a function.', () => {
-            expect(acts.resetRefundRequestFormStart).to.be.a('function')
+            expect(ut._resetRefundRequestFormStart).to.be.a('function')
           })
 
           it('Expected to return an action with type "RESET_REFUND_REQUEST_FORM_START".', () => {
-            expect(acts.resetRefundRequestFormStart())
+            expect(ut._resetRefundRequestFormStart())
               .to.have.property('type', acts.RESET_REFUND_REQUEST_FORM_START)
           })
 
-          it('Mutate state through reducer expected to set refund form `reseting` truth', () => {
+          it('Mutate state through reducer expected to set refund form `resetting` truth', () => {
             const testStartState           = cloneDeep(acts.initialState)
             const expected                 = cloneDeep(testStartState)
             expected.isResettingRefundForm = true;
 
             const state = refundRequestReducer(testStartState,
-              acts.resetRefundRequestFormStart())
+              ut._resetRefundRequestFormStart())
 
             expect(state).to.eql(expected)
           })
@@ -305,11 +475,11 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
           })
 
           it('Expected to be exported as a function.', () => {
-            expect(acts.resetRefundRequestFormEnd).to.be.a('function')
+            expect(ut._resetRefundRequestFormEnd).to.be.a('function')
           })
 
           it('Expected to return an action with type "RESET_REFUND_REQUEST_FORM_END".', () => {
-            expect(acts.resetRefundRequestFormEnd())
+            expect(ut._resetRefundRequestFormEnd())
               .to.have.property('type', acts.RESET_REFUND_REQUEST_FORM_END)
           })
 
@@ -318,8 +488,8 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
               const testStartState = cloneDeep(acts.initialState)
               const expected       = cloneDeep(testStartState)
               let state            = refundRequestReducer(testStartState,
-                acts.resetRefundRequestFormStart())
-              state                = refundRequestReducer(state, acts.resetRefundRequestFormEnd())
+                ut._resetRefundRequestFormStart())
+              state                = refundRequestReducer(state, ut._resetRefundRequestFormEnd())
 
               expect(state).to.eql(expected)
             })
@@ -386,12 +556,12 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
             })
 
             it('Expected to be exported as a function.', () => {
-              expect(acts.loadPaymentHistoryDataStart).to.be.a('function')
+              expect(ut._loadPaymentHistoryDataStart).to.be.a('function')
             })
 
             it('Expected to return an action with type "LOAD_PAYMENT_HISTORY_DATA_STARTED".',
               () => {
-                expect(acts.loadPaymentHistoryDataStart())
+                expect(ut._loadPaymentHistoryDataStart())
                   .to.have.property('type', acts.LOAD_PAYMENT_HISTORY_DATA_START)
               })
 
@@ -401,7 +571,7 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
               expected.refundRequestForm.isLoadingPaymentHistory = true;
 
               const state = refundRequestReducer(testStartState,
-                acts.loadPaymentHistoryDataStart())
+                ut._loadPaymentHistoryDataStart())
 
               expect(state).to.eql(expected)
             })
@@ -414,17 +584,17 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
             })
 
             it('Expected to be exported as a function.', () => {
-              expect(acts.loadPaymentHistoryDataLoaded).to.be.a('function')
+              expect(ut._loadPaymentHistoryDataLoaded).to.be.a('function')
             })
 
             it('Expected to return an action with type "LOAD_PAYMENT_HISTORY_DATA_LOADED".',
               () => {
-                expect(acts.loadPaymentHistoryDataLoaded(paymentHistoryData))
+                expect(ut._loadPaymentHistoryDataLoaded(paymentHistoryData))
                   .to.have.property('type', acts.LOAD_PAYMENT_HISTORY_DATA_LOADED)
               })
 
             it('Expected to assign the first argument to `payload` property.', () => {
-              expect(acts.loadPaymentHistoryDataLoaded(paymentHistoryData))
+              expect(ut._loadPaymentHistoryDataLoaded(paymentHistoryData))
                 .to.have.property('payload').and.eql(paymentHistoryData)
             })
 
@@ -433,9 +603,9 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
               const expected                       = cloneDeep(testStartState)
               expected.refundRequestForm.fees.data = paymentHistoryData[0].items
               let state                            = refundRequestReducer(testStartState,
-                acts.loadPaymentHistoryDataStart())
+                ut._loadPaymentHistoryDataStart())
               state                                =
-                refundRequestReducer(state, acts.loadPaymentHistoryDataLoaded(paymentHistoryData))
+                refundRequestReducer(state, ut._loadPaymentHistoryDataLoaded(paymentHistoryData))
 
               expect(state).to.eql(expected)
             })
@@ -449,7 +619,17 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
             }
             const { dispatchSpy, getStateSpy } = reducerSpy(refundRequestReducer, stateHolder)
 
+            beforeEach(() => {
+              // Mock Date.now() including (moment!). Fixed to the ms.
+              MockDate.set(mockNowMsFromEpoch)
+              sinon.stub(uuid, 'v4', function () {
+                return mockUuid
+              })
+            })
+
             afterEach(() => {
+              MockDate.reset()
+              uuid.v4.restore()
               stateHolder.state.refundRequest = cloneDeep(acts.initialState)
               dispatchSpy.reset()
               getStateSpy.reset()
@@ -461,22 +641,22 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
             })
 
             it('Expected to be exported as a function.', () => {
-              expect(acts.loadPaymentHistoryDataIssue).to.be.a('function')
+              expect(ut._loadPaymentHistoryDataIssue).to.be.a('function')
             })
 
             it('Expected to return a function (is a thunk).', () => {
-              expect(acts.loadPaymentHistoryDataIssue(requestIssueReport)).to.be.a('function')
+              expect(ut._loadPaymentHistoryDataIssue(requestIssueReport)).to.be.a('function')
             })
 
             it('Thunk expected to return void.', () => {
-              return expect(
-                acts.loadPaymentHistoryDataIssue(requestIssueReport)(dispatchSpy, getStateSpy))
-                .to.be.void
+              expect(ut._loadPaymentHistoryDataIssue(requestIssueReport)
+              (dispatchSpy, getStateSpy)).to.be.void
             })
 
             it('Confirm all expected thunk dispatches', () => {
-              acts.loadPaymentHistoryDataIssue(requestIssueReport)(dispatchSpy, getStateSpy)
-              expect(dispatchSpy).to.have.been.calledTwice
+              ut._loadPaymentHistoryDataIssue(cloneDeep(requestIssueReport))
+              (dispatchSpy, getStateSpy)
+              expect(dispatchSpy).to.have.callCount(5)
               expect(dispatchSpy).to.have.been.calledWithExactly({
                 type: acts.LOAD_PAYMENT_HISTORY_DATA_ISSUE
               })
@@ -484,14 +664,33 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
                 type:    acts.ISSUE_RAISED,
                 payload: requestIssueReport
               })
+              expect(dispatchSpy).to.have.been.calledWithExactly({
+                type: acts.SYSTEM_ERROR_SHOWN
+              })
+
+              const failedAction = acts.LOAD_PAYMENT_HISTORY_DATA_ISSUE
+              const sysErrReport =
+                      ut._convertIssueReportToSysErrorReport(failedAction,
+                        cloneDeep(requestIssueReport))
+              const capturedSystemError:TimeStampedSystemErrorReportType = {
+                id:           mockUuid,
+                receivedAt:   moment(mockNowMsFromEpoch).utc().format(),
+                sysErrReport: sysErrReport
+              }
+              expect(dispatchSpy).to.have.been.calledWithExactly({
+                type:    SYS_ERROR_ADDED,
+                payload: capturedSystemError
+              })
             })
 
             it('Final state mutation expected to contain issue report.', () => {
               const expected                          = cloneDeep(acts.initialState)
               expected.isIssue                        = true
+              expected.isShowSystemError              = true
               expected.issueReport                    = [requestIssueReport]
               expected.refundRequestForm.fees.isIssue = true
-              acts.loadPaymentHistoryDataIssue(requestIssueReport)(dispatchSpy, getStateSpy)
+              ut._loadPaymentHistoryDataIssue(cloneDeep(requestIssueReport))(dispatchSpy,
+                getStateSpy)
               expect(stateHolder.state.refundRequest).to.eql(expected)
             })
           })
@@ -636,11 +835,11 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
             })
 
             it('Expected to be exported as a function.', () => {
-              expect(acts.loadNamesDataStart).to.be.a('function')
+              expect(ut._loadNamesDataStart).to.be.a('function')
             })
 
             it('Expected to return an action with type "LOAD_NAMES_START".', () => {
-              expect(acts.loadNamesDataStart())
+              expect(ut._loadNamesDataStart())
                 .to.have.property('type', acts.LOAD_NAMES_START)
             })
 
@@ -649,7 +848,7 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
               const expected                            = cloneDeep(testStartState)
               expected.refundRequestForm.isLoadingNames = true;
 
-              const state = refundRequestReducer(testStartState, acts.loadNamesDataStart())
+              const state = refundRequestReducer(testStartState, ut._loadNamesDataStart())
 
               expect(state).to.eql(expected)
             })
@@ -662,16 +861,16 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
             })
 
             it('Expected to be exported as a function.', () => {
-              expect(acts.loadNamesDataLoaded).to.be.a('function')
+              expect(ut._loadNamesDataLoaded).to.be.a('function')
             })
 
             it('Expected to return an action with type "LOAD_NAMES_LOADED".', () => {
-              expect(acts.loadNamesDataLoaded(namesData))
+              expect(ut._loadNamesDataLoaded(namesData))
                 .to.have.property('type', acts.LOAD_NAMES_LOADED)
             })
 
             it('Expected to assign names to `payload` property.', () => {
-              expect(acts.loadNamesDataLoaded(namesData))
+              expect(ut._loadNamesDataLoaded(namesData))
                 .to.have.property('payload').and.eql(namesData)
             })
 
@@ -680,8 +879,8 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
               const expected                        = cloneDeep(testStartState)
               expected.refundRequestForm.names.data = namesData
 
-              let state = refundRequestReducer(testStartState, acts.loadNamesDataStart())
-              state     = refundRequestReducer(state, acts.loadNamesDataLoaded(namesData))
+              let state = refundRequestReducer(testStartState, ut._loadNamesDataStart())
+              state     = refundRequestReducer(state, ut._loadNamesDataLoaded(namesData))
 
               expect(state).to.eql(expected)
             })
@@ -706,20 +905,20 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
             })
 
             it('Expected to be exported as a function.', () => {
-              expect(acts.loadNamesDataIssue).to.be.a('function')
+              expect(ut._loadNamesDataIssue).to.be.a('function')
             })
 
             it('Expected to return a function (is a thunk).', () => {
-              expect(acts.loadNamesDataIssue(requestIssueReport)).to.be.a('function')
+              expect(ut._loadNamesDataIssue(requestIssueReport)).to.be.a('function')
             })
 
             it('Thunk expected to return void.', () => {
-              return expect(acts.loadNamesDataIssue(requestIssueReport)(dispatchSpy, getStateSpy))
+              return expect(ut._loadNamesDataIssue(requestIssueReport)(dispatchSpy, getStateSpy))
                 .to.be.void
             })
 
             it('Confirm all expected thunk dispatches', () => {
-              acts.loadNamesDataIssue(requestIssueReport)(dispatchSpy, getStateSpy)
+              ut._loadNamesDataIssue(requestIssueReport)(dispatchSpy, getStateSpy)
               expect(dispatchSpy).to.have.been.calledTwice
               expect(dispatchSpy).to.have.been.calledWithExactly({
                 type: acts.LOAD_NAMES_ISSUE,
@@ -735,7 +934,7 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
               expected.isIssue                         = true
               expected.issueReport                     = [requestIssueReport]
               expected.refundRequestForm.names.isIssue = true
-              acts.loadNamesDataIssue(requestIssueReport)(dispatchSpy, getStateSpy)
+              ut._loadNamesDataIssue(requestIssueReport)(dispatchSpy, getStateSpy)
               expect(stateHolder.state.refundRequest).to.eql(expected)
             })
 
@@ -899,11 +1098,11 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
             })
 
             it('Expected to be exported as a function.', () => {
-              expect(acts.loadAddressesDataStart).to.be.a('function')
+              expect(ut._loadAddressesDataStart).to.be.a('function')
             })
 
             it('Expected to return an action with type "LOAD_ADDRESSES_START".', () => {
-              expect(acts.loadAddressesDataStart())
+              expect(ut._loadAddressesDataStart())
                 .to.have.property('type', acts.LOAD_ADDRESSES_START)
             })
 
@@ -912,7 +1111,7 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
               const expected                                = cloneDeep(testStartState)
               expected.refundRequestForm.isLoadingAddresses = true;
 
-              const state = refundRequestReducer(testStartState, acts.loadAddressesDataStart())
+              const state = refundRequestReducer(testStartState, ut._loadAddressesDataStart())
 
               expect(state).to.eql(expected)
             })
@@ -926,16 +1125,16 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
             })
 
             it('Expected to be exported as a function.', () => {
-              expect(acts.loadAddressesDataLoaded).to.be.a('function')
+              expect(ut._loadAddressesDataLoaded).to.be.a('function')
             })
 
             it('Expected to return an action with type "LOAD_ADDRESSES_LOADED".', () => {
-              expect(acts.loadAddressesDataLoaded(addressesData))
+              expect(ut._loadAddressesDataLoaded(addressesData))
                 .to.have.property('type', acts.LOAD_ADDRESSES_LOADED)
             })
 
             it('Expected to assign the first argument to `payload` property.', () => {
-              expect(acts.loadAddressesDataLoaded(addressesData))
+              expect(ut._loadAddressesDataLoaded(addressesData))
                 .to.have.property('payload').and.eql(addressesData)
             })
 
@@ -944,8 +1143,8 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
               const expected                            = cloneDeep(testStartState)
               expected.refundRequestForm.addresses.data = addressesData
 
-              let state = refundRequestReducer(testStartState, acts.loadAddressesDataStart())
-              state     = refundRequestReducer(state, acts.loadAddressesDataLoaded(addressesData))
+              let state = refundRequestReducer(testStartState, ut._loadAddressesDataStart())
+              state     = refundRequestReducer(state, ut._loadAddressesDataLoaded(addressesData))
 
               expect(state).to.eql(expected)
             })
@@ -970,21 +1169,21 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
             })
 
             it('Expected to be exported as a function.', () => {
-              expect(acts.loadAddressesDataIssue).to.be.a('function')
+              expect(ut._loadAddressesDataIssue).to.be.a('function')
             })
 
             it('Expected to return a function (is a thunk).', () => {
-              expect(acts.loadAddressesDataIssue(requestIssueReport)).to.be.a('function')
+              expect(ut._loadAddressesDataIssue(requestIssueReport)).to.be.a('function')
             })
 
             it('Thunk expected to return void.', () => {
               return expect(
-                acts.loadAddressesDataIssue(requestIssueReport)(dispatchSpy, getStateSpy))
+                ut._loadAddressesDataIssue(requestIssueReport)(dispatchSpy, getStateSpy))
                 .to.be.void
             })
 
             it('Confirm all expected thunk dispatches', () => {
-              acts.loadAddressesDataIssue(requestIssueReport)(dispatchSpy, getStateSpy)
+              ut._loadAddressesDataIssue(requestIssueReport)(dispatchSpy, getStateSpy)
               expect(dispatchSpy).to.have.been.calledTwice
               expect(dispatchSpy).to.have.been.calledWithExactly({
                 type: acts.LOAD_ADDRESSES_ISSUE,
@@ -1000,7 +1199,7 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
               expected.isIssue                             = true
               expected.issueReport                         = [requestIssueReport]
               expected.refundRequestForm.addresses.isIssue = true
-              acts.loadAddressesDataIssue(requestIssueReport)(dispatchSpy, getStateSpy)
+              ut._loadAddressesDataIssue(requestIssueReport)(dispatchSpy, getStateSpy)
               expect(stateHolder.state.refundRequest).to.eql(expected)
             })
           })
@@ -1154,11 +1353,11 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
           })
 
           it('Expected to be exported as a function.', () => {
-            expect(acts.lookupReferencedDataStart).to.be.a('function')
+            expect(ut._lookupReferencedDataStart).to.be.a('function')
           })
 
           it('Expected to return an action with type "LOOKUP_REFERENCED_DATA_START".', () => {
-            expect(acts.lookupReferencedDataStart())
+            expect(ut._lookupReferencedDataStart())
               .to.have.property('type', acts.LOOKUP_REFERENCED_DATA_START)
           })
 
@@ -1168,8 +1367,8 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
             expected.lookupForm             = cloneDeep(lookupData)
             expected.lookupForm.isLookingUp = true
 
-            let state = refundRequestReducer(testStartState, acts.validLookupStart(lookupData))
-            state     = refundRequestReducer(state, acts.lookupReferencedDataStart())
+            let state = refundRequestReducer(testStartState, ut._validLookupStart(lookupData))
+            state     = refundRequestReducer(state, ut._lookupReferencedDataStart())
 
             expect(state).to.eql(expected)
           })
@@ -1182,11 +1381,11 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
           })
 
           it('Expected to be exported as a function.', () => {
-            expect(acts.lookupReferencedDataLoaded).to.be.a('function')
+            expect(ut._lookupReferencedDataLoaded).to.be.a('function')
           })
 
           it('Expected to return an action with type "LOOKUP_REFERENCED_DATA_LOADED".', () => {
-            expect(acts.lookupReferencedDataLoaded())
+            expect(ut._lookupReferencedDataLoaded())
               .to.have.property('type', acts.LOOKUP_REFERENCED_DATA_LOADED)
           })
 
@@ -1194,7 +1393,7 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
             const testStartState = cloneDeep(acts.initialState)
             const expected       = cloneDeep(testStartState)
 
-            const state = refundRequestReducer(testStartState, acts.lookupReferencedDataLoaded())
+            const state = refundRequestReducer(testStartState, ut._lookupReferencedDataLoaded())
 
             expect(state).to.eql(expected)
           })
@@ -1207,11 +1406,11 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
           })
 
           it('Expected to be exported as a function.', () => {
-            expect(acts.lookupReferencedDataIssue).to.be.a('function')
+            expect(ut._lookupReferencedDataIssue).to.be.a('function')
           })
 
           it('Expected to return an action with type "LOOKUP_REFERENCED_DATA_ISSUE".', () => {
-            expect(acts.lookupReferencedDataIssue())
+            expect(ut._lookupReferencedDataIssue())
               .to.have.property('type', acts.LOOKUP_REFERENCED_DATA_ISSUE)
           })
 
@@ -1220,8 +1419,8 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
             const expected              = cloneDeep(testStartState)
             expected.lookupForm.isIssue = true
 
-            let state = refundRequestReducer(testStartState, acts.lookupReferencedDataStart())
-            state     = refundRequestReducer(state, acts.lookupReferencedDataIssue())
+            let state = refundRequestReducer(testStartState, ut._lookupReferencedDataStart())
+            state     = refundRequestReducer(state, ut._lookupReferencedDataIssue())
 
             expect(state).to.eql(expected)
           })
@@ -1325,11 +1524,11 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
         })
 
         it('Expected to be exported as a function.', () => {
-          expect(acts.validLookupStart).to.be.a('function')
+          expect(ut._validLookupStart).to.be.a('function')
         })
 
         it('Expected to return an action with type "VALID_LOOKUP_START".', () => {
-          expect(acts.validLookupStart(cloneDeep(lookupData)))
+          expect(ut._validLookupStart(cloneDeep(lookupData)))
             .to.have.property('type', acts.VALID_LOOKUP_START)
         })
 
@@ -1338,7 +1537,7 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
           const expected       = cloneDeep(testStartState)
           expected.lookupForm  = cloneDeep(lookupData)
           const state          = refundRequestReducer(testStartState,
-            acts.validLookupStart(cloneDeep(lookupData)))
+            ut._validLookupStart(cloneDeep(lookupData)))
 
           expect(state).to.eql(expected)
         })
@@ -1350,11 +1549,11 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
         })
 
         it('Expected to be exported as a function.', () => {
-          expect(acts.validLookupEnd).to.be.a('function')
+          expect(ut._validLookupEnd).to.be.a('function')
         })
 
         it('Expected to return an action with type "VALID_LOOKUP_END".', () => {
-          expect(acts.validLookupEnd(cloneDeep(lookupData)))
+          expect(ut._validLookupEnd(cloneDeep(lookupData)))
             .to.have.property('type', acts.VALID_LOOKUP_END)
         })
 
@@ -1363,8 +1562,8 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
           const expected       = cloneDeep(testStartState)
           expected.lookupForm  = lookupData
           let state            = refundRequestReducer(testStartState,
-            acts.validLookupStart(cloneDeep(lookupData)))
-          state                = refundRequestReducer(state, acts.validLookupEnd())
+            ut._validLookupStart(cloneDeep(lookupData)))
+          state                = refundRequestReducer(state, ut._validLookupEnd())
 
           expect(state).to.eql(expected)
         })
@@ -1402,7 +1601,7 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
           expect(acts.validLookup(cloneDeep(lookupData))).to.be.a('function')
         })
 
-        it('Thunk expected to return a Promise..', () => {
+        it('Thunk expected to return a Promise.', () => {
           return expect(acts.validLookup(cloneDeep(lookupData))(dispatchSpy, getStateSpy))
             .to.eventually.be.fulfilled
         })
@@ -1498,10 +1697,10 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
         })
 
         it('Mutate state through reducer expected to produce...', () => {
-          const testStartState = cloneDeep(acts.initialState)
-          const expected       = cloneDeep(testStartState)
-          expected.save.isSaving    = true;
-          const state          = refundRequestReducer(testStartState, acts.postRefundRequest())
+          const testStartState   = cloneDeep(acts.initialState)
+          const expected         = cloneDeep(testStartState)
+          expected.save.isSaving = true;
+          const state            = refundRequestReducer(testStartState, acts.postRefundRequest())
 
           expect(state).to.eql(expected)
         })
@@ -1522,12 +1721,12 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
         })
 
         it('Mutate state through reducer expected to produce...', () => {
-          const testStartState = cloneDeep(acts.initialState)
-          const expected       = cloneDeep(testStartState)
+          const testStartState  = cloneDeep(acts.initialState)
+          const expected        = cloneDeep(testStartState)
           expected.save.isSaved = true;
 
-          let state        = refundRequestReducer(testStartState, acts.postRefundRequest())
-          state            = refundRequestReducer(state, acts.savedRefundRequest())
+          let state = refundRequestReducer(testStartState, acts.postRefundRequest())
+          state     = refundRequestReducer(state, acts.savedRefundRequest())
 
           expect(state).to.eql(expected)
         })
@@ -1579,17 +1778,17 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
         })
 
         it('Final state mutation expected to contain issue report.', () => {
-          const expected                          = cloneDeep(acts.initialState)
-          expected.isIssue                        = true
-          expected.save.isIssue                   = true
-          expected.issueReport                    = [requestIssueReport]
+          const expected        = cloneDeep(acts.initialState)
+          expected.isIssue      = true
+          expected.save.isIssue = true
+          expected.issueReport  = [requestIssueReport]
           acts.saveRefundIssue(requestIssueReport)(dispatchSpy, getStateSpy)
           expect(stateHolder.state.refundRequest).to.eql(expected)
         })
       })
 
       describe('saveRefundRequest (thunk)', () => {
-        const stateHolder = {
+        const stateHolder       = {
           state: {
             refundRequest: cloneDeep(acts.initialState)
           }
@@ -1631,7 +1830,7 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
                 type: acts.POST_REFUND_REQUEST
               })
               expect(dispatchSpy).to.have.been.calledWithExactly({
-                type:    acts.SAVED_REFUND_REQUEST,
+                type: acts.SAVED_REFUND_REQUEST,
               })
               // mocking setup using fully configured request in fluentRequest.
               expect(fetchMock.called(saveRefundAPI.format())).to.be.true
@@ -1693,9 +1892,9 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
         })
 
         it('Mutate state through reducer expected to clear all issues in state', () => {
-          acts.loadPaymentHistoryDataIssue(requestIssueReport)(dispatchSpy, getStateSpy)
-          acts.loadNamesDataIssue(requestIssueReport)(dispatchSpy, getStateSpy)
-          acts.loadAddressesDataIssue(requestIssueReport)(dispatchSpy, getStateSpy)
+          ut._loadPaymentHistoryDataIssue(requestIssueReport)(dispatchSpy, getStateSpy)
+          ut._loadNamesDataIssue(requestIssueReport)(dispatchSpy, getStateSpy)
+          ut._loadAddressesDataIssue(requestIssueReport)(dispatchSpy, getStateSpy)
           const state = refundRequestReducer(stateHolder.state.refundRequest,
             acts.clearIssueReport())
 

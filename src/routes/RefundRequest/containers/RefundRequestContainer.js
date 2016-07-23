@@ -6,10 +6,10 @@ import type {
 
 import {connect} from 'react-redux'
 import {
-  closeModal,
+  goToLogin,
   lookupReferencedData,
   loadingPdf,
-  openModal,
+  systemError,
   pdfBinary,
   pdfLoaded,
   resetState,
@@ -20,6 +20,10 @@ import {
 import RefundRequest from '../components/RefundRequest'
 
 const mapStateToProps = (state:Object):MapToObjectType => ({
+  systemErrorData: {
+    sysErrReports:     state.systemError.sysErrReports,
+    isShowSystemError: state.refundRequest.isShowSystemError
+  },
   pdfData: {
     pdf: state.refundRequest.pdf
   },
@@ -35,7 +39,6 @@ const mapStateToProps = (state:Object):MapToObjectType => ({
   miscData: {
     misc: {
       isIssue:               state.refundRequest.isIssue,
-      isModalOpen:           state.refundRequest.isModalOpen,
       isResettingRefundForm: state.refundRequest.isResettingRefundForm,
       isNegativeTesting:     state.refundRequest.isNegativeTesting,
       issueReport:           state.refundRequest.issueReport
@@ -44,20 +47,20 @@ const mapStateToProps = (state:Object):MapToObjectType => ({
 })
 
 const mapActionCreators:{
-  closeModal: Function,
+  goToLogin: Function,
   lookupReferencedData: Function,
   loadingPdf: Function,
-  openModal: Function,
+  systemError: Function,
   pdfBinary: Function,
   pdfLoaded: Function,
   resetState: Function,
   saveRefundRequest: Function,
   validLookup: Function
 } = {
-  closeModal,
+  goToLogin,
   lookupReferencedData,
   loadingPdf,
-  openModal,
+  systemError,
   pdfBinary,
   pdfLoaded,
   resetState,

@@ -10,8 +10,7 @@ import type {
 
 import React from 'react'
 import {Box, VBox, Center, Container} from 'react-layout-components'
-import SystemError from 'reusable/modules/SystemError/components/SystemError'
-import Modal from 'react-modal'
+import SystemError from 'reusable/modules/SystemError'
 
 import PdfPanel from 'reusable/components/PdfPanel/PdfPanel'
 import LookupForm from './LookupForm'
@@ -19,18 +18,19 @@ import RefundRequestForm from './RefundRequestForm'
 // import pick from 'lodash/pick'
 
 type PropType = {
+  hideSystemError: Function,
   loadingPdf: Function,
   lookupFormData: LookupFormDataType,
-  miscData: MiscDataType,
   lookupReferencedData: Function,
-  openModal: Function,
-  closeModal: Function,
+  miscData: MiscDataType,
   pdfBinary: Function,
   pdfData: PdfDataType,
   pdfLoaded: Function,
   refundRequestFormData: RefundRequestFormDataType,
   resetState: Function,
   saveRefundRequest: Function,
+  systemError: Function,
+  systemErrorData: Object,
   // saveRefundRequestData: SaveRefundRequestDataType,
   validLookup: Function
 }
@@ -62,11 +62,11 @@ export class RefundRequest extends React.Component {
   // }
 
   onOpenModal() {
-    this.props.openModal()
+    this.props.systemError()
   }
 
   onModalRequestClose() {
-    this.props.closeModal()
+    this.props.hideSystemError()
   }
 
   onFileOpen(file:Object) {
@@ -99,12 +99,10 @@ export class RefundRequest extends React.Component {
   render():Object {
     return (
       <section className='load-refund-request'>
-        <Modal
-          isOpen={this.props.miscData.misc.isModalOpen}
-          onRequestClose={this.onModalRequestClose}
-          style={modalStyles} >
+        <SystemError {...this.props.systemErrorData}
+          onModalRequestClose={this.onModalRequestClose} >
           I like turtles.
-        </Modal>
+        </SystemError>
         <Center flex='1 0 auto'>
           <button type='submit' className='btn btn-primary'
                   onClick={this.onOpenModal}>Open Modal</button>
@@ -139,12 +137,11 @@ export class RefundRequest extends React.Component {
 
 RefundRequest.displayName = 'RefundRequest'
 RefundRequest.propTypes = {
-  closeModal:            React.PropTypes.func.isRequired,
+  hideSystemError:       React.PropTypes.func.isRequired,
   loadingPdf:            React.PropTypes.func.isRequired,
   lookupFormData:        React.PropTypes.object,
   lookupReferencedData:  React.PropTypes.func.isRequired,
   miscData:              React.PropTypes.object.isRequired,
-  openModal:             React.PropTypes.func.isRequired,
   pdfBinary:             React.PropTypes.func.isRequired,
   pdfData:               React.PropTypes.object,
   pdfLoaded:             React.PropTypes.func.isRequired,
@@ -152,6 +149,8 @@ RefundRequest.propTypes = {
   resetState:            React.PropTypes.func.isRequired,
   saveRefundRequest:     React.PropTypes.func.isRequired,
   saveRefundRequestData: React.PropTypes.object,
+  systemError:           React.PropTypes.func.isRequired,
+  systemErrorData:       React.PropTypes.object.isRequired,
   validLookup:           React.PropTypes.func.isRequired
 }
 

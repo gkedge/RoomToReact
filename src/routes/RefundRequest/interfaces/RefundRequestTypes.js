@@ -124,7 +124,6 @@ export type PdfReadPayloadType = {
 export type MiscDataType = {
   misc: {
     isIssue: boolean,
-    isModalOpen: boolean,
     isResettingRefundForm: boolean,
     isNegativeTesting: boolean,
     issueReport: Array<RequestIssueReportType>
@@ -167,7 +166,7 @@ export type RefundRequestStateType = {
   refundRequestForm: RefundRequestFormStateType,
   save: SaveRequestStateType,
   isIssue: boolean,
-  isModalOpen: boolean,
+  isShowSystemError: boolean,
   isResettingRefundForm: boolean,
   isNegativeTesting: boolean,
   issueReport: Array<RequestIssueReportType>

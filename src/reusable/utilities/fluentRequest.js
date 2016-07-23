@@ -13,7 +13,6 @@ import RequestIssue from 'reusable/errors/RequestIssue'
 
 import 'whatwg-fetch'  // isomorphic-fetch contains the browser-specific whatwg-fetch
 import _debug from 'debug'
-import moment from 'moment'
 import urlUtil, {Url} from 'url'
 import assign from 'lodash/assign'
 import isUndefined from 'lodash/isUndefined'
@@ -70,11 +69,12 @@ export const getRootContext = (key:? string):? Url => {
 }
 
 let serviceChainFailNumber = 0
-export const responseFail  = (reason:any, message:?string) => {
+export const responseFail  = (reason:any, message:?string):string => {
+  reason = (reason || '')
+  message = (message || '')
   try {
-    message = (message || '')
     if (reason.skipLogging) {
-      return
+      return ''
     }
 
     const serviceChain = reason.serviceChain === undefined
@@ -142,8 +142,11 @@ export const responseFail  = (reason:any, message:?string) => {
   finally {
     console.error(message)
   }
+  return message
 }
 
+// FPNG embeds error status within the response JSON.  That has to be
+// consulted along with HTTP error code/status.
 const _defaultJsonErrorHandler:Function = (response:Object):Promise => {
   return new Promise((resolve:Function, reject:Function):any /* Promise */ => {
     const contentType = response.headers.get("content-type")
@@ -157,11 +160,7 @@ const _defaultJsonErrorHandler:Function = (response:Object):Promise => {
           // is available.
           if (!response.ok || !jsonStatusOk) {
             const requestIssueReport:RequestIssueReportType = {
-              // TODO: Add path URL & Data/Time
-              // If 'response' doesn't have URL, json()
-              // will have to pass it in for use to report.
-              // url: response.getURL() ... I hope.
-              // time: moment()
+              reqUrl:           urlUtil.parse(response.url || '//url-missing/'),
               statusCode:       response.status,
               statusText:       response.statusText,
               errorCode:        json.errorCode,
@@ -180,7 +179,7 @@ const _defaultJsonErrorHandler:Function = (response:Object):Promise => {
         })
     }
     else if (!response.ok) {
-      // For the 500's where the error comming back may not have any 'content-type'
+      // For the 500's where the error coming back may not have any 'content-type'
       // header.
       reject(new RequestIssue({
         statusCode: response.status,
@@ -513,7 +512,7 @@ export class Request {
       .then((res:any):any /* Promise */ => jsonErrorHandler(res))
       // Since FPNG insists on embedding error status within the JSON,
       // the jsonErrorHandler has to read the response JSON!  So, the
-      // response cannot be reread here by fetch's JSON reading support.
+      // response cannot be re-read here by fetch's JSON reading support.
       // .then((res:any):any /* Promise */ => res.json())
       .then((json:any):any /* Promise */ => {
         if (strict && !isObject(json)) {

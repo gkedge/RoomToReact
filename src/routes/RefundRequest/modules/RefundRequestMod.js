@@ -24,7 +24,10 @@ import type {
   RefundRequestStateType
 } from '../interfaces/RefundRequestTypes'
 
-type RrsType = RefundRequestStateType
+import type {
+  SystemErrorReportType,
+  raiseSystemError
+} from 'reusable/modules/SystemError'
 
 import _debug from 'debug'
 import {reset} from 'redux-form'
@@ -43,6 +46,8 @@ import {createReducer, unknownAction} from 'reusable/utilities/reduxStoreUtils'
 
 // import dispatchTime from 'promise-time'
 import {promiseTime as dispatchTime} from 'reusable/utilities/promisePlugins'
+
+type RrsType = RefundRequestStateType
 
 const debug     = _debug('refunds:RefundRequestMod:debug')
 const debugTime = _debug('refunds:RefundRequestMod:time')
@@ -76,8 +81,21 @@ export const ISSUE_RAISED                     = '@@refund/request/ISSUE_RAISED'
 export const VALID_LOOKUP_START               = '@@refund/request/VALID_LOOKUP_START'
 export const VALID_LOOKUP_END                 = '@@refund/request/VALID_LOOKUP_END'
 export const VALID_LOOKUP_ISSUE               = '@@refund/request/VALID_LOOKUP_ISSUE'
-export const OPEN_MODAL                       = '@@refund/request/OPEN_MODAL'
-export const CLOSE_MODAL                      = '@@refund/request/CLOSE_MODAL'
+export const SYSTEM_ERROR_SHOWN                       = '@@refund/request/SYSTEM_ERROR_SHOWN'
+export const SYSTEM_ERROR_HIDDEN                      = '@@refund/request/SYSTEM_ERROR_HIDDEN'
+
+const _convertIssueReportToSysErrorReport =
+        (failedAction:string,
+         issueReport:RequestIssueReportType):SystemErrorReportType => {
+          return ({
+            errorMessageText: issueReport.errorMessageText.join(',\n'),
+            actionThatFailed: failedAction,
+            fpngErrorCode: issueReport.errorCode,
+            httpStatusCode: issueReport.statusCode,
+            httpStatusText: issueReport.statusText,
+            reqUrl: issueReport.reqUrl
+          })
+        }
 
 // ------------------------------------
 // Actions
@@ -97,25 +115,40 @@ export const raiseIssue = (issueMessage:any):ActionPayloadType => {
   }
 }
 
-export const openModal = ():ActionPayloadType => {
+const _showSystemError = ():ActionPayloadType => {
   return {
-    type:    OPEN_MODAL
+    type: SYSTEM_ERROR_SHOWN
   }
 }
 
-export const closeModal = ():ActionPayloadType => {
-  return {
-    type:    CLOSE_MODAL
+export const systemError = (systemErrorReport:SystemErrorReportType):Function => {
+  return (dispatch:Function) => {
+    dispatch(raiseSystemError(systemErrorReport))
+    dispatch(_showSystemError())
   }
 }
 
-export const loadPaymentHistoryDataStart = ():ActionPayloadType => {
+export const _hideSystemError = ():ActionPayloadType => {
+  return {
+    type: SYSTEM_ERROR_HIDDEN
+  }
+}
+
+export const goToLogin = ():Function => {
+  return (dispatch:Function) => {
+    dispatch(resetRefundRequestForm())
+    dispatch(clearIssueReport())
+    dispatch(_hideSystemError())
+  }
+}
+
+const _loadPaymentHistoryDataStart = ():ActionPayloadType => {
   return {
     type: LOAD_PAYMENT_HISTORY_DATA_START
   }
 }
 
-export const loadPaymentHistoryDataLoaded =
+const _loadPaymentHistoryDataLoaded =
                (paymentHistoryData:PaymentHistoryDataType):ActionPayloadType => {
                  return {
                    type:    LOAD_PAYMENT_HISTORY_DATA_LOADED,
@@ -123,9 +156,17 @@ export const loadPaymentHistoryDataLoaded =
                  }
                }
 
-export const loadPaymentHistoryDataIssue = (issueMessage:any):Function => {
+const _loadPaymentHistoryDataIssue = (issueMessage:any):Function => {
   return (dispatch:Function) => {
     dispatch(raiseIssue(issueMessage))
+
+    if (issueMessage.errorMessageText && issueMessage.errorMessageText.length) {
+      var systemErrorReport =
+            _convertIssueReportToSysErrorReport(LOAD_PAYMENT_HISTORY_DATA_ISSUE,
+              issueMessage)
+      dispatch(systemError(systemErrorReport))
+    }
+
     dispatch({
       type: LOAD_PAYMENT_HISTORY_DATA_ISSUE
     })
@@ -137,39 +178,39 @@ export const loadPaymentHistoryData = ():Function => {
     let lookupForm          = getState().refundRequest.lookupForm
     const paymentHistoryAPI = url.parse('paymentHistory/' + lookupForm.referenceNum)
     debug('loadPaymentHistoryData: Lookup Form: ' + JSON.stringify(lookupForm))
-    dispatch(loadPaymentHistoryDataStart())
+    dispatch(_loadPaymentHistoryDataStart())
     return get(paymentHistoryAPI)
       .setMimeType('json')
       .json()
       .then((jsonData:Object):any /* Promise*/ => {
         // TODO: check schema during development.
-        return dispatch(loadPaymentHistoryDataLoaded(jsonData))
+        return dispatch(_loadPaymentHistoryDataLoaded(jsonData))
       })
       .catch((reason:Error):any /* Promise*/ => {
         if (!getState().refundRequest.isNegativeTesting) {
           responseFail(reason, 'Failed to load payment history')
         }
-        return dispatch(loadPaymentHistoryDataIssue(reason.message))
+        return dispatch(_loadPaymentHistoryDataIssue(reason.message))
       })
       .catch(
-        (reason:Error):any /* Promise*/ => dispatch(loadPaymentHistoryDataIssue(reason.message)))
+        (reason:Error):any /* Promise*/ => dispatch(_loadPaymentHistoryDataIssue(reason.message)))
   }
 }
 
-export const loadNamesDataStart = ():ActionPayloadType => {
+const _loadNamesDataStart = ():ActionPayloadType => {
   return {
     type: LOAD_NAMES_START
   }
 }
 
-export const loadNamesDataLoaded = (namesData:NamesDataType):ActionPayloadType => {
+const _loadNamesDataLoaded = (namesData:NamesDataType):ActionPayloadType => {
   return {
     type:    LOAD_NAMES_LOADED,
     payload: namesData
   }
 }
 
-export const loadNamesDataIssue = (issueMessage:RequestIssueReportType):Function => {
+const _loadNamesDataIssue = (issueMessage:RequestIssueReportType):Function => {
   return (dispatch:Function) => {
     dispatch(raiseIssue(issueMessage))
     dispatch({
@@ -185,39 +226,39 @@ export const loadNamesData = ():Function => {
                                    lookupForm.referenceNum +
                                    '/personNames')
     debug('loadNamesData: Lookup Form: ' + JSON.stringify(lookupForm))
-    dispatch(loadNamesDataStart())
+    dispatch(_loadNamesDataStart())
 
     return get(loadNamesAPI)
       .setMimeType('json')
       .json()
       .then((jsonData:Object):any /* Promise*/ => {
         // TODO: check schema during development.
-        return dispatch(loadNamesDataLoaded(jsonData))
+        return dispatch(_loadNamesDataLoaded(jsonData))
       })
       .catch((reason:Error):any => {
         if (!getState().refundRequest.isNegativeTesting) {
           responseFail(reason, 'Failed to load names associated with patent/trademark')
         }
-        return dispatch(loadNamesDataIssue(reason.message))
+        return dispatch(_loadNamesDataIssue(reason.message))
       })
-      .catch((reason:Error):any /* Promise*/ => dispatch(loadNamesDataIssue(reason.message)))
+      .catch((reason:Error):any /* Promise*/ => dispatch(_loadNamesDataIssue(reason.message)))
   }
 }
 
-export const loadAddressesDataStart = ():ActionPayloadType => {
+const _loadAddressesDataStart = ():ActionPayloadType => {
   return {
     type: LOAD_ADDRESSES_START
   }
 }
 
-export const loadAddressesDataLoaded = (addressesData:AddressesDataType):ActionPayloadType => {
+const _loadAddressesDataLoaded = (addressesData:AddressesDataType):ActionPayloadType => {
   return {
     type:    LOAD_ADDRESSES_LOADED,
     payload: addressesData
   }
 }
 
-export const loadAddressesDataIssue = (issueMessage:RequestIssueReportType):Function => {
+const _loadAddressesDataIssue = (issueMessage:RequestIssueReportType):Function => {
   return (dispatch:Function) => {
     dispatch(raiseIssue(issueMessage))
     dispatch({
@@ -233,22 +274,22 @@ export const loadAddressesData:Function = ():Function => {
                                        lookupForm.referenceNum +
                                        '/addresses')
     debug('loadAddressesData: Lookup Form: ' + JSON.stringify(lookupForm))
-    dispatch(loadAddressesDataStart())
+    dispatch(_loadAddressesDataStart())
 
     return get(loadAddressesAPI)
       .setMimeType('json')
       .json()
       .then((jsonData:Object):any /* Promise*/ => {
         // TODO: check schema during development.
-        return dispatch(loadAddressesDataLoaded(jsonData))
+        return dispatch(_loadAddressesDataLoaded(jsonData))
       })
       .catch((reason:Error):any /* Promise*/ => {
         if (!getState().refundRequest.isNegativeTesting) {
           responseFail(reason, 'Failed to load addresses associated with patent/trademark')
         }
-        return dispatch(loadAddressesDataIssue(reason.message))
+        return dispatch(_loadAddressesDataIssue(reason.message))
       })
-      .catch((reason:Error):any /* Promise*/ => dispatch(loadAddressesDataIssue(reason.message)))
+      .catch((reason:Error):any /* Promise*/ => dispatch(_loadAddressesDataIssue(reason.message)))
   }
 }
 
@@ -318,19 +359,19 @@ export const saveRefundRequest = ():Function => {
   }
 }
 
-export const lookupReferencedDataStart = ():ActionPayloadType => {
+const _lookupReferencedDataStart = ():ActionPayloadType => {
   return {
     type: LOOKUP_REFERENCED_DATA_START
   }
 }
 
-export const lookupReferencedDataLoaded = ():ActionPayloadType => {
+const _lookupReferencedDataLoaded = ():ActionPayloadType => {
   return {
     type: LOOKUP_REFERENCED_DATA_LOADED
   }
 }
 
-export const lookupReferencedDataIssue = ():ActionPayloadType => {
+const _lookupReferencedDataIssue = ():ActionPayloadType => {
   return {
     type: LOOKUP_REFERENCED_DATA_ISSUE
   }
@@ -338,7 +379,7 @@ export const lookupReferencedDataIssue = ():ActionPayloadType => {
 
 export const lookupReferencedData = ():Function => {
   return (dispatch:Function, getState:Function):any /* Promise */ => {
-    dispatch(lookupReferencedDataStart())
+    dispatch(_lookupReferencedDataStart())
     // Though not presently used, purposely showing the args for a
     // 'resolve' tied to a Promise.spread() to help understand what
     // it does very differently than a Promise.all() and provide a
@@ -351,7 +392,7 @@ export const lookupReferencedData = ():Function => {
         debugTime('lookupReferencedData time: +' + allDispatches.time + 'ms')
       }
 
-      return dispatch(lookupReferencedDataLoaded())
+      return dispatch(_lookupReferencedDataLoaded())
     }
 
     const allDispatches = ():Promise =>
@@ -368,28 +409,28 @@ export const lookupReferencedData = ():Function => {
           if (!getState().refundRequest.isNegativeTesting) {
             responseFail(reason, 'Failed to lookup referenced data')
           }
-          return dispatch(lookupReferencedDataIssue())
+          return dispatch(_lookupReferencedDataIssue())
         })
-        .catch(():any /* Promise*/ => dispatch(lookupReferencedDataIssue()))
+        .catch(():any /* Promise*/ => dispatch(_lookupReferencedDataIssue()))
 
     return debugTime.enabled ? dispatchTime(allDispatches)() : allDispatches()
   }
 }
 
-export const validLookupStart = (lookupFormData:LookupDataType):ActionPayloadType => {
+const _validLookupStart = (lookupFormData:LookupDataType):ActionPayloadType => {
   return {
     type:    VALID_LOOKUP_START,
     payload: lookupFormData
   }
 }
 
-export const validLookupEnd = ():ActionPayloadType => {
+const _validLookupEnd = ():ActionPayloadType => {
   return {
     type: VALID_LOOKUP_END
   }
 }
 
-export const validLookupIssue = ():ActionPayloadType => {
+const _validLookupIssue = ():ActionPayloadType => {
   return {
     type: VALID_LOOKUP_ISSUE
   }
@@ -397,18 +438,18 @@ export const validLookupIssue = ():ActionPayloadType => {
 
 export function validLookup(lookupFormData:LookupDataType):Function {
   return (dispatch:Function, getState:Function):any /* Promise */ => {
-    dispatch(validLookupStart(lookupFormData))
+    dispatch(_validLookupStart(lookupFormData))
     dispatch(resetRefundRequestForm())
 
     return dispatch(lookupReferencedData())
-      .then(():any /* Promise */ => dispatch(validLookupEnd()))
+      .then(():any /* Promise */ => dispatch(_validLookupEnd()))
       .catch((reason:any):any /* Promise*/ => {
         if (!getState().refundRequest.isNegativeTesting) {
           responseFail(reason, 'Failed to validate lookup')
         }
-        return dispatch(validLookupIssue())
+        return dispatch(_validLookupIssue())
       })
-      .catch(():any /* Promise*/ => dispatch(validLookupIssue()))
+      .catch(():any /* Promise*/ => dispatch(_validLookupIssue()))
   }
 }
 
@@ -424,13 +465,13 @@ export const resetState = ():ActionPayloadType => {
   }
 }
 
-export const resetRefundRequestFormStart = ():ActionPayloadType => {
+const _resetRefundRequestFormStart = ():ActionPayloadType => {
   return {
     type: RESET_REFUND_REQUEST_FORM_START
   }
 }
 
-export const resetRefundRequestFormEnd = ():ActionPayloadType => {
+const _resetRefundRequestFormEnd = ():ActionPayloadType => {
   return {
     type: RESET_REFUND_REQUEST_FORM_END
   }
@@ -438,11 +479,35 @@ export const resetRefundRequestFormEnd = ():ActionPayloadType => {
 
 export const resetRefundRequestForm = ():Function => {
   return (dispatch:Function) => {
-    dispatch(resetRefundRequestFormStart())
+    dispatch(_resetRefundRequestFormStart())
     // TODO: Hope this isn't async... Check.
     dispatch(reset('resetRefundRequestForm'))
-    dispatch(resetRefundRequestFormEnd())
+    dispatch(_resetRefundRequestFormEnd())
   }
+}
+
+// Private functions that are solely exposed for UT'ing purposes
+export const ut = {
+  _convertIssueReportToSysErrorReport,
+  _loadPaymentHistoryDataStart,
+  _loadPaymentHistoryDataLoaded,
+  _loadPaymentHistoryDataIssue,
+  _loadNamesDataStart,
+  _loadNamesDataLoaded,
+  _loadNamesDataIssue,
+  _loadAddressesDataStart,
+  _loadAddressesDataLoaded,
+  _loadAddressesDataIssue,
+  _lookupReferencedDataStart,
+  _lookupReferencedDataLoaded,
+  _lookupReferencedDataIssue,
+  _resetRefundRequestFormStart,
+  _resetRefundRequestFormEnd,
+  _showSystemError,
+  _hideSystemError,
+  _validLookupStart,
+  _validLookupEnd,
+  _validLookupIssue
 }
 
 /*eslint "key-spacing": 0*/
@@ -669,9 +734,10 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
   [CLEAR_ISSUE_REPORT]:               (state:RrsType):RrsType => {
     return ({
       ...state,
-      isIssue:     false,
-      issueReport: [],
-      lookupForm:  {
+      isIssue:           false,
+      isShowSystemError: false,
+      issueReport:       [],
+      lookupForm:        {
         ...state.lookupForm,
         isIssue: false
       },
@@ -729,16 +795,16 @@ const LOAD_REFUND_REQUEST_ACTION_HANDLERS = {
   [VALID_LOOKUP_ISSUE]:               (state:RrsType):RrsType => {
     return state
   },
-  [OPEN_MODAL]:                       (state:RrsType):RrsType => {
+  [SYSTEM_ERROR_SHOWN]:               (state:RrsType):RrsType => {
     return ({
       ...state,
-      isModalOpen: true
+      isShowSystemError: true
     })
   },
-  [CLOSE_MODAL]:                      (state:RrsType):RrsType => {
+  [SYSTEM_ERROR_HIDDEN]:              (state:RrsType):RrsType => {
     return ({
       ...state,
-      isModalOpen: false
+      isShowSystemError: false
     })
   }
 }
@@ -803,7 +869,7 @@ export const initialState:RrsType = {
     isSaved:               false
   },
   isIssue:               false,
-  isModalOpen:           false,
+  isShowSystemError:     false,
   isResettingRefundForm: false,
   isNegativeTesting:     false,
   issueReport:           []

@@ -6,8 +6,7 @@ import {syncHistoryWithStore} from 'react-router-redux'
 import createStore from './store/createStore'
 import AppContainer from './containers/AppContainer'
 import _debug from 'debug'
-import { initialState as systemErrorInitialState } from
-  'reusable/modules/SystemError/modules/SystemErrorMod'
+import { systemErrorInitialState } from 'reusable/modules/SystemError'
 
 _debug.enable(process.env.DEBUG)
 

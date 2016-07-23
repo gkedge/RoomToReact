@@ -3,7 +3,7 @@
 
 import { combineReducers } from 'redux'
 import { routerReducer as router } from 'react-router-redux'
-import systemError from 'reusable/modules/SystemError/modules/SystemErrorMod'
+import { systemErrorReducer as systemError } from 'reusable/modules/SystemError'
 
 export const makeRootReducer = (asyncReducers) => {
   return combineReducers({

@@ -5,7 +5,7 @@ import type {ActionPayloadType} from 'reusable/interfaces/FpngTypes'
 import type {
   SystemErrorReportPayloadType,
   SystemErrorStateType
-} from 'reusable/modules/SystemError/interfaces/SystemErrorTypes'
+} from './SystemErrorTypes'
 import moment from 'moment'
 import uuid from 'uuid'
 import _debug from 'debug'

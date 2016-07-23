@@ -4,6 +4,10 @@ import sinon from 'sinon';
 import {mount, shallow} from 'enzyme';
 
 const props = {
+  systemErrorData: {
+    sysErrReports: [],
+    isShowSystemError:   false
+  },
   pdfData:               {
     pdf: {
       isError:   false,
@@ -63,7 +67,6 @@ const props = {
   miscData: {
     misc: {
       isIssue:               false,
-      isModalOpen:           false,
       isResettingRefundForm: false,
       isNegativeTesting:     false,
       issueReport:           []
@@ -78,8 +81,8 @@ const props = {
   isResettingRefundForm: false,
   isNegativeTesting:     false,
   issueReport:           [],
-  openModal:             sinon.spy(),
-  closeModal:            sinon.spy(),
+  systemError:           sinon.spy(),
+  hideSystemError:       sinon.spy(),
   loadingPdf:            sinon.spy(),
   lookupReferencedData:  sinon.spy(),
   pdfBinary:             sinon.spy(),

@@ -1,23 +1,29 @@
 /* @flow */
 
-import type {ActionPayloadType, RequestIssueReportType} from 'reusable/interfaces/FpngTypes'
+import type {
+  ActionPayloadType,
+  RequestIssueReportType
+} from 'reusable/interfaces/FpngTypes'
 
 import type {
   SystemErrorStateType,
   SystemErrorReportType,
   TimeStampedSystemErrorReportType,
   SystemErrorReportPayloadType
-} from 'reusable/modules/SystemError/interfaces/SystemErrorTypes'
+} from 'reusable/modules/SystemError'
 
 // http://redux.js.org/docs/recipes/WritingTests.html
-import url, {Url} from 'url'
+import url from 'url'
 import MockDate from 'mockdate'
 import moment from 'moment'
 import cloneDeep from 'lodash/cloneDeep'
 import uuid from 'uuid'
 
-import * as acts from 'reusable/modules/SystemError/modules/SystemErrorMod'
-import systemErrorReducer from 'reusable/modules/SystemError/modules/SystemErrorMod'
+import { systemErrorReducer,
+  SYS_ERROR_ADDED, SYS_ERROR_CLEARED,
+  systemErrorInitialState,
+  raiseSystemError,
+  clearSystemErrors} from 'reusable/modules/SystemError'
 
 describe('SystemError/SystemErrorMod', () => {
   describe('Actions', function () { // Can't use '() ==> here...
@@ -37,14 +43,14 @@ describe('SystemError/SystemErrorMod', () => {
       })
 
       it('Expected to initialize with `initialState`.', () => {
-        expect(systemErrorReducer(undefined, undefined)).to.equal(acts.initialState)
+        expect(systemErrorReducer(undefined, undefined)).to.equal(systemErrorInitialState)
       })
 
       it('Mutate state through reducer expected to produce current or initial state', () => {
         let state = systemErrorReducer(undefined, { type: 'Yow!' })
-        expect(state).to.eql(acts.initialState)
+        expect(state).to.eql(systemErrorInitialState)
         state = systemErrorReducer(state, { type: '@@@@@@@' })
-        expect(state).to.eql(acts.initialState)
+        expect(state).to.eql(systemErrorInitialState)
       })
 
       describe('raiseSystemError', () => {
@@ -64,20 +70,20 @@ describe('SystemError/SystemErrorMod', () => {
         })
 
         it('Expected to export a constant SYS_ERROR_ADDED.', () => {
-          expect(acts.SYS_ERROR_ADDED).to.equal('@@fpng/SYS_ERROR_ADDED')
+          expect(SYS_ERROR_ADDED).to.equal('@@fpng/SYS_ERROR_ADDED')
         })
 
         it('Expected to be exported as a function.', () => {
-          expect(acts.raiseSystemError).to.be.a('function')
+          expect(raiseSystemError).to.be.a('function')
         })
 
         it('Expected to return an action with type "SYS_ERROR_ADDED".', () => {
-          expect(acts.raiseSystemError(systemErrorReport))
-            .to.have.property('type', acts.SYS_ERROR_ADDED)
+          expect(raiseSystemError(systemErrorReport))
+            .to.have.property('type', SYS_ERROR_ADDED)
         })
 
         it('Expected to return an action with time-stamped, system error payload.', () => {
-          expect(acts.raiseSystemError(systemErrorReport))
+          expect(raiseSystemError(systemErrorReport))
             .to.have.property('payload').eql({
             id:           mockUuid,
             receivedAt:   moment(mockNowMsFromEpoch).utc().format(),
@@ -91,12 +97,12 @@ describe('SystemError/SystemErrorMod', () => {
             receivedAt: moment(mockNowMsFromEpoch).utc().format(),
             sysErrReport: systemErrorReport
           }
-          const testStartState   = cloneDeep(acts.initialState)
+          const testStartState   = cloneDeep(systemErrorInitialState)
           const expected         = cloneDeep(testStartState)
           expected.sysErrReports = [capturedSystemError];
 
           const state = systemErrorReducer(testStartState,
-            acts.raiseSystemError(systemErrorReport))
+            raiseSystemError(systemErrorReport))
 
           expect(state).to.eql(expected)
         })
@@ -105,27 +111,27 @@ describe('SystemError/SystemErrorMod', () => {
       describe('clearSystemErrors', () => {
 
         it('Expected to export a constant SYS_ERROR_CLEARED.', () => {
-          expect(acts.SYS_ERROR_CLEARED).to.equal('@@fpng/SYS_ERROR_CLEARED')
+          expect(SYS_ERROR_CLEARED).to.equal('@@fpng/SYS_ERROR_CLEARED')
         })
 
         it('Expected to be exported as a function.', () => {
-          expect(acts.clearSystemErrors).to.be.a('function')
+          expect(clearSystemErrors).to.be.a('function')
         })
 
         it('Expected to return an action with type "SYS_ERROR_CLEARED".', () => {
-          expect(acts.clearSystemErrors())
-            .to.have.property('type', acts.SYS_ERROR_CLEARED)
+          expect(clearSystemErrors())
+            .to.have.property('type', SYS_ERROR_CLEARED)
         })
 
         it('Mutate state through reducer expected to remove all collected errors.', () => {
-          const testStartState   = cloneDeep(acts.initialState)
+          const testStartState   = cloneDeep(systemErrorInitialState)
 
           let state = systemErrorReducer(testStartState,
-            acts.raiseSystemError(systemErrorReport))
+            raiseSystemError(systemErrorReport))
 
-          state = systemErrorReducer(state, acts.clearSystemErrors(systemErrorReport))
+          state = systemErrorReducer(state, clearSystemErrors(systemErrorReport))
 
-          expect(state).to.eql(acts.initialState)
+          expect(state).to.eql(systemErrorInitialState)
         })
       })
     })
