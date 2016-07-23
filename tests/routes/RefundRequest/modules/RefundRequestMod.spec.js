@@ -885,7 +885,7 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
               expect(state).to.eql(expected)
             })
           })
-
+ 
           describe('loadNamesDataIssue (thunk)', () => {
             const stateHolder = {
               state: {
@@ -894,7 +894,17 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
             }
             const { dispatchSpy, getStateSpy } = reducerSpy(refundRequestReducer, stateHolder)
 
+            beforeEach(() => {
+              // Mock Date.now() including (moment!). Fixed to the ms.
+              MockDate.set(mockNowMsFromEpoch)
+              sinon.stub(uuid, 'v4', function () {
+                return mockUuid
+              })
+            })
+
             afterEach(() => {
+              MockDate.reset()
+              uuid.v4.restore()
               stateHolder.state.refundRequest = cloneDeep(acts.initialState)
               dispatchSpy.reset()
               getStateSpy.reset()
@@ -919,7 +929,7 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
 
             it('Confirm all expected thunk dispatches', () => {
               ut._loadNamesDataIssue(requestIssueReport)(dispatchSpy, getStateSpy)
-              expect(dispatchSpy).to.have.been.calledTwice
+              expect(dispatchSpy).to.have.callCount(5)
               expect(dispatchSpy).to.have.been.calledWithExactly({
                 type: acts.LOAD_NAMES_ISSUE,
               })
@@ -927,14 +937,33 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
                 type:    acts.ISSUE_RAISED,
                 payload: requestIssueReport
               })
+              expect(dispatchSpy).to.have.been.calledWithExactly({
+                type: acts.SYSTEM_ERROR_SHOWN
+              })
+
+              const failedAction = acts.LOAD_NAMES_ISSUE
+              const sysErrReport =
+                      ut._convertIssueReportToSysErrorReport(failedAction,
+                        cloneDeep(requestIssueReport))
+              const capturedSystemError:TimeStampedSystemErrorReportType = {
+                id:           mockUuid,
+                receivedAt:   moment(mockNowMsFromEpoch).utc().format(),
+                sysErrReport: sysErrReport
+              }
+              expect(dispatchSpy).to.have.been.calledWithExactly({
+                type:    SYS_ERROR_ADDED,
+                payload: capturedSystemError
+              })
             })
 
             it('Final state mutation expected to contain issue report.', () => {
               const expected                           = cloneDeep(acts.initialState)
               expected.isIssue                         = true
+              expected.isShowSystemError              = true
               expected.issueReport                     = [requestIssueReport]
               expected.refundRequestForm.names.isIssue = true
-              ut._loadNamesDataIssue(requestIssueReport)(dispatchSpy, getStateSpy)
+              ut._loadNamesDataIssue(cloneDeep(requestIssueReport))
+              (dispatchSpy, getStateSpy)
               expect(stateHolder.state.refundRequest).to.eql(expected)
             })
 
@@ -1150,59 +1179,88 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
             })
           })
 
-          describe('loadAddressesDataIssue (thunk)', () => {
-            const stateHolder = {
-              state: {
-                refundRequest: cloneDeep(acts.initialState)
+            describe('loadAddressesDataIssue (thunk)', () => {
+              const stateHolder = {
+                state: {
+                  refundRequest: cloneDeep(acts.initialState)
+                }
               }
-            }
-            const { dispatchSpy, getStateSpy } = reducerSpy(refundRequestReducer, stateHolder)
-
-            afterEach(() => {
-              stateHolder.state.refundRequest = cloneDeep(acts.initialState)
-              dispatchSpy.reset()
-              getStateSpy.reset()
-            })
-
-            it('Expected to export a constant LOAD_ADDRESSES_ISSUE.', () => {
-              expect(acts.LOAD_ADDRESSES_ISSUE).to.equal('@@refund/request/LOAD_ADDRESSES_ISSUE')
-            })
-
-            it('Expected to be exported as a function.', () => {
-              expect(ut._loadAddressesDataIssue).to.be.a('function')
-            })
-
-            it('Expected to return a function (is a thunk).', () => {
-              expect(ut._loadAddressesDataIssue(requestIssueReport)).to.be.a('function')
-            })
-
-            it('Thunk expected to return void.', () => {
-              return expect(
-                ut._loadAddressesDataIssue(requestIssueReport)(dispatchSpy, getStateSpy))
-                .to.be.void
-            })
-
-            it('Confirm all expected thunk dispatches', () => {
-              ut._loadAddressesDataIssue(requestIssueReport)(dispatchSpy, getStateSpy)
-              expect(dispatchSpy).to.have.been.calledTwice
-              expect(dispatchSpy).to.have.been.calledWithExactly({
-                type: acts.LOAD_ADDRESSES_ISSUE,
+              const { dispatchSpy, getStateSpy } = reducerSpy(refundRequestReducer, stateHolder)
+  
+              beforeEach(() => {
+                // Mock Date.now() including (moment!). Fixed to the ms.
+                MockDate.set(mockNowMsFromEpoch)
+                sinon.stub(uuid, 'v4', function () {
+                  return mockUuid
+                })
               })
-              expect(dispatchSpy).to.have.been.calledWithExactly({
-                type:    acts.ISSUE_RAISED,
-                payload: requestIssueReport
+  
+              afterEach(() => {
+                MockDate.reset()
+                uuid.v4.restore()
+                stateHolder.state.refundRequest = cloneDeep(acts.initialState)
+                dispatchSpy.reset()
+                getStateSpy.reset()
+              })
+  
+              it('Expected to export a constant LOAD_ADDRESSES_ISSUE.', () => {
+                expect(acts.LOAD_ADDRESSES_ISSUE).to.equal('@@refund/request/LOAD_ADDRESSES_ISSUE')
+              })
+  
+              it('Expected to be exported as a function.', () => {
+                expect(ut._loadAddressesDataIssue).to.be.a('function')
+              })
+  
+              it('Expected to return a function (is a thunk).', () => {
+                expect(ut._loadAddressesDataIssue(requestIssueReport)).to.be.a('function')
+              })
+  
+              it('Thunk expected to return void.', () => {
+                return expect(
+                  ut._loadAddressesDataIssue(requestIssueReport)(dispatchSpy, getStateSpy))
+                  .to.be.void
+              })
+  
+              it('Confirm all expected thunk dispatches', () => {
+                ut._loadAddressesDataIssue(requestIssueReport)(dispatchSpy, getStateSpy)
+                expect(dispatchSpy).to.have.callCount(5)
+                expect(dispatchSpy).to.have.been.calledWithExactly({
+                  type: acts.LOAD_ADDRESSES_ISSUE,
+                })
+                expect(dispatchSpy).to.have.been.calledWithExactly({
+                  type:    acts.ISSUE_RAISED,
+                  payload: requestIssueReport
+                })
+                expect(dispatchSpy).to.have.been.calledWithExactly({
+                  type: acts.SYSTEM_ERROR_SHOWN
+                })
+  
+                const failedAction = acts.LOAD_ADDRESSES_ISSUE
+                const sysErrReport =
+                        ut._convertIssueReportToSysErrorReport(failedAction,
+                          cloneDeep(requestIssueReport))
+                const capturedSystemError:TimeStampedSystemErrorReportType = {
+                  id:           mockUuid,
+                  receivedAt:   moment(mockNowMsFromEpoch).utc().format(),
+                  sysErrReport: sysErrReport
+                }
+                expect(dispatchSpy).to.have.been.calledWithExactly({
+                  type:    SYS_ERROR_ADDED,
+                  payload: capturedSystemError
+                })
+              })
+  
+              it('Final state mutation expected to contain issue report.', () => {
+                const expected                               = cloneDeep(acts.initialState)
+                expected.isIssue                             = true
+                expected.isShowSystemError              = true
+                expected.issueReport                         = [requestIssueReport]
+                expected.refundRequestForm.addresses.isIssue = true
+                ut._loadAddressesDataIssue(cloneDeep(requestIssueReport))
+                (dispatchSpy, getStateSpy)
+                expect(stateHolder.state.refundRequest).to.eql(expected)
               })
             })
-
-            it('Final state mutation expected to contain issue report.', () => {
-              const expected                               = cloneDeep(acts.initialState)
-              expected.isIssue                             = true
-              expected.issueReport                         = [requestIssueReport]
-              expected.refundRequestForm.addresses.isIssue = true
-              ut._loadAddressesDataIssue(requestIssueReport)(dispatchSpy, getStateSpy)
-              expect(stateHolder.state.refundRequest).to.eql(expected)
-            })
-          })
 
           describe('loadAddressesData (thunk)', () => {
             const stateHolder                          = {

@@ -6,6 +6,7 @@ import { routerReducer as router } from 'react-router-redux'
 import { systemErrorReducer as systemError } from 'reusable/modules/SystemError'
 
 export const makeRootReducer = (asyncReducers) => {
+  debugger
   return combineReducers({
     // Add sync reducers here
     router,

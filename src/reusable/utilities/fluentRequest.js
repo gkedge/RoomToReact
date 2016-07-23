@@ -468,6 +468,7 @@ export class Request {
         })
       }
 
+      // TODO: support recording for response data; use save-as package.
       if (afterResponse || debugRequestTime.enabled) {
         // fetchTime() is a timer focused on functions that return
         // a Promise.

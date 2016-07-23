@@ -213,6 +213,13 @@ const _loadNamesDataLoaded = (namesData:NamesDataType):ActionPayloadType => {
 const _loadNamesDataIssue = (issueMessage:RequestIssueReportType):Function => {
   return (dispatch:Function) => {
     dispatch(raiseIssue(issueMessage))
+
+    if (issueMessage.errorMessageText && issueMessage.errorMessageText.length) {
+      var systemErrorReport =
+            _convertIssueReportToSysErrorReport(LOAD_NAMES_ISSUE, issueMessage)
+      dispatch(systemError(systemErrorReport))
+    }
+
     dispatch({
       type: LOAD_NAMES_ISSUE
     })
@@ -261,6 +268,13 @@ const _loadAddressesDataLoaded = (addressesData:AddressesDataType):ActionPayload
 const _loadAddressesDataIssue = (issueMessage:RequestIssueReportType):Function => {
   return (dispatch:Function) => {
     dispatch(raiseIssue(issueMessage))
+
+    if (issueMessage.errorMessageText && issueMessage.errorMessageText.length) {
+      var systemErrorReport =
+            _convertIssueReportToSysErrorReport(LOAD_ADDRESSES_ISSUE, issueMessage)
+      dispatch(systemError(systemErrorReport))
+    }
+
     dispatch({
       type: LOAD_ADDRESSES_ISSUE
     })
