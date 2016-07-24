@@ -18,6 +18,8 @@ global.sinon = sinon
 global.expect = chai.expect
 global.should = chai.should()
 
+chai.config.truncateThreshold = 0
+
 _debug.enable(process.env.DEBUG)
 
 // ---------------------------------------

@@ -18,7 +18,7 @@ import RefundRequestForm from './RefundRequestForm'
 // import pick from 'lodash/pick'
 
 type PropType = {
-  hideSystemError: Function,
+  goToLogin: Function,
   loadingPdf: Function,
   lookupFormData: LookupFormDataType,
   lookupReferencedData: Function,
@@ -66,7 +66,7 @@ export class RefundRequest extends React.Component {
   }
 
   onModalRequestClose() {
-    this.props.hideSystemError()
+    this.props.goToLogin()
   }
 
   onFileOpen(file:Object) {
@@ -137,7 +137,7 @@ export class RefundRequest extends React.Component {
 
 RefundRequest.displayName = 'RefundRequest'
 RefundRequest.propTypes = {
-  hideSystemError:       React.PropTypes.func.isRequired,
+  goToLogin:       React.PropTypes.func.isRequired,
   loadingPdf:            React.PropTypes.func.isRequired,
   lookupFormData:        React.PropTypes.object,
   lookupReferencedData:  React.PropTypes.func.isRequired,

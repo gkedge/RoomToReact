@@ -1,5 +1,5 @@
 /* @flow */
-import Modal from 'react-modal'
+import SweetAlert from 'sweetalert-react'
 import React from 'react'
 
 import type {
@@ -46,14 +46,13 @@ export default class SystemError extends React.Component {
   render():Object {
     return (
       <section className='system-error'>
-        <Modal
-          isOpen={this.props.isShowSystemError}
-          onAfterOpen={this.onAfterOpen}
-          onRequestClose={this.onModalRequestClose}
-          closeTimeoutMS={this.props.closeTimeoutMS || 0}
-          style={this.props.systemErrorStyles || defaultSystemErrorStyles}>
-          {this.props.children}
-        </Modal>
+        <SweetAlert
+          show={this.props.show}
+          title="Demo"
+          text="SweetAlert in React"
+          timer={this.props.closeTimeoutMS}
+          onConfirm={this.onModalRequestClose}
+        />
       </section>)
   }
 }
