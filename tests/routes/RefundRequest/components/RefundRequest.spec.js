@@ -82,7 +82,7 @@ const props = {
   isNegativeTesting:     false,
   issueReport:           [],
   systemError:           sinon.spy(),
-  hideSystemError:       sinon.spy(),
+  goToLogin:             sinon.spy(),
   loadingPdf:            sinon.spy(),
   lookupReferencedData:  sinon.spy(),
   pdfBinary:             sinon.spy(),
