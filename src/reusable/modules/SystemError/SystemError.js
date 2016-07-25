@@ -36,29 +36,31 @@ export default class SystemError extends React.Component {
   }
 
   onAfterOpen() {
-    this.props.onAfterOpen && this.props.onAfterOpen()
+    // this.props.onAfterOpen && this.props.onAfterOpen()
   }
 
   render():Object {
+    const message = "<p>An unrecoverable system error has occurred.</p><br/>" +
+                    "<p>You will be redirected to the Login Screen.</p>"
     return (
       <section className='system-error'>
         <SweetAlert
           show={this.props.isShowSystemError}
-          title="Demo Complex"
-          type="success"
-          text="SweetAlert in React"
-          showCancelButton={true}
+          title='System Error'
+          type='error'
+          text={message}
+          html={true}
           onConfirm={() => {
-            console.log('confirm'); // eslint-disable-line no-console
+            console.log('confirm') // eslint-disable-line no-console
             this.onModalRequestClose()
           }}
           onCancel={() => {
-            console.log('cancel'); // eslint-disable-line no-console
+            console.log('cancel') // eslint-disable-line no-console
             this.onModalRequestClose()
           }}
-         
-          onEscapeKey={() => this.onModalRequestClose()}
-          onOutsideClick={() => this.onModalRequestClose()}
+
+          onEscapeKey={():void => this.onModalRequestClose()}
+          onOutsideClick={():void => this.onModalRequestClose()}
         />
       </section>)
   }
@@ -66,9 +68,9 @@ export default class SystemError extends React.Component {
 
 SystemError.displayName = 'SystemError'
 SystemError.propTypes = {
-  sysErrReports: React.PropTypes.array,
-  isShowSystemError: React.PropTypes.bool.isRequired,
-  onModalRequestClose: React.PropTypes.func.isRequired
+  isShowSystemError:   React.PropTypes.bool.isRequired,
+  onModalRequestClose: React.PropTypes.func.isRequired,
+  sysErrReports:       React.PropTypes.array
 
   // goToLogin:       React.PropTypes.func.isRequired,
 }

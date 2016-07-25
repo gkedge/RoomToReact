@@ -31,7 +31,6 @@ export const SYS_ERROR_CLEARED = '@@fpng/SYS_ERROR_CLEARED'
 // Actions
 // ------------------------------------
 export const raiseSystemError = (sysErrReport:any):ActionPayloadType => {
-  debugger
   if (isString(sysErrReport)) {
     sysErrReport = {
       errorMessageText: sysErrReport,

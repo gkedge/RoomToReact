@@ -109,7 +109,6 @@ export class RefundRequest extends React.Component {
   }
 
   render():Object {
-    debugger
     return (
       <section className='load-refund-request'>
         <SystemError {...this.props.systemErrorData}
