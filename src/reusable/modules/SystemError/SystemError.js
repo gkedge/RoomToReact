@@ -8,13 +8,9 @@ import type {
 } from './SystemErrorTypes'
 
 type PropType = {
-  isShowSystemError: boolean,
-  closeTimeoutMS: ?number,
-  systemErrorStyles: ?SystemErrorStylesType,
-  onAfterOpen: ?Function,
-  onModalRequestClose: Function,
   sysErrReports: TimeStampedSystemErrorReportsType,
-  children: string
+  isShowSystemError: boolean,
+  onModalRequestClose: Function
 }
 
 const defaultSystemErrorStyles = {
@@ -47,11 +43,22 @@ export default class SystemError extends React.Component {
     return (
       <section className='system-error'>
         <SweetAlert
-          show={this.props.show}
-          title="Demo"
+          show={this.props.isShowSystemError}
+          title="Demo Complex"
+          type="success"
           text="SweetAlert in React"
-          timer={this.props.closeTimeoutMS}
-          onConfirm={this.onModalRequestClose}
+          showCancelButton={true}
+          onConfirm={() => {
+            console.log('confirm'); // eslint-disable-line no-console
+            this.onModalRequestClose()
+          }}
+          onCancel={() => {
+            console.log('cancel'); // eslint-disable-line no-console
+            this.onModalRequestClose()
+          }}
+         
+          onEscapeKey={() => this.onModalRequestClose()}
+          onOutsideClick={() => this.onModalRequestClose()}
         />
       </section>)
   }
@@ -59,12 +66,10 @@ export default class SystemError extends React.Component {
 
 SystemError.displayName = 'SystemError'
 SystemError.propTypes = {
-  children:            React.PropTypes.string,
-  closeTimeoutMS:      React.PropTypes.number,
-  isShowSystemError:   React.PropTypes.bool.isRequired,
-  onAfterOpen:         React.PropTypes.func,
-  onModalRequestClose: React.PropTypes.func.isRequired,
-  sysErrReports:       React.PropTypes.array.isRequired,
-  systemErrorStyles:   React.PropTypes.object
+  sysErrReports: React.PropTypes.array,
+  isShowSystemError: React.PropTypes.bool.isRequired,
+  onModalRequestClose: React.PropTypes.func.isRequired
+
+  // goToLogin:       React.PropTypes.func.isRequired,
 }
 

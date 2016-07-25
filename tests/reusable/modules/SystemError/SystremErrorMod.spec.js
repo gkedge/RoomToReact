@@ -100,7 +100,7 @@ describe('SystemError/SystemErrorMod', () => {
           }
           const testStartState   = cloneDeep(systemErrorInitialState)
           const expected         = cloneDeep(testStartState)
-          expected.sysErrReports = [capturedSystemError];
+          expected.sysErrReports = [capturedSystemError]
 
           const state = systemErrorReducer(testStartState,
             raiseSystemError(systemErrorReport))

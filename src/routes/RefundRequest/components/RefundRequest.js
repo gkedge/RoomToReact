@@ -17,6 +17,9 @@ import LookupForm from './LookupForm'
 import RefundRequestForm from './RefundRequestForm'
 // import pick from 'lodash/pick'
 
+// TODO: Temporary for test...
+import url from 'url'
+
 type PropType = {
   goToLogin: Function,
   loadingPdf: Function,
@@ -62,7 +65,16 @@ export class RefundRequest extends React.Component {
   // }
 
   onOpenModal() {
-    this.props.systemError()
+    const systemErrorReport = {
+      actionThatFailed: "test",
+      errorMessageText: ["It's hot", "Entering Dante's Inferno"].join(',\n'),
+      fpngErrorCode   : 666,
+      httpStatusCode  : 999,
+      httpStatusText  : 'Flip Wilson made me do it.',
+      reqUrl          : url.parse('//mephistopheles.com/')
+    }
+
+    this.props.systemError(systemErrorReport)
   }
 
   onModalRequestClose() {
@@ -97,11 +109,11 @@ export class RefundRequest extends React.Component {
   }
 
   render():Object {
+    debugger
     return (
       <section className='load-refund-request'>
         <SystemError {...this.props.systemErrorData}
           onModalRequestClose={this.onModalRequestClose} >
-          I like turtles.
         </SystemError>
         <Center flex='1 0 auto'>
           <button type='submit' className='btn btn-primary'

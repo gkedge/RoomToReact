@@ -6,6 +6,7 @@ import type {
   SystemErrorReportPayloadType,
   SystemErrorStateType
 } from './SystemErrorTypes'
+import url from 'url'
 import moment from 'moment'
 import uuid from 'uuid'
 import _debug from 'debug'
@@ -30,6 +31,7 @@ export const SYS_ERROR_CLEARED = '@@fpng/SYS_ERROR_CLEARED'
 // Actions
 // ------------------------------------
 export const raiseSystemError = (sysErrReport:any):ActionPayloadType => {
+  debugger
   if (isString(sysErrReport)) {
     sysErrReport = {
       errorMessageText: sysErrReport,

@@ -81,8 +81,8 @@ export const ISSUE_RAISED                     = '@@refund/request/ISSUE_RAISED'
 export const VALID_LOOKUP_START               = '@@refund/request/VALID_LOOKUP_START'
 export const VALID_LOOKUP_END                 = '@@refund/request/VALID_LOOKUP_END'
 export const VALID_LOOKUP_ISSUE               = '@@refund/request/VALID_LOOKUP_ISSUE'
-export const SYSTEM_ERROR_SHOWN                       = '@@refund/request/SYSTEM_ERROR_SHOWN'
-export const SYSTEM_ERROR_HIDDEN                      = '@@refund/request/SYSTEM_ERROR_HIDDEN'
+export const SYSTEM_ERROR_SHOWN               = '@@refund/request/SYSTEM_ERROR_SHOWN'
+export const SYSTEM_ERROR_HIDDEN              = '@@refund/request/SYSTEM_ERROR_HIDDEN'
 
 const _convertIssueReportToSysErrorReport =
         (failedAction:string,

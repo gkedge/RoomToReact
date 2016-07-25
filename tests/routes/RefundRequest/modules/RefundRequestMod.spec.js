@@ -856,8 +856,8 @@ describe('(Route/Module) RefundRequest/RefundRequestMod', () => {
 
           describe('loadNamesDataLoaded', () => {
 
-            it('Expected to export a constant LOAD_NAMES_ISSUE.', () => {
-              expect(acts.LOAD_NAMES_ISSUE).to.equal('@@refund/request/LOAD_NAMES_ISSUE')
+            it('Expected to export a constant LOAD_NAMES_LOADED.', () => {
+              expect(acts.LOAD_NAMES_LOADED).to.equal('@@refund/request/LOAD_NAMES_LOADED')
             })
 
             it('Expected to be exported as a function.', () => {
